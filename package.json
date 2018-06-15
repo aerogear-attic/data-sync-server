@@ -6,7 +6,7 @@
   "scripts": {
     "test": "standard --fix && mocha",
     "start": "node ./server.js",
-    "start-dev": "SCHEMA_FILE=./schema.graphql.sample nodemon ./server.js",
+    "start-dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json nodemon ./server.js",
     "format": "standard --fix"
   },
   "repository": {
@@ -35,6 +35,9 @@
     "graphql": "^0.13.2",
     "graphql-subscriptions": "^0.5.8",
     "graphql-tools": "^3.0.2",
+    "handlebars": "^4.0.11",
+    "lodash": "^4.17.10",
+    "pg": "^7.4.3",
     "subscriptions-transport-ws": "^0.9.11"
   }
 }

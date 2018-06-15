@@ -12,20 +12,22 @@ type Query {
 
 # The mutation type, represents all updates we can make to our data
 type Mutation {
-  createNote(note: NoteInput): Note
-  updateNote(note: NoteInput): Note
-  deleteNote(note: NoteInput): Note
+  createNote(
+    id: String,
+    title: String,
+    content: String,
+    timestamp: Float
+  ): Note
+  updateNote(
+    id: String,
+    title: String,
+    content: String
+  ): Note
+  deleteNote(id: String): Note
 }
 
 type Note {
   id: String
-  title: String
-  content: String
-  timestamp: Float
-}
-
-input NoteInput {
-  id: String!
   title: String
   content: String
   timestamp: Float

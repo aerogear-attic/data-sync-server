@@ -6,21 +6,36 @@ GraphQL based data sync server for mobile, with backend integration capabilities
 
 ## Trying it out
 
+*Setup PostgreSQL*
+
+```
+docker run --rm --name=postgres -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -v `pwd`/examples:/tmp/examples -d postgres
+docker exec postgres psql -U postgres -f /tmp/examples/create_tables.example.sql
+```
+
+*Start Server*
+
 ```
 npm i
 npm run start-dev
 ```
 
-To run normally (not dev), you'll need to specify some env vars and config files.
-There are samples in the repo used by the `start-dev` script above.
-
-```
-SCHEMA_FILE=./schema.graphql.sample npm start
-```
-
+Go to http://localhost:8000/graphiql for an interactive query brower.
 The graphql endpoint is at `/graphql`.
 The subscriptions websocket is at `/subscriptions`.
 
+*Inspecting Postgres*
+
+```
+docker exec -it postgres psql -U postgres
+```
+
+*Stop Server*
+
+```
+# Ctrl-C to exit npm cmd
+docker stop postgres
+```
 ## Architecture
 
 The baseline architecture is shown below:
