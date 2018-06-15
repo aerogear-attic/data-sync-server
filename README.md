@@ -2,16 +2,24 @@
 
 GraphQL based data sync server for mobile, with backend integration capabilities
 
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 ## Trying it out
 
-For use with the AeroGear SDK and Apollo GraphQL Client.
-For the latest/in-development client changes, use the relevant AeroGear fork of the Apollo GraphQL Client.
+```
+npm i
+npm run start-dev
+```
 
-TODO
+To run normally (not dev), you'll need to specify some env vars and config files.
+There are samples in the repo used by the `start-dev` script above.
 
-* links to AeroGear forks of Apollo GraphQL Clients
-* links ot AeroGear SDKs
-* Steps for configuring the Apollo GraphQL Client via the AeroGear SDK
+```
+SCHEMA_FILE=./schema.graphql.sample npm start
+```
+
+The graphql endpoint is at `/graphql`.
+The subscriptions websocket is at `/subscriptions`.
 
 ## Architecture
 
