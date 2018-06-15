@@ -5,6 +5,7 @@ const graphql = require('graphql')
 const http = require('http')
 const { SubscriptionServer } = require('subscriptions-transport-ws')
 const app = express()
+const fs = require('fs')
 
 const HTTP_PORT = process.env.HTTP_PORT || '8000'
 
@@ -30,11 +31,17 @@ const schema = require('./lib/schemaParser').parseFromFile(SCHEMA_FILE, DATA_SOU
 
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }))
 
-// TODO Move this to the Admin UI
-app.get('/graphiql', graphiqlExpress({
+var graphiqlConfig = {
   endpointURL: '/graphql', // if you want GraphiQL enabled
   subscriptionsEndpoint: `ws://localhost:${HTTP_PORT}/subscriptions`
-}))
+}
+const QUERY_FILE = process.env.QUERY_FILE
+if (QUERY_FILE && QUERY_FILE.length > 0) {
+  graphiqlConfig.query = fs.readFileSync(QUERY_FILE).toString()
+}
+
+// TODO Move this to the Admin UI
+app.get('/graphiql', graphiqlExpress(graphiqlConfig))
 
 // Wrap the Express server
 const ws = http.createServer(app)

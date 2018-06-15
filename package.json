@@ -6,7 +6,7 @@
   "scripts": {
     "test": "standard --fix && mocha",
     "start": "node ./server.js",
-    "start-dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json nodemon ./server.js",
+    "start-dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./server.js",
     "format": "standard --fix"
   },
   "repository": {

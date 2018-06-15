@@ -1,0 +1,43 @@
+query q1{
+  listNotes{
+    id
+    title
+    timestamp
+    content
+  }
+}
+
+query q2 {
+  readNote(id: "abc"){
+    id
+    title
+    content
+  }
+}
+
+mutation m1{
+  createNote(id: "abc", title: "Hello", content: "Hello World!", timestamp:1529098385672) {
+    id
+    title
+    content
+    timestamp
+  }
+}
+
+mutation m2 {
+  updateNote(id: "abc", title:"Hi", content:"Hello again World!"){
+    id
+    title
+    content
+    timestamp
+  }
+}
+
+mutation m3 {
+  deleteNote(id:"abc") {
+    id
+    title
+    timestamp
+    content
+  }
+}
