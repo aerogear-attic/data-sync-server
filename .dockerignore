@@ -1,0 +1,10 @@
+.git
+node_modules
+test
+CONTRIBUTING.md
+Jenkinsfile
+LICENSE
+README.md
+examples
+*.png
+nodemon.json

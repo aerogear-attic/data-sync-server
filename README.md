@@ -36,6 +36,41 @@ docker exec -it postgres psql -U postgres
 # Ctrl-C to exit npm cmd
 docker stop postgres
 ```
+
+## Running on Kubernetes
+
+```
+kubectl create secret generic data-sync-config \
+ --from-file=schema.graphql=./examples/schema.example.graphql \
+ --from-file=data-sources.json=./k8s_templates/data-sources.json \
+ --from-file=query.graphql=./examples/query.example.graphql \
+ --from-file=resolver-mappings.json=./examples/resolver-mappings.example.json
+
+kubectl create configmap postgres-sql \
+ --from-file=create_tables.sql=./examples/create_tables.example.sql
+
+kubectl create -f ./k8s_templates/postgres_claim.yml
+kubectl create -f ./k8s_templates/postgres_deployment.yml
+kubectl create -f ./k8s_templates/postgres_service.yml
+kubectl create -f ./k8s_templates/datasync_deployment.yml
+kubectl create -f ./k8s_templates/datasync_service.yml
+kubectl create -f ./k8s_templates/datasync_route.yml
+```
+
+Wait for postgres to be running, then create tables
+
+```
+kubectl exec `kubectl get pod -l run=postgres --template="{{(index .items 0).metadata.name}}"` -it -- bash
+psql -U datasync -d datasync -f /var/lib/pgsql/sql/create_tables.sql
+exit
+```
+
+Open the GraphiQL query browser via the exposed route
+
+```
+kubectl get route datasync --template "https://{{.spec.host}}/graphiql "
+```
+
 ## Architecture
 
 The baseline architecture is shown below:

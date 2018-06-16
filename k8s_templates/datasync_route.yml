@@ -1,0 +1,32 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  creationTimestamp: 2018-06-16T10:45:54Z
+  labels:
+    run: datasync
+  name: datasync
+  namespace: dm-myproject-4
+  resourceVersion: "662439016"
+  selfLink: /apis/route.openshift.io/v1/namespaces/dm-myproject-4/routes/datasync
+  uid: 71b6b8a8-7152-11e8-82bb-02ec8e61afcf
+spec:
+  host: datasync-dm-myproject-4.193b.starter-ca-central-1.openshiftapps.com
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: datasync
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: 2018-06-16T10:45:54Z
+      status: "True"
+      type: Admitted
+    host: datasync-dm-myproject-4.193b.starter-ca-central-1.openshiftapps.com
+    routerCanonicalHostname: elb.193b.starter-ca-central-1.openshiftapps.com
+    routerName: router
+    wildcardPolicy: None

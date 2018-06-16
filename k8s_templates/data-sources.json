@@ -1,0 +1,12 @@
+{
+  "p1": {
+    "type": "postgres",
+    "config": {
+      "user": "datasync",
+      "password": "datasync",
+      "database": "datasync",
+      "host": "postgres",
+      "dialect": "postgres"
+    }
+  }
+}

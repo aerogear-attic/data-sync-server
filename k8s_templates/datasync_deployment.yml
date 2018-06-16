@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: datasync
+  name: datasync
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: datasync
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: datasync
+    spec:
+      containers:
+      - env:
+        - name: SCHEMA_FILE
+          value: /etc/data-sync/config/schema.graphql
+        - name: DATA_SOURCES_FILE
+          value: /etc/data-sync/config/data-sources.json
+        - name: RESOLVER_MAPPINGS_FILE
+          value: /etc/data-sync/config/resolver-mappings.json
+        - name: QUERY_FILE
+          value: /etc/data-sync/config/query.graphql
+        image: docker.io/davidmartin/data-sync-server:latest
+        imagePullPolicy: IfNotPresent
+        name: datasync
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        volumeMounts:
+        - mountPath: "/etc/data-sync/config"
+          name: data-sync-config
+          readOnly: true
+      volumes:
+      - name: data-sync-config
+        secret:
+          secretName: data-sync-config

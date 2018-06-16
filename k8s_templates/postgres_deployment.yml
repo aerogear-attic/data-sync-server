@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: postgres
+  name: postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: postgres
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: postgres
+    spec:
+      containers:
+      - env:
+        - name: POSTGRESQL_USER
+          value: datasync
+        - name: POSTGRESQL_PASSWORD
+          value: datasync
+        - name: POSTGRESQL_DATABASE
+          value: datasync
+        image: centos/postgresql-96-centos7:latest
+        imagePullPolicy: IfNotPresent
+        name: postgres
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        volumeMounts:
+        - mountPath: "/var/lib/pgsql/data"
+          name: postgres-data
+        volumeMounts:
+        - mountPath: "/var/lib/pgsql/sql"
+          name: postgres-sql
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-data
+      - name: postgres-sql
+        configMap:
+          name: postgres-sql
