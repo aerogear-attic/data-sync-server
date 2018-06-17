@@ -4,8 +4,11 @@ const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
 const graphql = require('graphql')
 const http = require('http')
 const { SubscriptionServer } = require('subscriptions-transport-ws')
+const cors = require('cors')
 const app = express()
 const fs = require('fs')
+
+app.use('*', cors());
 
 const HTTP_PORT = process.env.HTTP_PORT || '8000'
 
