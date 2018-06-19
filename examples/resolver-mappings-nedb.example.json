@@ -1,0 +1,31 @@
+{
+  "Query": {
+    "readNote": {
+      "dataSource": "nedb_notes",
+      "requestMapping": "{\"operation\": \"findOne\",\"query\": {\"id\": \"{{context.arguments.id}}\"}}",
+      "responseMapping": "{{toJSON context.result}}"
+    },
+    "listNotes": {
+      "dataSource": "nedb_notes",
+      "requestMapping": "{\"operation\": \"find\",\"query\": {}}",
+      "responseMapping": "{{toJSON context.result}}"
+    }
+  },
+  "Mutation": {
+    "createNote": {
+      "dataSource": "nedb_notes",
+      "requestMapping": "{\"operation\": \"insert\",\"doc\": {\"id\": \"{{context.arguments.id}}\",\"title\": \"{{context.arguments.title}}\",\"content\": \"{{context.arguments.content}}\",\"timestamp\": {{context.arguments.timestamp}}\n}}",
+      "responseMapping": "{{toJSON context.result}}"
+    },
+    "updateNote": {
+      "dataSource": "nedb_notes",
+      "requestMapping": "{\"operation\": \"update\",\"query\": {\"id\": \"{{context.arguments.id}}\"}, \"update\":{\"title\": \"{{context.arguments.title}}\",\"content\": \"{{context.arguments.content}}\"},\"options\":{}}",
+      "responseMapping": "{{toJSON context.result}}"
+    },
+    "deleteNote": {
+      "dataSource": "nedb_notes",
+      "requestMapping": "{\"operation\": \"remove\",\"query\": {\"id\": \"{{context.arguments.id}}\"},\"options\":{}}",
+      "responseMapping": "{{toJSON context.result}}"
+    }
+  }
+}

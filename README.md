@@ -44,7 +44,7 @@ kubectl create secret generic data-sync-config \
  --from-file=schema.graphql=./examples/schema.example.graphql \
  --from-file=data-sources.json=./k8s_templates/data-sources.json \
  --from-file=query.graphql=./examples/query.example.graphql \
- --from-file=resolver-mappings.json=./examples/resolver-mappings.example.json
+ --from-file=resolver-mappings.json=./examples/resolver-mappings-postgres.example.json
 
 kubectl create configmap postgres-sql \
  --from-file=create_tables.sql=./examples/create_tables.example.sql
