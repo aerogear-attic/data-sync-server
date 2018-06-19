@@ -12,5 +12,11 @@
   "nedb_notes": {
     "type": "nedb",
     "collection": "notes"
+  },
+  "http_couchdb": {
+    "type": "http",
+    "host": "localhost",
+    "port":5984,
+    "basic_auth": "admin:password"
   }
 }

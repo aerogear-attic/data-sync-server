@@ -37,6 +37,20 @@ docker exec -it postgres psql -U postgres
 docker stop postgres
 ```
 
+## HTTP Resolver Example (using CouchDB)
+
+*Start CouchDB*
+
+```
+docker run --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=password -d couchdb
+```
+
+*Create notes db*
+
+```
+curl -X PUT http://admin:password@127.0.0.1:5984/notes
+```
+
 ## Running on Kubernetes
 
 ```

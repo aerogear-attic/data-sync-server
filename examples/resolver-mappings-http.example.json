@@ -1,0 +1,31 @@
+{
+  "Query": {
+    "readNote": {
+      "dataSource": "http_couchdb",
+      "requestMapping": "{\"path\": \"/notes/{{context.arguments.id}}\",\"method\":\"GET\"}",
+      "responseMapping": "{{toJSON context.result}}"
+    },
+    "listNotes": {
+      "dataSource": "http_couchdb",
+      "requestMapping": "{\"path\": \"/notes/_all_docs\",\"method\":\"GET\"}",
+      "responseMapping": "{{toJSON context.result.rows}}"
+    }
+  },
+  "Mutation": {
+    "createNote": {
+      "dataSource": "http_couchdb",
+      "requestMapping": "{\"path\": \"/notes/{{context.arguments.id}}\",\"method\": \"PUT\",\"body\":{\"title\": \"{{context.arguments.title}}\",\"content\": \"{{context.arguments.content}}\",\"timestamp\": {{context.arguments.timestamp}} }}",
+      "responseMapping": "{{toJSON context.result}}"
+    },
+    "updateNote": {
+      "dataSource": "http_couchdb",
+      "requestMapping": "{\"path\": \"/notes/{{context.arguments.id}}\",\"method\":\"PUT\",\"body\":{\"title\":\"{{context.arguments.title}}\",\"content\": \"{{context.arguments.content}}\"}}",
+      "responseMapping": "{{toJSON context.result}}"
+    },
+    "deleteNote": {
+      "dataSource": "http_couchdb",
+      "requestMapping": "{\"path\": \"/notes/{{context.arguments.id}}\",\"method\":\"DELETE\"}",
+      "responseMapping": "{{toJSON context.result}}"
+    }
+  }
+}
