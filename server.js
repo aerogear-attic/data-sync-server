@@ -8,7 +8,7 @@ const cors = require('cors')
 const app = express()
 const fs = require('fs')
 
-app.use('*', cors());
+app.use('*', cors())
 
 const HTTP_PORT = process.env.HTTP_PORT || '8000'
 
@@ -32,7 +32,8 @@ if (RESOLVER_MAPPINGS_FILE == null || RESOLVER_MAPPINGS_FILE.length === 0) {
 
 const schema = require('./lib/schemaParser').parseFromFile(SCHEMA_FILE, DATA_SOURCES_FILE, RESOLVER_MAPPINGS_FILE)
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }))
+const tracing = true
+app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, tracing }))
 
 var graphiqlConfig = {
   endpointURL: '/graphql', // if you want GraphiQL enabled
