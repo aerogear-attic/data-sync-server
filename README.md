@@ -17,7 +17,7 @@ docker exec postgres psql -U postgres -f /tmp/examples/create_tables.example.sql
 
 ```
 npm i
-npm run start-dev
+npm run dev
 ```
 
 Go to http://localhost:8000/graphiql for an interactive query brower.
