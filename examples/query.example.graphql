@@ -1,5 +1,5 @@
-query q1{
-  listNotes{
+query q1 {
+  listNotes {
     id
     title
     timestamp
@@ -8,15 +8,20 @@ query q1{
 }
 
 query q2 {
-  readNote(id: "abc"){
+  readNote(id: "abc") {
     id
     title
     content
   }
 }
 
-mutation m1{
-  createNote(id: "abc", title: "Hello", content: "Hello World!", timestamp:1529098385672) {
+mutation m1 {
+  createNote(
+    id: "abc"
+    title: "Hello"
+    content: "Hello World!"
+    timestamp: 1529098385672
+  ) {
     id
     title
     content
@@ -25,7 +30,7 @@ mutation m1{
 }
 
 mutation m2 {
-  updateNote(id: "abc", title:"Hi", content:"Hello again World!"){
+  updateNote(id: "abc", title: "Hi", content: "Hello again World!") {
     id
     title
     content
@@ -34,7 +39,7 @@ mutation m2 {
 }
 
 mutation m3 {
-  deleteNote(id:"abc") {
+  deleteNote(id: "abc") {
     id
     title
     timestamp
