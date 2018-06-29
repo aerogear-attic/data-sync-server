@@ -19,7 +19,7 @@
   "homepage": "https://github.com/aerogear/aerogear-data-sync-server#readme",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint && echo 'need to add tests'",
+    "test": "echo 'need to add tests'",
     "start": "node ./server.js",
     "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./server.js",
     "lint": "standard",
@@ -44,6 +44,7 @@
     "subscriptions-transport-ws": "^0.9.11"
   },
   "pre-commit": [
+    "lint",
     "test"
   ]
 }
