@@ -16,6 +16,7 @@ version: 2
         - image: circleci/node:carbon
       steps:
         - checkout
+        - setup_remote_docker
         - run: npm run docker:build
         - run: npm run docker:push
 
@@ -25,22 +26,30 @@ version: 2
         - image: circleci/node:carbon
       steps:
         - checkout
+        - setup_remote_docker
         - run: npm run docker:build:release
         - run: npm run docker:push:release
 
 workflows:
   version: 2
-  build_and_release:
+  build_and_push:
     jobs:
-      - build:
+      - test:
           filters:
             tags:
               only: /.*/
-      - npm_publish:
+      - docker_push_master:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+      - docker_push_release:
           requires:
             - build
           filters:
             tags:
-              only: /.*/ # allow anything because tag syntax is validated as part of validate-release.sh
+              only: /\d\.\d\.\d/
             branches:
               ignore: /.*/
