@@ -1,35 +1,35 @@
 version: 2
-  jobs:
-    test:
-      docker:
-        # Node 8 LTS
-        - image: circleci/node:carbon
-      steps:
-        - checkout
-        - run: npm install
-        - run: npm run lint
-        - run: npm test
+jobs:
+  test:
+    docker:
+      # Node 8 LTS
+      - image: circleci/node:carbon
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm run lint
+      - run: npm test
 
-    docker_push_master:
-      docker:
-        # Node 8 LTS
-        - image: circleci/node:carbon
-      steps:
-        - checkout
-        - setup_remote_docker
-        - run: npm run docker:build
-        - run: npm run docker:push
+  docker_push_master:
+    docker:
+      # Node 8 LTS
+      - image: circleci/node:carbon
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: npm run docker:build
+      - run: npm run docker:push
 
-    docker_push_release:
-      docker:
-        # Node 8 LTS
-        - image: circleci/node:carbon
-      steps:
-        - checkout
-        - setup_remote_docker
-        - run: npm run release:validate
-        - run: npm run docker:build:release
-        - run: npm run docker:push:release
+  docker_push_release:
+    docker:
+      # Node 8 LTS
+      - image: circleci/node:carbon
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: npm run release:validate
+      - run: npm run docker:build:release
+      - run: npm run docker:push:release
 
 workflows:
   version: 2
