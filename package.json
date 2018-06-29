@@ -2,13 +2,6 @@
   "name": "data-sync-server",
   "version": "1.0.0",
   "description": "GraphQL based server for syncing data between clients",
-  "main": "index.js",
-  "scripts": {
-    "test": "standard --fix && mocha",
-    "start": "node ./server.js",
-    "start-dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./server.js",
-    "format": "standard --fix"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aerogear/aerogear-data-sync-server.git"
@@ -24,8 +17,17 @@
     "url": "https://github.com/aerogear/aerogear-data-sync-server/issues"
   },
   "homepage": "https://github.com/aerogear/aerogear-data-sync-server#readme",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run lint && echo 'need to add tests'",
+    "start": "node ./server.js",
+    "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./server.js",
+    "lint": "standard",
+    "format": "standard --fix"
+  },
   "devDependencies": {
     "nodemon": "^1.17.5",
+    "pre-commit": "^1.2.2",
     "standard": "^11.0.1"
   },
   "dependencies": {
@@ -40,5 +42,8 @@
     "lodash": "^4.17.10",
     "pg": "^7.4.3",
     "subscriptions-transport-ws": "^0.9.11"
-  }
+  },
+  "pre-commit": [
+    "test"
+  ]
 }
