@@ -40,14 +40,14 @@ workflows:
               only: /.*/
       - docker_push_master:
           requires:
-            - build
+            - test
           filters:
             branches:
               only:
                 - master
       - docker_push_release:
           requires:
-            - build
+            - test
           filters:
             tags:
               only: /\d\.\d\.\d/
