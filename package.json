@@ -23,7 +23,12 @@
     "start": "node ./server.js",
     "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./server.js",
     "lint": "standard",
-    "format": "standard --fix"
+    "format": "standard --fix",
+    "docker:build": "./scripts/docker_build.sh",
+    "docker:build:release": "./scripts/docker_build_release.sh",
+    "docker:push": "./scripts/docker_push.sh",
+    "docker:push:release": "./scripts/docker_push_release.sh",
+    "release:validate": "./scripts/validateRelease.sh"
   },
   "devDependencies": {
     "nodemon": "^1.17.5",
