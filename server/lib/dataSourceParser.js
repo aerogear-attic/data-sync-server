@@ -1,17 +1,25 @@
 const _ = require('lodash')
 const {Client} = require('pg')
 
-module.exports = function (dataSources) {
+module.exports = function (dataSources, connect = true) {
   let dataSourceClients = {}
   let dataSourceTypes = {}
   // connect to any datasources with persistent connections
   _.forEach(dataSources, (value, key) => {
+    let isHandled = false
     if (value.type === 'postgres') {
       dataSourceClients[key] = new Client(value.config)
-      dataSourceClients[key].connect()
+      if (connect) {
+        dataSourceClients[key].connect()
+      }
+      isHandled = true
     }
 
-    dataSourceTypes[key] = value.type
+    if (isHandled) {
+      dataSourceTypes[key] = value.type
+    } else {
+      throw new Error('Unhandled data source type: ' + value.type)
+    }
   })
 
   return {
