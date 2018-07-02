@@ -20,8 +20,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo 'need to add tests'",
-    "start": "node ./server.js",
-    "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./server.js",
+    "start": "node ./index.js",
+    "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./index.js",
     "lint": "standard",
     "format": "standard --fix",
     "docker:build": "./scripts/docker_build.sh",
