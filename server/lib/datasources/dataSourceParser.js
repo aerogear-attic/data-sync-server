@@ -6,8 +6,9 @@ const parsers = require('./parsers')
 module.exports = function (dataSourceDefs, connect = true) {
   let dataSources = {}
   // connect to any datasources with persistent connections
-  forEach(dataSourceDefs, (dataSource, dataSourceName) => {
+  forEach(dataSourceDefs, (dataSource) => {
     let parser = parsers[dataSource.type]
+    const dataSourceName = dataSource.name
 
     if (parser) {
       if (parser.createDataSource && typeof parser.createDataSource === 'function') {

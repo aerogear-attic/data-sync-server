@@ -21,14 +21,18 @@
   "scripts": {
     "test": "ava",
     "start": "node ./index.js",
-    "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings-nedb.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./index.js",
+    "dev": "source ./scripts/dev_env.sh && nodemon ./index.js",
     "lint": "standard",
     "format": "standard --fix",
     "docker:build": "./scripts/docker_build.sh",
     "docker:build:release": "./scripts/docker_build_release.sh",
     "docker:push": "./scripts/docker_push.sh",
     "docker:push:release": "./scripts/docker_push_release.sh",
-    "release:validate": "./scripts/validateRelease.sh"
+    "release:validate": "./scripts/validateRelease.sh",
+    "db:start": "docker run --rm --name=postgres -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -v `pwd`/examples:/tmp/examples -d postgres",
+    "db:stop": "docker stop postgres",
+    "db:seed": "./scripts/db_seed.sh",
+    "db:shell": "docker exec -it postgres psql -U postgres"
   },
   "devDependencies": {
     "ava": "1.0.0-beta.6",
@@ -49,6 +53,7 @@
     "lodash": "^4.17.10",
     "nedb": "^1.8.0",
     "pg": "^7.4.3",
+    "sequelize": "^4.38.0",
     "subscriptions-transport-ws": "^0.9.11"
   },
   "pre-commit": [

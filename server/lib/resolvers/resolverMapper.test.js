@@ -11,30 +11,32 @@ const resolverMapper = require('./resolverMapper')
  */
 
 test('should create Postgres resolvers successfully with no Handlebars templates', t => {
-  const dataSourceDefs = {
-    'p1': {
-      'type': 'postgres',
-      'config': {
-        'not_really_important': 'not_an_integration_test'
-      }
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
     }
-  }
+  }]
   const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
 
-  const resolverMappings = {
-    'q1': {
-      'type': 'Query',
-      'dataSource': 'p1',
-      'requestMapping': 'q1_requestMapping {{ var }}',
-      'responseMapping': 'q1_responseMapping {{ toJSON "foo" }}'
+  const resolverMappings = [{
+    'type': 'Query',
+    'field': 'q1',
+    'DataSource': {
+      'name': 'p1'
     },
-    'm1': {
-      'type': 'Mutation',
-      'dataSource': 'p1',
-      'requestMapping': 'm1_requestMapping  {{ var }}',
-      'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
-    }
-  }
+    'requestMapping': 'q1_requestMapping {{ var }}',
+    'responseMapping': 'q1_responseMapping {{ toJSON "foo" }}'
+  }, {
+    'type': 'Mutation',
+    'field': 'm1',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'requestMapping': 'm1_requestMapping  {{ var }}',
+    'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
+  }]
 
   const resolvers = resolverMapper(dataSources, resolverMappings)
 
@@ -56,30 +58,32 @@ test('should return empty when feeded empty', t => {
 })
 
 test('should allow unknown operations', t => {
-  const dataSourceDefs = {
-    'p1': {
-      'type': 'postgres',
-      'config': {
-        'not_really_important': 'not_an_integration_test'
-      }
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
     }
-  }
+  }]
   const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
 
-  const resolverMappings = {
-    'q1': {
-      'type': 'Query',
-      'dataSource': 'p1',
-      'requestMapping': 'q1_requestMapping',
-      'responseMapping': 'q1_responseMapping'
+  const resolverMappings = [{
+    'type': 'Query',
+    'field': 'q1',
+    'DataSource': {
+      'name': 'p1'
     },
-    'foo': {
-      'type': 'UnknownOperation',
-      'dataSource': 'p1',
-      'requestMapping': 'm1_requestMapping  {{ var }}',
-      'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
-    }
-  }
+    'requestMapping': 'q1_requestMapping',
+    'responseMapping': 'q1_responseMapping'
+  }, {
+    'type': 'UnknownOperation',
+    'field': 'foo',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'requestMapping': 'm1_requestMapping  {{ var }}',
+    'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
+  }]
   const resolvers = resolverMapper(dataSources, resolverMappings)
 
   t.deepEqual(Object.keys(resolvers), ['Query', 'Mutation', 'Subscription', 'UnknownOperation'])
@@ -90,23 +94,23 @@ test('should allow unknown operations', t => {
 })
 
 test('should throw exception when data source is not defined', t => {
-  const dataSourceDefs = {
-    'p1': {
-      'type': 'postgres',
-      'config': {
-        'not_really_important': 'not_an_integration_test'
-      }
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
     }
-  }
+  }]
   const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
-  const resolverMappings = {
-    'q1': {
-      'type': 'Query',
-      'dataSource': '',
-      'requestMapping': 'q1_requestMapping',
-      'responseMapping': 'q1_responseMapping'
-    }
-  }
+  const resolverMappings = [{
+    'type': 'Query',
+    'field': 'q1',
+    'DataSource': {
+      'name': ''
+    },
+    'requestMapping': 'q1_requestMapping',
+    'responseMapping': 'q1_responseMapping'
+  }]
 
   t.throws(() => {
     resolverMapper(dataSources, resolverMappings)
@@ -114,23 +118,23 @@ test('should throw exception when data source is not defined', t => {
 })
 
 test('should throw exception when request mapping is not defined', t => {
-  const dataSourceDefs = {
-    'p1': {
-      'type': 'postgres',
-      'config': {
-        'not_really_important': 'not_an_integration_test'
-      }
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
     }
-  }
+  }]
   const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
-  const resolverMappings = {
-    'q1': {
-      'type': 'Query',
-      'dataSource': 'p1',
-      'requestMapping': '',
-      'responseMapping': 'q1_responseMapping'
-    }
-  }
+  const resolverMappings = [{
+    'type': 'Query',
+    'field': 'q1',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'requestMapping': '',
+    'responseMapping': 'q1_responseMapping'
+  }]
 
   t.throws(() => {
     resolverMapper(dataSources, resolverMappings)
@@ -138,23 +142,23 @@ test('should throw exception when request mapping is not defined', t => {
 })
 
 test('should throw exception when response mapping is not defined', t => {
-  const dataSourceDefs = {
-    'p1': {
-      'type': 'postgres',
-      'config': {
-        'not_really_important': 'not_an_integration_test'
-      }
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
     }
-  }
+  }]
   const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
-  const resolverMappings = {
-    'q1': {
-      'type': 'Query',
-      'dataSource': 'p1',
-      'requestMapping': 'foo',
-      'responseMapping': ''
-    }
-  }
+  const resolverMappings = [{
+    'type': 'Query',
+    'field': 'q1',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'requestMapping': 'foo',
+    'responseMapping': ''
+  }]
 
   t.throws(() => {
     resolverMapper(dataSources, resolverMappings)
@@ -162,14 +166,15 @@ test('should throw exception when response mapping is not defined', t => {
 })
 
 test('should throw exception when the data source does not exist', t => {
-  const resolverMappings = {
-    'q1': {
-      'type': 'Query',
-      'dataSource': 'p1',
-      'requestMapping': 'q1_requestMapping',
-      'responseMapping': 'q1_responseMapping'
-    }
-  }
+  const resolverMappings = [{
+    'type': 'Query',
+    'field': 'q1',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'requestMapping': 'q1_requestMapping',
+    'responseMapping': 'q1_responseMapping'
+  }]
 
   t.throws(() => {
     resolverMapper({}, resolverMappings)
@@ -177,24 +182,24 @@ test('should throw exception when the data source does not exist', t => {
 })
 
 test('should throw error when there is an error in request mapping Handlebars templates', t => {
-  const dataSourceDefs = {
-    'p1': {
-      'type': 'postgres',
-      'config': {
-        'not_really_important': 'not_an_integration_test'
-      }
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
     }
-  }
+  }]
   const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
 
-  const resolverMappings = {
-    'q1': {
-      'type': 'Query',
-      'dataSource': 'p1',
-      'requestMapping': '{{ var } }',
-      'responseMapping': 'q1_responseMapping {{ toJSON "foo" }}'
-    }
-  }
+  const resolverMappings = [{
+    'type': 'Query',
+    'field': 'q1',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'requestMapping': '{{ var } }',
+    'responseMapping': 'q1_responseMapping {{ toJSON "foo" }}'
+  }]
 
   t.throws(() => {
     resolverMapper(dataSources, resolverMappings)
@@ -202,24 +207,24 @@ test('should throw error when there is an error in request mapping Handlebars te
 })
 
 test('should throw error when there is an error in response mapping Handlebars templates', t => {
-  const dataSourceDefs = {
-    'p1': {
-      'type': 'postgres',
-      'config': {
-        'not_really_important': 'not_an_integration_test'
-      }
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
     }
-  }
+  }]
   const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
 
-  const resolverMappings = {
-    'q1': {
-      'type': 'Query',
-      'dataSource': 'p1',
-      'requestMapping': '{{ var }}',
-      'responseMapping': 'q1_responseMapping {{ toJSON "foo" } }'
-    }
-  }
+  const resolverMappings = [{
+    'type': 'Query',
+    'field': 'q1',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'requestMapping': '{{ var }}',
+    'responseMapping': 'q1_responseMapping {{ toJSON "foo" } }'
+  }]
   t.throws(() => {
     resolverMapper(dataSources, resolverMappings)
   })
