@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -t aerogear/data-sync-server:latest .
+docker build -t aerogear/data-sync-server:master .
