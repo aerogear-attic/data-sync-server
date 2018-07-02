@@ -8,6 +8,8 @@ const cors = require('cors')
 const app = express()
 const fs = require('fs')
 
+const schemaParser = require('./lib/schemaParser')
+
 app.use('*', cors())
 
 const HTTP_PORT = process.env.HTTP_PORT || '8000'
@@ -30,12 +32,20 @@ if (RESOLVER_MAPPINGS_FILE == null || RESOLVER_MAPPINGS_FILE.length === 0) {
   process.exit(1)
 }
 
-const schema = require('./lib/schemaParser').parseFromFile(SCHEMA_FILE, DATA_SOURCES_FILE, RESOLVER_MAPPINGS_FILE)
+let schema
+
+try {
+  schema = schemaParser(SCHEMA_FILE, DATA_SOURCES_FILE, RESOLVER_MAPPINGS_FILE)
+} catch (ex) {
+  console.error('Error while building configuration')
+  console.error(ex)
+  process.exit(1)
+}
 
 const tracing = true
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, tracing }))
 
-var graphiqlConfig = {
+let graphiqlConfig = {
   endpointURL: '/graphql', // if you want GraphiQL enabled
   subscriptionsEndpoint: `ws://localhost:${HTTP_PORT}/subscriptions`
 }
