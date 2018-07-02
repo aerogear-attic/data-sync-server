@@ -18,13 +18,34 @@ module.exports = function (dataSourceTypes, dataSourceClients, resolverMappingsJ
     }
 
     _.forEach(resolverMapping, (value, key) => {
+      if (_.isEmpty(value.dataSource)) {
+        throw new Error('Missing data source for mapping: ' + key)
+      }
+
+      if (_.isEmpty(value.requestMapping)) {
+        throw new Error('Missing request mapping for mapping: ' + key)
+      }
+
+      if (_.isEmpty(value.responseMapping)) {
+        throw new Error('Missing response mapping for mapping: ' + key)
+      }
+
+      if (!(value.dataSource in dataSourceTypes)) {
+        throw new Error('Unknown data source "' + value.dataSource + '" for mapping ' + key)
+      }
+
       if (dataSourceTypes[value.dataSource] === 'postgres') {
         const dataSourceClient = dataSourceClients[value.dataSource]
-        resolvers[resolverMappingName][key] = buildPostgresResolver(
-          dataSourceClient,
-          value.requestMapping,
-          value.responseMapping
-        )
+        try {
+          resolvers[resolverMappingName][key] = buildPostgresResolver(
+            dataSourceClient,
+            value.requestMapping,
+            value.responseMapping
+          )
+        } catch (ex) {
+          console.log('Error while building Postgres resolver for mapping: ' + key)
+          throw new Error('Error while building Postgres resolver for mapping: ' + key)
+        }
       }
     })
   })
@@ -33,9 +54,29 @@ module.exports = function (dataSourceTypes, dataSourceClients, resolverMappingsJ
 }
 
 function buildPostgresResolver (dataSourceClient, requestMapping, responseMapping) {
+  // use Handlebars.precompile to fail early during initialization
+  try {
+    Handlebars.precompile(requestMapping)
+  } catch (ex) {
+    console.error('Compilation error in requestMapping: ' + requestMapping)
+    console.error(ex)
+    throw new Error('Compilation error in requestMapping: ' + requestMapping)
+  }
+
+  try {
+    Handlebars.precompile(responseMapping)
+  } catch (ex) {
+    console.error('Compilation error in response mapping: ' + responseMapping)
+    console.error(ex)
+    throw new Error('Compilation error in response mapping: ' + responseMapping)
+  }
+
+  const compiledRequestMapping = Handlebars.compile(requestMapping)
+  const compiledResponseMapping = Handlebars.compile(responseMapping)
+
   return (obj, args, context, info) => {
     return new Promise((resolve, reject) => {
-      const queryString = Handlebars.compile(requestMapping)({
+      const queryString = compiledRequestMapping({
         context: {
           arguments: args
         }
@@ -45,7 +86,7 @@ function buildPostgresResolver (dataSourceClient, requestMapping, responseMappin
         // TODO: should we end the connection with each request?
         // dataSourceClient.end()
 
-        const responseString = Handlebars.compile(responseMapping)({
+        const responseString = compiledResponseMapping({
           context: {
             result: res.rows
           }

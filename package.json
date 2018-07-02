@@ -19,7 +19,7 @@
   "homepage": "https://github.com/aerogear/data-sync-server#readme",
   "main": "index.js",
   "scripts": {
-    "test": "echo 'need to add tests'",
+    "test": "ava",
     "start": "node ./index.js",
     "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./index.js",
     "lint": "standard",
@@ -31,6 +31,7 @@
     "release:validate": "./scripts/validateRelease.sh"
   },
   "devDependencies": {
+    "ava": "1.0.0-beta.6",
     "nodemon": "^1.17.5",
     "pre-commit": "^1.2.2",
     "standard": "^11.0.1"
