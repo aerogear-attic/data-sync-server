@@ -8,7 +8,8 @@ const schemaParser = require('./lib/schemaParser')
 
 module.exports = function ({ graphQLConfig, graphiqlConfig }) {
   const { schemaFile, dataSourcesFile, resolverMappingsFile, tracing } = graphQLConfig
-  
+  let schema
+
   try {
     schema = schemaParser(schemaFile, dataSourcesFile, resolverMappingsFile)
   } catch (ex) {
