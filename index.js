@@ -1,10 +1,11 @@
 const config = require('./server/config')
 
-let { graphQLConfig, graphiqlConfig } = config
+let { graphQLConfig, graphiqlConfig, postgresConfig } = config
 let { port } = config.server
 
-const server = require('./server/server')({ graphQLConfig, graphiqlConfig })
-
-server.listen(port, () => {
+const models = require('./models/index')(postgresConfig)
+models.sequelize.sync().then(async () => {
+  const server = await require('./server/server')({ graphQLConfig, graphiqlConfig }, models)
+  await server.listen(port)
   console.log(`Server is now running on http://localhost:${port}`)
 })
