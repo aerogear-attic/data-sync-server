@@ -32,6 +32,10 @@ module.exports = function (dataSources, resolverMappings) {
       throw new Error('Unknown data source "' + resolverMapping.dataSource + '" for mapping ' + resolverMappingName)
     }
 
+    if (['Query', 'Mutation'].indexOf(resolverMapping.type) < 0) {
+      return
+    }
+
     let { type, client } = dataSources[resolverMapping.dataSource]
 
     if (type === 'postgres') {
