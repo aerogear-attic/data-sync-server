@@ -1,3 +1,5 @@
+const JSONParse = require('json-parse-safe')
+
 function buildPostgresResolver (dataSourceClient, compiledRequestMapping, compiledResponseMapping) {
   return function resolve (obj, args, context, info) {
     return new Promise((resolve, reject) => {
@@ -6,6 +8,7 @@ function buildPostgresResolver (dataSourceClient, compiledRequestMapping, compil
           arguments: args
         }
       })
+
       dataSourceClient.query(queryString, [], (err, res) => {
         if (err) return reject(err)
         // TODO: should we end the connection with each request?
@@ -17,15 +20,14 @@ function buildPostgresResolver (dataSourceClient, compiledRequestMapping, compil
           }
         })
 
-        let response
-        try {
-          response = JSON.parse(responseString)
-        } catch (e) {
+        let { value, error } = JSONParse(responseString)
+
+        if (error) {
           // TODO better error message back to user when this happens
-          return reject(e)
+          return reject(error)
         }
 
-        return resolve(response)
+        return resolve(value)
       })
     })
   }
