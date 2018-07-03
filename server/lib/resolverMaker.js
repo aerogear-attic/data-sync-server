@@ -4,50 +4,50 @@ Handlebars.registerHelper('toJSON', function (json) {
   return new Handlebars.SafeString(JSON.stringify(json))
 })
 
-module.exports = function (dataSourceTypes, dataSourceClients, resolverMappingsJson) {
+module.exports = function (dataSources, resolverMappings) {
   const resolvers = {
     Query: {},
     Mutation: {},
     Subscription: {}
   }
 
-  _.forEach(resolverMappingsJson, (resolverMapping, resolverMappingName) => {
-    // only setup mappings for queries and mutations at this time
-    if (['Query', 'Mutation'].indexOf(resolverMappingName) < 0) {
-      return
+  _.forEach(resolverMappings, (resolverMapping, resolverMappingName) => {
+    if (_.isEmpty(resolverMapping.type)) {
+      throw new Error('Missing query type for mapping: ' + resolverMappingName)
     }
 
-    _.forEach(resolverMapping, (value, key) => {
-      if (_.isEmpty(value.dataSource)) {
-        throw new Error('Missing data source for mapping: ' + key)
-      }
+    if (_.isEmpty(resolverMapping.dataSource)) {
+      throw new Error('Missing data source for mapping: ' + resolverMappingName)
+    }
 
-      if (_.isEmpty(value.requestMapping)) {
-        throw new Error('Missing request mapping for mapping: ' + key)
-      }
+    if (_.isEmpty(resolverMapping.requestMapping)) {
+      throw new Error('Missing request mapping for mapping: ' + resolverMappingName)
+    }
 
-      if (_.isEmpty(value.responseMapping)) {
-        throw new Error('Missing response mapping for mapping: ' + key)
-      }
+    if (_.isEmpty(resolverMapping.responseMapping)) {
+      throw new Error('Missing response mapping for mapping: ' + resolverMappingName)
+    }
 
-      if (!(value.dataSource in dataSourceTypes)) {
-        throw new Error('Unknown data source "' + value.dataSource + '" for mapping ' + key)
-      }
+    if (!(resolverMapping.dataSource in dataSources)) {
+      throw new Error('Unknown data source "' + resolverMapping.dataSource + '" for mapping ' + resolverMappingName)
+    }
 
-      if (dataSourceTypes[value.dataSource] === 'postgres') {
-        const dataSourceClient = dataSourceClients[value.dataSource]
-        try {
-          resolvers[resolverMappingName][key] = buildPostgresResolver(
-            dataSourceClient,
-            value.requestMapping,
-            value.responseMapping
-          )
-        } catch (ex) {
-          console.log('Error while building Postgres resolver for mapping: ' + key)
-          throw new Error('Error while building Postgres resolver for mapping: ' + key)
-        }
+    let { type, client } = dataSources[resolverMapping.dataSource]
+
+    if (type === 'postgres') {
+      try {
+        resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {} // temporary hack. This will be refactored as part of AEROGEAR-3436
+        resolvers[resolverMapping.type][resolverMappingName] = buildPostgresResolver(
+          client,
+          resolverMapping.requestMapping,
+          resolverMapping.responseMapping
+        )
+      } catch (ex) {
+        console.log(ex)
+        console.log('Error while building Postgres resolver for mapping: ' + resolverMappingName)
+        throw new Error('Error while building Postgres resolver for mapping: ' + resolverMappingName)
       }
-    })
+    }
   })
 
   return resolvers

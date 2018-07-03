@@ -85,3 +85,30 @@ The baseline architecture is shown below:
 6. Configured Authentication & Autohorizatin checks are applied
 7. Logging & Metrics data is gathered from the Server & connected Clients
 
+## Running Tests
+
+```
+npm run test
+```
+
+### Debugging Individual Tests
+
+The easiest way to debug tests is using Chrome DevTools. Use [inspect-process](https://npm.im/inspect-process) to easily launch a debugging session with Chrome DevTools.
+
+```
+npm install -g inspect-process
+```
+
+* In chrome go to [`chrome://inspect`](chrome://inspect/)
+* Click on 'Open dedicated DevTools for Node.' This will open a new DevTools window.
+* Click on 'add folder to workspace' and use the wizard to open this project.
+* Go to the appropriate test file (or code that's being tested) and set a breakpoint
+* Now run the individual test as follows:
+
+```
+inspect node_modules/ava/profile.js some/test/file.js
+```
+
+The DevTools window should automatically connect to the debugging session and execution should pause if some breakpoints are set.
+
+

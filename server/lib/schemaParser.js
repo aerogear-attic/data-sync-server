@@ -33,8 +33,8 @@ module.exports = function (schemaFile, dataSourcesFile, resolverMappingsFile) {
     throw new Error('Unable to read or parse RESOLVER_MAPPINGS_FILE ' + resolverMappingsFile)
   }
 
-  const {dataSourceTypes, dataSourceClients} = dataSourceParser(dataSourcesJson)
-  const resolvers = resolverMaker(dataSourceTypes, dataSourceClients, resolverMappingsJson)
+  const dataSources = dataSourceParser(dataSourcesJson)
+  const resolvers = resolverMaker(dataSources, resolverMappingsJson)
 
   return graphqlTools.makeExecutableSchema({
     typeDefs: [schemaString],

@@ -1,31 +1,32 @@
 {
-  "Query": {
-    "readNote": {
-      "dataSource": "p1",
-      "requestMapping": "SELECT id, title, content, timestamp FROM \"Notes\" WHERE id='{{context.arguments.id}}';",
-      "responseMapping": "{{toJSON context.result.[0]}}"
-    },
-    "listNotes": {
-      "dataSource": "p1",
-      "requestMapping": "SELECT id, title, content, timestamp FROM \"Notes\"",
-      "responseMapping": "{{toJSON context.result}}"
-    }
+  "readNote": {
+    "type": "Query",
+    "dataSource": "p1",
+    "requestMapping": "SELECT id, title, content, timestamp FROM \"Notes\" WHERE id='{{context.arguments.id}}';",
+    "responseMapping": "{{toJSON context.result.[0]}}"
   },
-  "Mutation": {
-    "createNote": {
-      "dataSource": "p1",
-      "requestMapping": "INSERT INTO \"Notes\" (\"id\",\"title\",\"content\",\"timestamp\") VALUES ('{{context.arguments.id}}','{{context.arguments.title}}','{{context.arguments.content}}',{{context.arguments.timestamp}}) RETURNING *;",
-      "responseMapping": "{{toJSON context.result.[0]}}"
-    },
-    "updateNote": {
-      "dataSource": "p1",
-      "requestMapping": "UPDATE \"Notes\" SET \"title\"='{{context.arguments.title}}',\"content\"='{{context.arguments.content}}' WHERE \"id\"='{{context.arguments.id}}' RETURNING *",
-      "responseMapping": "{{toJSON context.result.[0]}}"
-    },
-    "deleteNote": {
-      "dataSource": "p1",
-      "requestMapping": "DELETE FROM \"Notes\" WHERE \"id\"='{{context.arguments.id}}' RETURNING *",
-      "responseMapping": "{{toJSON context.result.[0]}}"
-    }
+  "listNotes": {
+    "type": "Query",
+    "dataSource": "p1",
+    "requestMapping": "SELECT id, title, content, timestamp FROM \"Notes\"",
+    "responseMapping": "{{toJSON context.result}}"
+  },
+  "createNote": {
+    "type": "Mutation",
+    "dataSource": "p1",
+    "requestMapping": "INSERT INTO \"Notes\" (\"id\",\"title\",\"content\",\"timestamp\") VALUES ('{{context.arguments.id}}','{{context.arguments.title}}','{{context.arguments.content}}',{{context.arguments.timestamp}}) RETURNING *;",
+    "responseMapping": "{{toJSON context.result.[0]}}"
+  },
+  "updateNote": {
+    "type": "Mutation",
+    "dataSource": "p1",
+    "requestMapping": "UPDATE \"Notes\" SET \"title\"='{{context.arguments.title}}',\"content\"='{{context.arguments.content}}' WHERE \"id\"='{{context.arguments.id}}' RETURNING *",
+    "responseMapping": "{{toJSON context.result.[0]}}"
+  },
+  "deleteNote": {
+    "type": "Mutation",
+    "dataSource": "p1",
+    "requestMapping": "DELETE FROM \"Notes\" WHERE \"id\"='{{context.arguments.id}}' RETURNING *",
+    "responseMapping": "{{toJSON context.result.[0]}}"
   }
 }

@@ -3,7 +3,7 @@ const {test} = require('ava')
 const dataSourceParser = require('./dataSourceParser')
 
 test('should parse single data source successfully', t => {
-  const dataSources = {
+  const dataSourceDefs = {
     'p1': {
       'type': 'postgres',
       'config': {
@@ -15,15 +15,18 @@ test('should parse single data source successfully', t => {
       }
     }
   }
-  const {dataSourceTypes, dataSourceClients} = dataSourceParser(dataSources, false)
+  const dataSources = dataSourceParser(dataSourceDefs, false)
 
-  t.deepEqual(dataSourceTypes, {'p1': 'postgres'})
-  t.is(Object.keys(dataSourceClients).length, 1)
-  t.truthy(dataSourceClients['p1'])
+  t.is(Object.keys(dataSources).length, 1)
+  t.truthy(dataSources['p1'])
+
+  let { type, client } = dataSources['p1']
+  t.deepEqual(type, 'postgres')
+  t.truthy(client)
 })
 
 test('should parse multiple data sources successfully', t => {
-  const dataSources = {
+  const dataSourceDefs = {
     'p1': {
       'type': 'postgres',
       'config': {
@@ -45,22 +48,20 @@ test('should parse multiple data sources successfully', t => {
       }
     }
   }
-  const {dataSourceTypes, dataSourceClients} = dataSourceParser(dataSources, false)
+  const dataSources = dataSourceParser(dataSourceDefs, false)
 
-  t.is(Object.keys(dataSourceTypes).length, 2)
-  t.is(Object.keys(dataSourceClients).length, 2)
+  t.is(Object.keys(dataSources).length, 2)
 })
 
 test('should return empty results when no data source is defined', t => {
-  const dataSources = {}
-  const {dataSourceTypes, dataSourceClients} = dataSourceParser(dataSources, false)
+  const dataSourceDefs = {}
+  const dataSources = dataSourceParser(dataSourceDefs, false)
 
-  t.deepEqual(dataSourceTypes, {})
-  t.deepEqual(dataSourceClients, {})
+  t.deepEqual(dataSources, {})
 })
 
 test('should throw error when there is an unknown data source', t => {
-  const dataSources = {
+  const dataSourceDefs = {
     'p1': {
       'type': 'foo',
       'config': {
@@ -70,6 +71,6 @@ test('should throw error when there is an unknown data source', t => {
   }
 
   t.throws(() => {
-    dataSourceParser(dataSources, false)
+    dataSourceParser(dataSourceDefs, false)
   })
 })
