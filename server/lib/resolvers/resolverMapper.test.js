@@ -1,7 +1,7 @@
 const {test} = require('ava')
 
 const dataSourceParser = require('../datasources/dataSourceParser')
-const resolverMaker = require('./resolverBuilder')
+const resolverMapper = require('./resolverMapper')
 
 /*
   NOTE: this is not an integration test. we can only test:
@@ -36,7 +36,7 @@ test('should create Postgres resolvers successfully with no Handlebars templates
     }
   }
 
-  const resolvers = resolverMaker(dataSources, resolverMappings)
+  const resolvers = resolverMapper(dataSources, resolverMappings)
 
   t.deepEqual(Object.keys(resolvers), ['Query', 'Mutation', 'Subscription'])
 
@@ -46,7 +46,7 @@ test('should create Postgres resolvers successfully with no Handlebars templates
 })
 
 test('should return empty when feeded empty', t => {
-  const resolvers = resolverMaker({}, {})
+  const resolvers = resolverMapper({}, {})
 
   t.deepEqual(resolvers, {
     Query: {},
@@ -80,7 +80,7 @@ test('should allow unknown operations', t => {
       'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
     }
   }
-  const resolvers = resolverMaker(dataSources, resolverMappings)
+  const resolvers = resolverMapper(dataSources, resolverMappings)
 
   t.deepEqual(Object.keys(resolvers), ['Query', 'Mutation', 'Subscription', 'UnknownOperation'])
 
@@ -109,7 +109,7 @@ test('should throw exception when data source is not defined', t => {
   }
 
   t.throws(() => {
-    resolverMaker(dataSources, resolverMappings)
+    resolverMapper(dataSources, resolverMappings)
   })
 })
 
@@ -133,7 +133,7 @@ test('should throw exception when request mapping is not defined', t => {
   }
 
   t.throws(() => {
-    resolverMaker(dataSources, resolverMappings)
+    resolverMapper(dataSources, resolverMappings)
   })
 })
 
@@ -157,7 +157,7 @@ test('should throw exception when response mapping is not defined', t => {
   }
 
   t.throws(() => {
-    resolverMaker(dataSources, resolverMappings)
+    resolverMapper(dataSources, resolverMappings)
   })
 })
 
@@ -172,7 +172,7 @@ test('should throw exception when the data source does not exist', t => {
   }
 
   t.throws(() => {
-    resolverMaker({}, resolverMappings)
+    resolverMapper({}, resolverMappings)
   })
 })
 
@@ -197,7 +197,7 @@ test('should throw error when there is an error in request mapping Handlebars te
   }
 
   t.throws(() => {
-    resolverMaker(dataSources, resolverMappings)
+    resolverMapper(dataSources, resolverMappings)
   })
 })
 
@@ -221,6 +221,6 @@ test('should throw error when there is an error in response mapping Handlebars t
     }
   }
   t.throws(() => {
-    resolverMaker(dataSources, resolverMappings)
+    resolverMapper(dataSources, resolverMappings)
   })
 })
