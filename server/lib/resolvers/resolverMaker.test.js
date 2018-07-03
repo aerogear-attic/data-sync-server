@@ -1,7 +1,7 @@
 const {test} = require('ava')
 
-const dataSourceParser = require('./dataSourceParser')
-const resolverMaker = require('./resolverMaker')
+const dataSourceParser = require('../datasources/dataSourceParser')
+const resolverMaker = require('./resolverBuilder')
 
 /*
   NOTE: this is not an integration test. we can only test:

@@ -21,7 +21,7 @@
   "scripts": {
     "test": "ava",
     "start": "node ./index.js",
-    "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./index.js",
+    "dev": "SCHEMA_FILE=./examples/schema.example.graphql DATA_SOURCES_FILE=./examples/data-sources.example.json RESOLVER_MAPPINGS_FILE=./examples/resolver-mappings-nedb.example.json QUERY_FILE=./examples/query.example.graphql nodemon ./index.js",
     "lint": "standard",
     "format": "standard --fix",
     "docker:build": "./scripts/docker_build.sh",
@@ -45,7 +45,9 @@
     "graphql-subscriptions": "^0.5.8",
     "graphql-tools": "^3.0.2",
     "handlebars": "^4.0.11",
+    "json-parse-safe": "^1.0.5",
     "lodash": "^4.17.10",
+    "nedb": "^1.8.0",
     "pg": "^7.4.3",
     "subscriptions-transport-ws": "^0.9.11"
   },
