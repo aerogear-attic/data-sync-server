@@ -9,9 +9,7 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
         }
       })
 
-      // console.log('requestMapping', requestMapping)
-
-      let parsedQuery = JSONParse(queryString)
+      const parsedQuery = JSONParse(queryString)
 
       if (parsedQuery.error) {
         // TODO better error message back to user when this happens
@@ -20,7 +18,7 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
         return reject(parsedQuery.error)
       }
 
-      let { operation, query, doc, options, update } = parsedQuery.value
+      const { operation, query, doc, options, update } = parsedQuery.value
 
       switch (operation) {
         case 'findOne':
@@ -45,13 +43,13 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
       function mapResponse (err, res) {
         if (err) return reject(err)
 
-        var responseString = compiledResponseMapping({
+        const responseString = compiledResponseMapping({
           context: {
             result: res
           }
         })
 
-        let { value, error } = JSONParse(responseString)
+        const { value, error } = JSONParse(responseString)
 
         if (error) {
           // TODO better error message back to user when this happens
