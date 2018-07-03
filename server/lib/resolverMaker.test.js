@@ -55,7 +55,7 @@ test('should return empty when feeded empty', t => {
   })
 })
 
-test('should ignore unknown operations', t => {
+test('should allow unknown operations', t => {
   const dataSourceDefs = {
     'p1': {
       'type': 'postgres',
@@ -82,7 +82,7 @@ test('should ignore unknown operations', t => {
   }
   const resolvers = resolverMaker(dataSources, resolverMappings)
 
-  t.deepEqual(Object.keys(resolvers), ['Query', 'Mutation', 'Subscription'])
+  t.deepEqual(Object.keys(resolvers), ['Query', 'Mutation', 'Subscription', 'UnknownOperation'])
 
   t.deepEqual(Object.keys(resolvers.Query), ['q1'])
   t.deepEqual(Object.keys(resolvers.Mutation), [])

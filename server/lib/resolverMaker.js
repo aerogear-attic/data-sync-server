@@ -32,20 +32,18 @@ module.exports = function (dataSources, resolverMappings) {
       throw new Error('Unknown data source "' + resolverMapping.dataSource + '" for mapping ' + resolverMappingName)
     }
 
-    if (['Query', 'Mutation'].indexOf(resolverMapping.type) < 0) {
-      return
-    }
-
     let { type, client } = dataSources[resolverMapping.dataSource]
 
     if (type === 'postgres') {
       try {
+        resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {} // temporary hack. This will be refactored as part of AEROGEAR-3436
         resolvers[resolverMapping.type][resolverMappingName] = buildPostgresResolver(
           client,
           resolverMapping.requestMapping,
           resolverMapping.responseMapping
         )
       } catch (ex) {
+        console.log(ex)
         console.log('Error while building Postgres resolver for mapping: ' + resolverMappingName)
         throw new Error('Error while building Postgres resolver for mapping: ' + resolverMappingName)
       }
