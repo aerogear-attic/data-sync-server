@@ -34,25 +34,21 @@ module.exports = function (dataSources, resolverMappings) {
     let builder = resolverBuilders[type]
 
     if (builder) {
-      try {
-        const { compiledRequestMapping, compiledResponseMapping } = compileMappings(resolverMapping.requestMapping, resolverMapping.responseMapping)
-        if (builder.buildResolver && typeof builder.buildResolver === 'function') {
-          const resolver = builder.buildResolver(
-            client,
-            compiledRequestMapping,
-            compiledResponseMapping
-          )
+      const { compiledRequestMapping, compiledResponseMapping } = compileMappings(resolverMapping.requestMapping, resolverMapping.responseMapping)
+      if (builder.buildResolver && typeof builder.buildResolver === 'function') {
+        const resolver = builder.buildResolver(
+          client,
+          compiledRequestMapping,
+          compiledResponseMapping
+        )
 
-          resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
-          resolvers[resolverMapping.type][resolverMappingName] = resolver
-        } else {
-          throw new Error(`resolver builder for ${type} missing build resolver function`)
-        }
-      } catch (ex) {
-        console.log(ex)
-        console.log(`Error while building resolver of type ${type} for mapping: ${resolverMappingName}`)
-        throw new Error(`Error while building resolver of type ${type} for mapping: ${resolverMappingName}`)
+        resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
+        resolvers[resolverMapping.type][resolverMappingName] = resolver
+      } else {
+        throw new Error(`resolver builder for ${type} missing buildResolver function`)
       }
+    } else {
+      throw new Error(`No resolver builder for type: ${type}`)
     }
   })
 
