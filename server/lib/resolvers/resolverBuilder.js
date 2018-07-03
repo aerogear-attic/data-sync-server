@@ -36,14 +36,18 @@ module.exports = function (dataSources, resolverMappings) {
     if (builder) {
       try {
         const { compiledRequestMapping, compiledResponseMapping } = compileMappings(resolverMapping.requestMapping, resolverMapping.responseMapping)
-        const resolver = builder.buildResolver(
-          client,
-          compiledRequestMapping,
-          compiledResponseMapping
-        )
+        if (builder.buildResolver && typeof builder.buildResolver === 'function') {
+          const resolver = builder.buildResolver(
+            client,
+            compiledRequestMapping,
+            compiledResponseMapping
+          )
 
-        resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
-        resolvers[resolverMapping.type][resolverMappingName] = resolver
+          resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
+          resolvers[resolverMapping.type][resolverMappingName] = resolver
+        } else {
+          throw new Error(`resolver builder for ${type} missing build resolver function`)
+        }
       } catch (ex) {
         console.log(ex)
         console.log(`Error while building resolver of type ${type} for mapping: ${resolverMappingName}`)
