@@ -1,12 +1,14 @@
 'use strict'
 
+const time = new Date()
+
 const datasources = [
   {
     name: 'nedb_notes',
     type: 'InMemory',
     config: '{"options":{"timestampData":true}}',
-    createdAt: '2018-07-03 10:11:30.054 +00:00',
-    updatedAt: '2018-07-03 10:11:30.054 +00:00'
+    createdAt: time,
+    updatedAt: time
   }
 ]
 
@@ -48,8 +50,8 @@ const notesSchema = {
   type Subscription {
     noteCreated: Note
   }`,
-  createdAt: '2018-07-03 10:11:30.054 +00:00',
-  updatedAt: '2018-07-03 10:11:30.054 +00:00'
+  createdAt: time,
+  updatedAt: time
 }
 
 const resolvers = [
@@ -59,8 +61,8 @@ const resolvers = [
     DataSourceId: 1,
     requestMapping: '{"operation": "findOne","query": {"_id": "{{context.arguments.id}}"}}',
     responseMapping: '{{toJSON context.result}}',
-    createdAt: '2018-07-03 10:11:30.054 +00:00',
-    updatedAt: '2018-07-03 10:11:30.054 +00:00'
+    createdAt: time,
+    updatedAt: time
   },
   {
     type: 'Query',
@@ -68,8 +70,8 @@ const resolvers = [
     DataSourceId: 1,
     requestMapping: '{"operation": "find","query": {}}',
     responseMapping: '{{toJSON context.result}}',
-    createdAt: '2018-07-03 10:11:30.054 +00:00',
-    updatedAt: '2018-07-03 10:11:30.054 +00:00'
+    createdAt: time,
+    updatedAt: time
   },
   {
     type: 'Mutation',
@@ -77,8 +79,8 @@ const resolvers = [
     DataSourceId: 1,
     requestMapping: '{"operation": "insert","doc": {"title": "{{context.arguments.title}}","content": "{{context.arguments.content}}"}}',
     responseMapping: '{{toJSON context.result}}',
-    createdAt: '2018-07-03 10:11:30.054 +00:00',
-    updatedAt: '2018-07-03 10:11:30.054 +00:00'
+    createdAt: time,
+    updatedAt: time
   },
   {
     type: 'Mutation',
@@ -86,8 +88,8 @@ const resolvers = [
     DataSourceId: 1,
     requestMapping: '{"operation": "update","query": {"_id": "{{context.arguments.id}}"}, "update":{"title": "{{context.arguments.title}}","content": "{{context.arguments.content}}"},"options":{}}',
     responseMapping: '{{toJSON context.result}}',
-    createdAt: '2018-07-03 10:11:30.054 +00:00',
-    updatedAt: '2018-07-03 10:11:30.054 +00:00'
+    createdAt: time,
+    updatedAt: time
   },
   {
     DataSourceId: 1,
@@ -95,8 +97,8 @@ const resolvers = [
     type: 'Mutation',
     requestMapping: '{"operation": "remove","query": {"_id": "{{context.arguments.id}}"},"options":{}}',
     responseMapping: '{{toJSON context.result}}',
-    createdAt: '2018-07-03 10:11:30.054 +00:00',
-    updatedAt: '2018-07-03 10:11:30.054 +00:00'
+    createdAt: time,
+    updatedAt: time
   }
 ]
 
