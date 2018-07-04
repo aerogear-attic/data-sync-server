@@ -1,8 +1,8 @@
 const fs = require('fs')
 const graphqlTools = require('graphql-tools')
 
-const dataSourceParser = require('./dataSourceParser')
-const resolverMaker = require('./resolverMaker')
+const dataSourceParser = require('./datasources/dataSourceParser')
+const resolverMapper = require('./resolvers/resolverMapper')
 
 module.exports = function (schemaFile, dataSourcesFile, resolverMappingsFile) {
   let schemaString
@@ -34,7 +34,7 @@ module.exports = function (schemaFile, dataSourcesFile, resolverMappingsFile) {
   }
 
   const dataSources = dataSourceParser(dataSourcesJson)
-  const resolvers = resolverMaker(dataSources, resolverMappingsJson)
+  const resolvers = resolverMapper(dataSources, resolverMappingsJson)
 
   return graphqlTools.makeExecutableSchema({
     typeDefs: [schemaString],
