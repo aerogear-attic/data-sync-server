@@ -102,8 +102,8 @@ const resolvers = [
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    queryInterface.bulkInsert('DataSources', datasources, {})
-    queryInterface.bulkInsert('GraphQLSchemas', [notesSchema], {})
+    await queryInterface.bulkInsert('DataSources', datasources, {})
+    await queryInterface.bulkInsert('GraphQLSchemas', [notesSchema], {})
     return queryInterface.bulkInsert('Resolvers', resolvers, {})
   }
 }
