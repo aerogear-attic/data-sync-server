@@ -14,9 +14,15 @@ npm install
 
 ### Start and Initialize the Database
 
+Use docker compose to start the database.
+
 ```
 docker-compose up db
+```
 
+Initialize the database in another terminal.
+
+```
 npm run db:init
 ```
 
