@@ -9,12 +9,14 @@ module.exports = function (dataSources, resolverMappings) {
     Subscription: {}
   }
 
-  _.forEach(resolverMappings, (resolverMapping, resolverMappingName) => {
+  _.forEach(resolverMappings, (resolverMapping) => {
+    const resolverMappingName = resolverMapping.field
+
     if (_.isEmpty(resolverMapping.type)) {
       throw new Error('Missing query type for mapping: ' + resolverMappingName)
     }
 
-    if (_.isEmpty(resolverMapping.dataSource)) {
+    if (_.isEmpty(resolverMapping.DataSource)) {
       throw new Error('Missing data source for mapping: ' + resolverMappingName)
     }
 
@@ -26,11 +28,11 @@ module.exports = function (dataSources, resolverMappings) {
       throw new Error('Missing response mapping for mapping: ' + resolverMappingName)
     }
 
-    if (!(resolverMapping.dataSource in dataSources)) {
-      throw new Error('Unknown data source "' + resolverMapping.dataSource + '" for mapping ' + resolverMappingName)
+    if (!(resolverMapping.DataSource.name in dataSources)) {
+      throw new Error('Unknown data source "' + resolverMapping.DataSource.name + '" for mapping ' + resolverMappingName)
     }
 
-    let { type, client } = dataSources[resolverMapping.dataSource]
+    let { type, client } = dataSources[resolverMapping.DataSource.name]
     let builder = resolverBuilders[type]
 
     if (builder) {
