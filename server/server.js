@@ -6,12 +6,32 @@ const cors = require('cors')
 
 const schemaParser = require('./lib/schemaParser')
 
-module.exports = function ({ graphQLConfig, graphiqlConfig }) {
-  const { schemaFile, dataSourcesFile, resolverMappingsFile, tracing } = graphQLConfig
+module.exports = async ({ graphQLConfig, graphiqlConfig }, models) => {
+  const { tracing } = graphQLConfig
   let schema
 
+  const graphQLSchema = await models.GraphQLSchema.findOne()
+  // TODO: how to handle no shcema when using hot schema
+  //       so the server gracefully starts
+  let graphQLSchemaString = '{}'
+  if (graphQLSchema != null) {
+    graphQLSchemaString = graphQLSchema.schema
+  }
+
+  const dataSources = await models.DataSource.findAll()
+  const dataSourcesJson = dataSources.map((dataSource) => {
+    return dataSource.toJSON()
+  })
+
+  const resolvers = await models.Resolver.findAll({
+    include: [ models.DataSource ]
+  })
+  const resolversJson = resolvers.map((resolver) => {
+    return resolver.toJSON()
+  })
+
   try {
-    schema = schemaParser(schemaFile, dataSourcesFile, resolverMappingsFile)
+    schema = schemaParser(graphQLSchemaString, dataSourcesJson, resolversJson)
   } catch (ex) {
     console.error('Error while building configuration')
     console.error(ex)
