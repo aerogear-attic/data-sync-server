@@ -19,10 +19,18 @@ const config = {
 }
 
 if (process.env.SCHEMA_LISTENER_CONFIG) {
+  let schemaListenerConfigStr
   try {
-    config.schemaListenerConfig = JSON.parse(process.env.SCHEMA_LISTENER_CONFIG)
+    schemaListenerConfigStr = Buffer.from(process.env.SCHEMA_LISTENER_CONFIG, 'base64').toString()
   } catch (ex) {
-    console.error(`SCHEMA_LISTENER_CONFIG environment variable is not valid json: ${process.env.SCHEMA_LISTENER_CONFIG}`)
+    console.error(`Cannot base64 decode SCHEMA_LISTENER_CONFIG environment variable: ${process.env.SCHEMA_LISTENER_CONFIG}`)
+    process.exit(1)
+  }
+
+  try {
+    config.schemaListenerConfig = JSON.parse(schemaListenerConfigStr)
+  } catch (ex) {
+    console.error(`Base64 decoded SCHEMA_LISTENER_CONFIG environment variable is not valid json: ${schemaListenerConfigStr}`)
     process.exit(1)
   }
 } else {
