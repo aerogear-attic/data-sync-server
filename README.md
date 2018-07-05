@@ -17,7 +17,7 @@ npm install
 Use docker compose to start the database.
 
 ```
-docker-compose up db
+docker-compose up
 ```
 
 Initialize the database in another terminal.
@@ -43,6 +43,17 @@ The subscriptions websocket is at `/subscriptions`.
 
 ```
 npm run db:shell
+```
+
+### Cleanup Postgres
+
+The Postgres container started by `docker-compose` can be stopped with `Ctrl + C`. To remove it fully:
+
+```
+docker-compose rm
+
+Going to remove aerogeardatasyncserver_postgres_1
+Are you sure? [yN] y
 ```
 
 ### Running Tests
