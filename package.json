@@ -29,7 +29,7 @@
     "docker:push": "./scripts/docker_push.sh",
     "docker:push:release": "./scripts/docker_push_release.sh",
     "release:validate": "./scripts/validateRelease.sh",
-    "db:init": "FORCE_DROP=true node ./sequelize/sync_models && sequelize db:seed:all",
+    "db:init": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed:all",
     "db:shell": "docker exec -it aerogeardatasyncserver_postgres_1 psql -U postgresql -d aerogear_data_sync_db"
   },
   "devDependencies": {
