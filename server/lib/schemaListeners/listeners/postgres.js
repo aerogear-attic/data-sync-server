@@ -9,9 +9,8 @@ module.exports = function (config, onReceive) {
     port: config.port
   })
 
-  // TODO: use _.throttle/_.bounce here
   pubsubInstance.addChannel(config.channel, async function () {
-    console.log('Received Postgres pubsub notification')
+    console.log('Received notification from listened Postgres channel')
     onReceive()
   })
 }
