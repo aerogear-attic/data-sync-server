@@ -1,7 +1,9 @@
 const PGPubsub = require('pg-pubsub')
 
-module.exports = function (config, onReceive) {
-  const pubsubInstance = new PGPubsub({
+function PostgresListener (config) {
+  let pubsubInstance
+
+  pubsubInstance = new PGPubsub({
     user: config.username,
     host: config.host,
     database: config.database,
@@ -9,8 +11,18 @@ module.exports = function (config, onReceive) {
     port: config.port
   })
 
-  pubsubInstance.addChannel(config.channel, async function () {
-    console.log('Received notification from listened Postgres channel')
-    onReceive()
-  })
+  this.start = function (onReceive) {
+    pubsubInstance.addChannel(config.channel, async function () {
+      console.log('Received notification from listened Postgres channel')
+      onReceive()
+    })
+  }
+
+  this.stop = function () {
+    pubsubInstance.close()
+  }
+
+  return this
 }
+
+module.exports = PostgresListener
