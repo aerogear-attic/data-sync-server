@@ -21,7 +21,7 @@
   "scripts": {
     "test": "ava",
     "start": "node ./index.js",
-    "dev": "source ./scripts/dev_env.sh && nodemon ./index.js",
+    "dev": "nodemon ./index.js",
     "lint": "standard",
     "format": "standard --fix",
     "docker:build": "./scripts/docker_build.sh",
@@ -29,15 +29,14 @@
     "docker:push": "./scripts/docker_push.sh",
     "docker:push:release": "./scripts/docker_push_release.sh",
     "release:validate": "./scripts/validateRelease.sh",
-    "db:start": "docker run --rm --name=postgres -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -v `pwd`/examples:/tmp/examples -d postgres",
-    "db:stop": "docker stop postgres",
-    "db:seed": "./scripts/db_seed.sh",
-    "db:shell": "docker exec -it postgres psql -U postgres"
+    "db:init": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed:all",
+    "db:shell": "docker exec -it aerogeardatasyncserver_postgres_1 psql -U postgresql -d aerogear_data_sync_db"
   },
   "devDependencies": {
     "ava": "1.0.0-beta.6",
     "nodemon": "^1.17.5",
     "pre-commit": "^1.2.2",
+    "sequelize-cli": "^4.0.0",
     "standard": "^11.0.1"
   },
   "dependencies": {

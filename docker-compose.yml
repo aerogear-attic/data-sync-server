@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgresql
+      POSTGRES_DB: aerogear_data_sync_db
+    volumes:
+      - ./examples:/tmp/examples
