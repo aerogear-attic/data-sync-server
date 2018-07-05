@@ -1,4 +1,4 @@
-var config = {
+const config = {
   server: {
     port: process.env.HTTP_PORT || '8000'
   },
@@ -14,6 +14,30 @@ var config = {
     password: process.env.POSTGRES_PASSWORD || 'postgres',
     host: process.env.POSTGRES_HOST || '127.0.0.1',
     port: process.env.POSTGRES_PORT || '5432'
+  },
+  schemaListenerConfig: undefined
+}
+
+if (process.env.SCHEMA_LISTENER_CONFIG) {
+  try {
+    config.schemaListenerConfig = JSON.parse(process.env.SCHEMA_LISTENER_CONFIG)
+  } catch (ex) {
+    console.error(`SCHEMA_LISTENER_CONFIG environment variable is not valid json: ${process.env.SCHEMA_LISTENER_CONFIG}`)
+    process.exit(1)
+  }
+} else {
+  console.info(`Using default schemaListener since SCHEMA_LISTENER_CONFIG environment variable is not defined`)
+
+  config.schemaListenerConfig = {
+    type: 'postgres',
+    config: {
+      channel: 'aerogear-data-sync-config',
+      database: config.postgresConfig.database,
+      username: config.postgresConfig.username,
+      password: config.postgresConfig.password,
+      host: config.postgresConfig.host,
+      port: config.postgresConfig.port
+    }
   }
 }
 
