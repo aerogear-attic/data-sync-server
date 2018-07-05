@@ -46,8 +46,6 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
 async function buildSchema (models) {
   const graphQLSchema = await models.GraphQLSchema.findOne()
-  // TODO: how to handle no shcema when using hot schema
-  //       so the server gracefully starts
   let graphQLSchemaString = null
   if (graphQLSchema != null) {
     graphQLSchemaString = graphQLSchema.schema
