@@ -23,10 +23,21 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   // TODO Move this to the Admin UI
   app.get('/graphiql', graphiqlExpress(graphiqlConfig))
 
-  schemaListenerCreator(schemaListenerConfig, async () => {
+  const schemaListener = schemaListenerCreator(schemaListenerConfig)
+  // "onReceive" will cause the server to reload the configuration which could be costly.
+  // don't allow doing it too often!
+  // we debounce the "onReceive" callback here to make sure it is debounced
+  // for all listener implementations.
+  // that means, the callback will be executed after the system waits until there
+  // is no request to call it for N milliseconds.
+  // like, when there's an evil client that notifies the listener every 100 ms,
+  // we still wait for N ms after the notifications are over
+  const onReceive = async () => {
     console.log('Received schema change notification. Rebuilding it')
     schema = await buildSchema(models)
-  })
+  }
+  const debouncedOnReceive = _.debounce(onReceive, 500)
+  schemaListener.start(debouncedOnReceive)
 
   // Wrap the Express server
   const server = http.createServer(app)
