@@ -1,6 +1,6 @@
 const PGPubsub = require('pg-pubsub')
 
-module.exports = function (config, callback) {
+module.exports = function (config, onReceive) {
   const pubsubInstance = new PGPubsub({
     user: config.username,
     host: config.host,
@@ -12,6 +12,6 @@ module.exports = function (config, callback) {
   // TODO: use _.throttle/_.bounce here
   pubsubInstance.addChannel(config.channel, async function () {
     console.log('Received Postgres pubsub notification')
-    callback()
+    onReceive()
   })
 }
