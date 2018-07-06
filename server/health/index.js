@@ -1,0 +1,1 @@
+exports.addHealthEndpoint = require('./healthchecks')
