@@ -52,7 +52,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   // Wrap the Express server
   const server = http.createServer(app)
 
-  process.on('SIGTERM', async () => {
+  const stopHandler = async () => {
     try {
       console.log('SIGTERM received. Closing connections, stopping server')
       await models.sequelize.close()
@@ -65,7 +65,12 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     } finally {
       process.exit(0)
     }
-  })
+  }
+
+  process.on('SIGTERM', stopHandler)
+  process.on('SIGABRT', stopHandler)
+  process.on('SIGQUIT', stopHandler)
+  process.on('SIGINT', stopHandler)
 
   return server
 }
