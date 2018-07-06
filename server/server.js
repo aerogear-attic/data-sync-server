@@ -25,6 +25,9 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   app.get('/graphiql', graphiqlExpress(graphiqlConfig))
   app.get('/healthz', async (req, res) => {
     const result = await runHealthChecks(models)
+    if (!result.ok) {
+      res.status(503)
+    }
     res.json(result)
   })
 
