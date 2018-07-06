@@ -32,23 +32,41 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   })
 
   const schemaListener = schemaListenerCreator(schemaListenerConfig)
-  // "onReceive" will cause the server to reload the configuration which could be costly.
-  // don't allow doing it too often!
-  // we debounce the "onReceive" callback here to make sure it is debounced
-  // for all listener implementations.
-  // that means, the callback will be executed after the system waits until there
-  // is no request to call it for N milliseconds.
-  // like, when there's an evil client that notifies the listener every 100 ms,
-  // we still wait for N ms after the notifications are over
-  const onReceive = async () => {
-    console.log('Received schema change notification. Rebuilding it')
-    schema = await buildSchema(models)
+  if (schemaListener) {
+    // "onReceive" will cause the server to reload the configuration which could be costly.
+    // don't allow doing it too often!
+    // we debounce the "onReceive" callback here to make sure it is debounced
+    // for all listener implementations.
+    // that means, the callback will be executed after the system waits until there
+    // is no request to call it for N milliseconds.
+    // like, when there's an evil client that notifies the listener every 100 ms,
+    // we still wait for N ms after the notifications are over
+    const onReceive = async () => {
+      console.log('Received schema change notification. Rebuilding it')
+      schema = await buildSchema(models)
+    }
+    const debouncedOnReceive = _.debounce(onReceive, 500)
+    schemaListener.start(debouncedOnReceive)
   }
-  const debouncedOnReceive = _.debounce(onReceive, 500)
-  schemaListener.start(debouncedOnReceive)
 
   // Wrap the Express server
   const server = http.createServer(app)
+
+  process.on('SIGTERM', async () => {
+    try {
+      console.log('SIGTERM received. Closing connections, stopping server')
+      await models.sequelize.close()
+      if (schemaListener) await schemaListener.stop()
+      await server.close()
+      console.log('Shutting down')
+    } catch (ex) {
+      console.error('Error during graceful shutdown')
+      console.error(ex)
+    } finally {
+      process.exit(0)
+    }
+  })
+
   return server
 }
 
