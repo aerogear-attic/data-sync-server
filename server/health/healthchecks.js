@@ -15,7 +15,11 @@ module.exports = function (App) {
         return res.sendStatus(500)
       }
 
-      return res.json(JSON.parse(data))
+      const result = JSON.parse(data)
+      if (result.status !== 'ok') {
+        res.status(500)
+      }
+      return res.json(result)
     })
   })
 }
