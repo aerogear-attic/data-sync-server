@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const resolverBuilders = require('./builders')
-const { compileMappings } = require('./compiler')
+const {compileMappings} = require('./compiler')
 
 module.exports = function (dataSources, resolverMappings) {
   const resolvers = {
@@ -32,14 +32,14 @@ module.exports = function (dataSources, resolverMappings) {
       throw new Error('Unknown data source "' + resolverMapping.DataSource.name + '" for mapping ' + resolverMappingName)
     }
 
-    let { type, client } = dataSources[resolverMapping.DataSource.name]
-    let builder = resolverBuilders[type]
+    let dataSource = dataSources[resolverMapping.DataSource.name]
+    let builder = resolverBuilders[dataSource.type]
 
     if (builder) {
-      const { compiledRequestMapping, compiledResponseMapping } = compileMappings(resolverMapping.requestMapping, resolverMapping.responseMapping)
+      const {compiledRequestMapping, compiledResponseMapping} = compileMappings(resolverMapping.requestMapping, resolverMapping.responseMapping)
       if (builder.buildResolver && typeof builder.buildResolver === 'function') {
         const resolver = builder.buildResolver(
-          client,
+          dataSource.client,
           compiledRequestMapping,
           compiledResponseMapping
         )
@@ -47,10 +47,10 @@ module.exports = function (dataSources, resolverMappings) {
         resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
         resolvers[resolverMapping.type][resolverMappingName] = resolver
       } else {
-        throw new Error(`resolver builder for ${type} missing buildResolver function`)
+        throw new Error(`Resolver builder for ${dataSource.type} missing buildResolver function`)
       }
     } else {
-      throw new Error(`No resolver builder for type: ${type}`)
+      throw new Error(`No resolver builder for type: ${dataSource.type}`)
     }
   })
 

@@ -1,15 +1,16 @@
-const { Client } = require('pg')
+const {Client} = require('pg')
 
 const type = 'Postgres'
 
-function CreatePostgresDataSource (config = {}, connect = true) {
-  let client = new Client(config.options)
-  if (connect) {
-    client.connect()
+function PostgresDataSource (config = {}) {
+  this.client = new Client(config.options)
+  this.type = type
+  this.connect = async () => {
+    await this.client.connect()
   }
-  return { client, type }
+  this.disconnect = async () => {
+    await this.client.end()
+  }
 }
 
-module.exports = {
-  createDataSource: CreatePostgresDataSource
-}
+module.exports = PostgresDataSource

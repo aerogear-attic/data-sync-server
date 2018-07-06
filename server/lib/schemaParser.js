@@ -7,8 +7,10 @@ module.exports = function (schemaString, dataSourcesJson, resolverMappingsJson) 
   const dataSources = dataSourceParser(dataSourcesJson)
   const resolvers = resolverMapper(dataSources, resolverMappingsJson)
 
-  return graphqlTools.makeExecutableSchema({
+  const schema = graphqlTools.makeExecutableSchema({
     typeDefs: [schemaString],
     resolvers: resolvers
   })
+
+  return {schema, dataSources}
 }
