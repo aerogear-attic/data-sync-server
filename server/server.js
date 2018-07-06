@@ -11,7 +11,8 @@ const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreat
 
 module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaListenerConfig}, models) => {
   const {tracing} = graphQLConfig
-  let schema = await buildSchema(models)
+  let {schema, dataSources} = await buildSchema(models)
+  await connectDataSources(dataSources)
 
   const app = express()
 
@@ -43,7 +44,16 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     // we still wait for N ms after the notifications are over
     const onReceive = async () => {
       console.log('Received schema change notification. Rebuilding it')
-      schema = await buildSchema(models)
+      try {
+        await disconnectDataSources(dataSources) // disconnect existing ones first
+        const result = await buildSchema(models)
+        await connectDataSources(dataSources)
+        schema = result.schema
+        dataSources = result.dataSources
+      } catch (ex) {
+        console.error('Error while reloading schema')
+        console.error(ex)
+      }
     }
     const debouncedOnReceive = _.debounce(onReceive, 500)
     schemaListener.start(debouncedOnReceive)
@@ -57,6 +67,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
       console.log('SIGTERM received. Closing connections, stopping server')
       await models.sequelize.close()
       if (schemaListener) await schemaListener.stop()
+      await disconnectDataSources(dataSources)
       await server.close()
       console.log('Shutting down')
     } catch (ex) {
@@ -127,5 +138,33 @@ async function buildSchema (models) {
     console.error('Error while building schema.')
     console.error(ex)
     throw new Error('Error while building schema.')
+  }
+}
+
+async function connectDataSources (dataSources) {
+  console.log('Connecting data sources')
+  for (let key of Object.keys(dataSources)) {
+    const dataSource = dataSources[key]
+    try {
+      await dataSource.connect()
+    } catch (ex) {
+      console.error(`Error while connecting datasource with key ${key}`)
+      console.error(ex)
+      throw new Error(`Error while connecting datasource with key ${key}`)
+    }
+  }
+}
+
+async function disconnectDataSources (dataSources) {
+  console.log('Disconnecting data sources')
+  for (let key in Object.keys(dataSources)) {
+    const dataSource = dataSources[key]
+    try {
+      await dataSource.disconnect()
+    } catch (ex) {
+      console.error(`Error while disconnecting datasource with key ${key}`)
+      console.error(ex)
+      // swallow
+    }
   }
 }

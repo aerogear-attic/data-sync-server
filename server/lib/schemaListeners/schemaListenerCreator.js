@@ -1,17 +1,17 @@
 const listeners = require('./listeners')
 
 module.exports = function (schemaListenerConfig) {
-  const listenerModule = listeners[schemaListenerConfig.type]
+  const ListenerClass = listeners[schemaListenerConfig.type]
 
-  if (!listenerModule) {
+  if (!ListenerClass) {
     throw new Error(`Unhandled schema listener type: ${schemaListenerConfig.type}`)
   }
 
-  if (typeof listenerModule !== 'function') {
+  if (typeof ListenerClass !== 'function') {
     throw new Error(`Schema listener for ${schemaListenerConfig.type} is missing a constructor`)
   }
 
-  const listener = listenerModule(schemaListenerConfig.config)
+  const listener = new ListenerClass(schemaListenerConfig.config)
 
   if (!listener.start && typeof listener.start !== 'function') {
     throw new Error(`Schema listener for ${schemaListenerConfig.type} is missing "start" function`)

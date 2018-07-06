@@ -1,24 +1,34 @@
-const { forEach } = require('lodash')
+const {forEach} = require('lodash')
 
 // data sources we can parse
 const parsers = require('./parsers')
 
 module.exports = function (dataSourceDefs, connect = true) {
   let dataSources = {}
-  // connect to any datasources with persistent connections
-  forEach(dataSourceDefs, (dataSource) => {
-    let parser = parsers[dataSource.type]
-    const dataSourceName = dataSource.name
+  // only create the data sources. will connect later
+  forEach(dataSourceDefs, (dataSourceDef) => {
+    let Parser = parsers[dataSourceDef.type]
+    const dataSourceName = dataSourceDef.name
 
-    if (parser) {
-      if (parser.createDataSource && typeof parser.createDataSource === 'function') {
-        dataSources[dataSourceName] = parser.createDataSource(dataSource.config, connect)
-      } else {
-        throw new Error(`Parser ${dataSource.type} missing create function`)
-      }
-    } else {
-      throw new Error(`Unhandled data source type: ${dataSource.type}`)
+    if (!Parser) {
+      throw new Error(`Unhandled data source type: ${dataSourceDef.type}`)
     }
+
+    if (typeof Parser !== 'function') {
+      throw new Error(`Data source parser for ${dataSourceDef.type} is missing a constructor`)
+    }
+
+    const dataSourceObj = new Parser(dataSourceDef.config)
+
+    if (!dataSourceObj.connect && typeof dataSourceObj.connect !== 'function') {
+      throw new Error(`Data source for ${dataSourceDef.type} is missing "connect" function`)
+    }
+
+    if (!dataSourceObj.disconnect && typeof dataSourceObj.disconnect !== 'function') {
+      throw new Error(`Data source for ${dataSourceDef.type} is missing "disconnect" function`)
+    }
+
+    dataSources[dataSourceName] = dataSourceObj
   })
 
   return dataSources
