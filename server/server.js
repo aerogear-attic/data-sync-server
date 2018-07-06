@@ -45,6 +45,7 @@ module.exports = async ({ graphQLConfig, graphiqlConfig }, models) => {
 
   // TODO Move this to the Admin UI
   app.get('/graphiql', graphiqlExpress(graphiqlConfig))
+  app.get('/healthz', (req, res) => res.sendStatus(200))
 
   // Wrap the Express server
   const server = http.createServer(app)
