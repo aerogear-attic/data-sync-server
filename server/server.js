@@ -4,6 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const {graphqlExpress, graphiqlExpress} = require('apollo-server-express')
 const cors = require('cors')
+const { runHealthChecks } = require('./health')
 
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
@@ -22,6 +23,13 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
   // TODO Move this to the Admin UI
   app.get('/graphiql', graphiqlExpress(graphiqlConfig))
+  app.get('/healthz', async (req, res) => {
+    const result = await runHealthChecks(models)
+    if (!result.ok) {
+      res.status(503)
+    }
+    res.json(result)
+  })
 
   const schemaListener = schemaListenerCreator(schemaListenerConfig)
   // "onReceive" will cause the server to reload the configuration which could be costly.
