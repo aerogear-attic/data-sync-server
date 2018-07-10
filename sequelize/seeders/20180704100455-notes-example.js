@@ -13,6 +13,7 @@ const datasources = [
 ]
 
 const notesSchema = {
+  name: 'default',
   schema: `schema {
     query: Query
     mutation: Mutation
