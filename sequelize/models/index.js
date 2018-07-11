@@ -8,9 +8,10 @@ const db = {}
 
 module.exports = (config) => {
   const sequelize = new Sequelize(config.database, config.username, config.password, {
-    'host': config.host,
-    'port': config.port,
-    'dialect': 'postgres'
+    host: config.host,
+    port: config.port,
+    dialect: 'postgres',
+    operatorsAliases: false
   })
 
   // load all models in current dir

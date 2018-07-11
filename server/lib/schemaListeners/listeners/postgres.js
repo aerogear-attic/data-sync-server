@@ -1,4 +1,5 @@
 const PGPubsub = require('pg-pubsub')
+const { log } = require('../../util/logger')
 
 function PostgresListener (config) {
   let pubsubInstance
@@ -9,11 +10,11 @@ function PostgresListener (config) {
     database: config.database,
     password: config.password,
     port: config.port
-  })
+  }, { log: log.info.bind(log) })
 
   this.start = function (onReceive) {
     pubsubInstance.addChannel(config.channel, async function () {
-      console.log('Received notification from listened Postgres channel')
+      log.info('Received notification from listened Postgres channel')
       onReceive()
     })
   }

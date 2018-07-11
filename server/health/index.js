@@ -1,3 +1,5 @@
+const { log } = require('../lib/util/logger')
+
 exports.runHealthChecks = async function (db) {
   // Checks database connectivity by auth attempt
   function databaseConnectivityCheck () {
@@ -13,7 +15,7 @@ exports.runHealthChecks = async function (db) {
 
   function handleReject ({label, promise}) {
     return promise.catch(err => {
-      console.error(err)
+      log.error(err)
       return {[label]: false}
     })
   }

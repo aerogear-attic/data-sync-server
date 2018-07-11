@@ -1,3 +1,5 @@
+
+const { log } = require('../lib/util/logger')
 require('dotenv').config()
 
 const config = {
@@ -25,18 +27,18 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
   try {
     schemaListenerConfigStr = Buffer.from(process.env.SCHEMA_LISTENER_CONFIG, 'base64').toString()
   } catch (ex) {
-    console.error(`Cannot base64 decode SCHEMA_LISTENER_CONFIG environment variable: ${process.env.SCHEMA_LISTENER_CONFIG}`)
+    log.error(`Cannot base64 decode SCHEMA_LISTENER_CONFIG environment variable: ${process.env.SCHEMA_LISTENER_CONFIG}`)
     process.exit(1)
   }
 
   try {
     config.schemaListenerConfig = JSON.parse(schemaListenerConfigStr)
   } catch (ex) {
-    console.error(`Base64 decoded SCHEMA_LISTENER_CONFIG environment variable is not valid json: ${schemaListenerConfigStr}`)
+    log.error(`Base64 decoded SCHEMA_LISTENER_CONFIG environment variable is not valid json: ${schemaListenerConfigStr}`)
     process.exit(1)
   }
 } else {
-  console.info(`Using default schemaListener since SCHEMA_LISTENER_CONFIG environment variable is not defined`)
+  log.info(`Using default schemaListener since SCHEMA_LISTENER_CONFIG environment variable is not defined`)
 
   config.schemaListenerConfig = {
     type: 'postgres',
