@@ -31,10 +31,10 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
           dataSourceClient.insert(doc, mapResponse)
           break
         case 'update':
-          dataSourceClient.update(query, update, options, mapResponse)
+          dataSourceClient.update(query, update, options || {}, mapResponse)
           break
         case 'remove':
-          dataSourceClient.remove(query, options, mapResponse)
+          dataSourceClient.remove(query, options || {}, mapResponse)
           break
         default:
           return reject(new Error(`Unknown/unsupported nedb operation "${operation}"`))
