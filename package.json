@@ -55,6 +55,7 @@
     "nedb": "^1.8.0",
     "pg": "^7.4.3",
     "pg-pubsub": "^0.4.0",
+    "pino": "^4.17.3",
     "sequelize": "^4.38.0",
     "subscriptions-transport-ws": "^0.9.11"
   },
