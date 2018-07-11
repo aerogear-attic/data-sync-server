@@ -32,12 +32,12 @@ const notesSchema = {
   
   type Query {
     allProfiles:[Profile!]!
-    profile(email: String!):Profile!
+    profile(email: String!):Profile
   }
   
   type Mutation {
     createProfile(email: String!, displayName: String!, biography: String!, avatarUrl: String!):Profile!
-    updateProfile(id: ID!, email: String!, display_name: String!, biography: String!, pictureUrl: String!):Profile!
+    updateProfile(id: ID!, email: String!, displayName: String!, biography: String!, avatarUrl: String!):Profile
     deleteProfile(id: ID!):Boolean!
   }
   
@@ -76,6 +76,41 @@ const resolvers = [
       }
     }`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'updateProfile',
+    DataSourceId: 2,
+    requestMapping: `{
+      "operation": "update",
+      "query": {"_type":"profile", "_id": "{{context.arguments.id}}" },
+      "update": { 
+        "$set": {
+          "email": "{{context.arguments.email}}",
+          "displayName": "{{context.arguments.displayName}}", 
+          "biography": "{{context.arguments.biography}}",    
+          "avatarUrl": "{{context.arguments.avatarUrl}}"
+        }    
+      },
+      "options": {
+        "returnUpdatedDocs": true
+      }
+    }`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'deleteProfile',
+    DataSourceId: 2,
+    requestMapping: `{
+      "operation": "remove",
+      "query": {"_type":"profile", "_id": "{{context.arguments.id}}" }
+    }`,
+    responseMapping: '{{toBoolean context.result}}',
     createdAt: time,
     updatedAt: time
   }
