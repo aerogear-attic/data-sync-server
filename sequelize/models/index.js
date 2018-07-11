@@ -5,13 +5,15 @@ const path = require('path')
 const Sequelize = require('sequelize')
 const basename = path.basename(module.filename)
 const db = {}
+const { log } = require('../../server/lib/util/logger')
 
 module.exports = (config) => {
   const sequelize = new Sequelize(config.database, config.username, config.password, {
     host: config.host,
     port: config.port,
     dialect: 'postgres',
-    operatorsAliases: false
+    operatorsAliases: false,
+    logging: (message, ...args) => { log.info(message) }
   })
 
   // load all models in current dir
