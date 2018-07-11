@@ -133,4 +133,10 @@ The baseline architecture is shown below:
 7. Logging & Metrics data is gathered from the Server & connected Clients
 
 
+## Memeolist
 
+To start the application with MemeoList schema and queries run
+```
+npm run db:init:memeo
+npm run dev:memeo
+```

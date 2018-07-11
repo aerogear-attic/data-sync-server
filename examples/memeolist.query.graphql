@@ -1,0 +1,42 @@
+query q1{
+  allProfiles{
+    _id
+    email
+    display_name
+    biography
+    pictureUrl
+  }
+}
+
+query q2{
+  profile(email:"asd"){
+    _id
+    email
+    display_name
+    biography
+    pictureUrl
+  }
+}
+
+mutation createProfile {
+  createProfile(email:"asd", display_name:"bla", biography:"hello", pictureUrl:"hi there"){
+    _id
+    email
+    display_name
+    biography
+    pictureUrl
+  }
+}
+
+mutation updateProfile{
+  updateProfile(id:"gCMUtAjZHfrna5FG", email:"asd2", display_name:"bla", biography:"hello", pictureUrl:"hi there")
+}
+
+mutation deleteProfile{
+  deleteProfile(id:"gCMUtAjZHfrna5FG")
+}
+
+## Notes:
+## - @isUnique for email doesn't work
+## - no login: need to pass user id with each request
+## - 
