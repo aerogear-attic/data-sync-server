@@ -2,6 +2,14 @@
 const { log } = require('../lib/util/logger')
 require('dotenv').config()
 
+const fs = require('fs')
+
+let graphiqlQueryFileContent = ''
+
+if (process.env.GRAPHIQL_QUERY_FILE) {
+  graphiqlQueryFileContent = fs.readFileSync(process.env.GRAPHIQL_QUERY_FILE).toString()
+}
+
 const config = {
   server: {
     port: process.env.HTTP_PORT || '8000'
@@ -10,7 +18,8 @@ const config = {
     tracing: true
   },
   graphiqlConfig: {
-    endpointURL: '/graphql' // if you want GraphiQL enabled
+    endpointURL: '/graphql', // if you want GraphiQL enabled
+    query: graphiqlQueryFileContent
   },
   postgresConfig: {
     database: process.env.POSTGRES_DATABASE || 'aerogear_data_sync_db',

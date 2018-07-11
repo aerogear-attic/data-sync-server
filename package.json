@@ -22,6 +22,7 @@
     "test": "ava",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino",
+    "dev:memeo": "GRAPHIQL_QUERY_FILE='examples/memeolist.query.graphql' nodemon ./index.js | pino",
     "lint": "standard",
     "format": "standard --fix",
     "docker:build": "./scripts/docker_build.sh",
@@ -29,7 +30,8 @@
     "docker:push": "./scripts/docker_push.sh",
     "docker:push:release": "./scripts/docker_push_release.sh",
     "release:validate": "./scripts/validateRelease.sh",
-    "db:init": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed:all",
+    "db:init": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed 20180704100455-notes-example.js",
+    "db:init:memeo": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed 20180711143600-memeolist-example.js",
     "db:shell": "docker exec -it aerogeardatasyncserver_postgres_1 psql -U postgresql -d aerogear_data_sync_db"
   },
   "devDependencies": {

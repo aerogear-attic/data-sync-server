@@ -14,3 +14,4 @@ k8s_templates
 .vscode
 .circleci
 .env
+sequelize/seeders

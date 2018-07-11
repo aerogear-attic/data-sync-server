@@ -4,6 +4,7 @@ const time = new Date()
 
 const datasources = [
   {
+    id: 1,
     name: 'nedb_notes',
     type: 'InMemory',
     config: '{"options":{"timestampData":true}}',
