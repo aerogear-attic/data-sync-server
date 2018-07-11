@@ -12,7 +12,7 @@ function compileMappings (requestMapping, responseMapping) {
   } catch (ex) {
     log.error('Compilation error in requestMapping: ' + requestMapping)
     log.error(ex)
-    throw(ex)
+    throw (ex)
   }
 
   try {
@@ -20,7 +20,7 @@ function compileMappings (requestMapping, responseMapping) {
   } catch (ex) {
     log.error('Compilation error in response mapping: ' + responseMapping)
     log.error(ex)
-    throw(ex)
+    throw (ex)
   }
 
   const compiledRequestMapping = Handlebars.compile(requestMapping)
