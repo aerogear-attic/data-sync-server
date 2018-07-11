@@ -5,6 +5,10 @@ Handlebars.registerHelper('toJSON', function (json) {
   return new Handlebars.SafeString(JSON.stringify(json))
 })
 
+Handlebars.registerHelper('toBoolean', function (result) {
+  return new Handlebars.SafeString(!!result)
+})
+
 Handlebars.registerHelper('convertNeDBIds', function (json) {
   if (Array.isArray(json)) {
     for (let item of json) {
