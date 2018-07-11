@@ -28,6 +28,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
   // TODO Move this to the Admin UI
   app.get('/graphiql', graphiqlExpress(graphiqlConfig))
+
   app.get('/healthz', async (req, res) => {
     const result = await runHealthChecks(models)
     if (!result.ok) {
@@ -141,7 +142,7 @@ async function buildSchema (models) {
   } catch (error) {
     log.error('Error while building schema.')
     log.error(error)
-    throw(error)
+    throw (error)
   }
 }
 
@@ -154,7 +155,7 @@ async function connectDataSources (dataSources) {
     } catch (error) {
       log.error(`Error while connecting datasource with key ${key}`)
       log.error(error)
-      throw(error)
+      throw (error)
     }
   }
 }
