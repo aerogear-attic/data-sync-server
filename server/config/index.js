@@ -10,8 +10,8 @@ if (process.env.GRAPHIQL_QUERY_FILE) {
   try {
     graphiqlQueryFileContent = fs.readFileSync(process.env.GRAPHIQL_QUERY_FILE, 'utf-8')
   } catch (ex) {
-    console.error(`Unable to read GRAPHIQL_QUERY_FILE ${process.env.GRAPHIQL_QUERY_FILE} . Skipping it.`)
-    console.error(ex)
+    log.error(`Unable to read GRAPHIQL_QUERY_FILE ${process.env.GRAPHIQL_QUERY_FILE} . Skipping it.`)
+    log.error(ex)
   }
 }
 
