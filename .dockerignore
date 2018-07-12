@@ -8,10 +8,7 @@ README.md
 examples
 *.png
 nodemon.json
-.sequelizerc
-scripts
 k8s_templates
 .vscode
 .circleci
 .env
-sequelize/seeders
