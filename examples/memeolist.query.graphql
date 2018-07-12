@@ -5,7 +5,18 @@ query allProfiles{
         displayName
         biography
         avatarUrl
+        memes {
+          id
+          photoUrl
+        }
     }
+}
+
+query allMemes{
+  allMemes{
+    id
+    photoUrl
+  }
 }
 
 mutation createProfile {
@@ -30,4 +41,11 @@ mutation updateProfile {
 
 mutation deleteProfile {
     deleteProfile(id:"CHANGEME")
+}
+
+mutation createMeme {
+  createMeme(ownerId: "u81R7GQxj7qTIH8H" photoUrl: "https://test.com"){
+    id
+    photoUrl
+  }
 }

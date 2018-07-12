@@ -5,9 +5,15 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
     return new Promise((resolve, reject) => {
       const queryString = compiledRequestMapping({
         context: {
-          arguments: args
+          arguments: args,
+          parent: obj
         }
       })
+
+      console.log('obj', obj)
+      console.log('args', args)
+      console.log('context', context)
+      console.log('info', info)
 
       const parsedQuery = JSONParse(queryString)
 
