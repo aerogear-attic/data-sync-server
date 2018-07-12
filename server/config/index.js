@@ -7,7 +7,12 @@ const fs = require('fs')
 let graphiqlQueryFileContent = ''
 
 if (process.env.GRAPHIQL_QUERY_FILE) {
-  graphiqlQueryFileContent = fs.readFileSync(process.env.GRAPHIQL_QUERY_FILE).toString()
+  try {
+    graphiqlQueryFileContent = fs.readFileSync(process.env.GRAPHIQL_QUERY_FILE, 'utf-8')
+  } catch (ex) {
+    console.error(`Unable to read GRAPHIQL_QUERY_FILE ${process.env.GRAPHIQL_QUERY_FILE} . Skipping it.`)
+    console.error(ex)
+  }
 }
 
 const config = {
