@@ -28,17 +28,21 @@ const notesSchema = {
   
   type Meme {
     id: ID! @isUnique
+    photoUrl: String!
+    ownerId: String!
   }
   
   type Query {
     allProfiles:[Profile!]!
     profile(email: String!):Profile
+    allMemes:[Meme!]!
   }
   
   type Mutation {
     createProfile(email: String!, displayName: String!, biography: String!, avatarUrl: String!):Profile!
     updateProfile(id: ID!, email: String!, displayName: String!, biography: String!, avatarUrl: String!):Profile
     deleteProfile(id: ID!):Boolean!
+    createMeme(ownerId: String! photoUrl: String!):Meme!
   }
   
   type Subscription {
@@ -51,6 +55,40 @@ const notesSchema = {
 }
 
 const resolvers = [
+  {
+    type: 'Query',
+    field: 'allMemes',
+    DataSourceId: 2,
+    requestMapping: '{"operation": "find", "query": {"_type":"meme"}}',
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'createMeme',
+    DataSourceId: 2,
+    requestMapping: `{
+      "operation": "insert",
+      "doc": {
+        "_type":"meme",
+        "photoUrl": "{{context.arguments.photoUrl}}",
+        "ownerId": "{{context.arguments.ownerId}}"
+      }
+    }`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Profile',
+    field: 'memes',
+    DataSourceId: 2,
+    requestMapping: '{"operation": "find", "query": {"_type":"meme", "ownerId": "{{context.parent.id}}"}}',
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
   {
     type: 'Query',
     field: 'allProfiles',
