@@ -18,7 +18,7 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
         return reject(parsedQuery.error)
       }
 
-      const { operation, query, doc, options, update } = parsedQuery.value
+      const {operation, query, doc, options, update} = parsedQuery.value
 
       switch (operation) {
         case 'findOne':
@@ -31,7 +31,7 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
           dataSourceClient.insert(doc, mapResponse)
           break
         case 'update':
-          dataSourceClient.update(query, update, options || {}, mapResponse)
+          dataSourceClient.update(query, update, options || {}, mapUpdateResponse)
           break
         case 'remove':
           dataSourceClient.remove(query, options || {}, mapResponse)
@@ -49,7 +49,7 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
           }
         })
 
-        const { value, error } = JSONParse(responseString)
+        const {value, error} = JSONParse(responseString)
 
         if (error) {
           // TODO better error message back to user when this happens
@@ -57,6 +57,13 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
         }
 
         return resolve(value)
+      }
+
+      function mapUpdateResponse (err, numAffected, affectedDocuments) {
+        if (numAffected === 0) {
+          return mapResponse(err, [])
+        }
+        return mapResponse(err, affectedDocuments)
       }
     })
   }
