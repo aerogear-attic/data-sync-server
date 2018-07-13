@@ -14,6 +14,7 @@ const datasources = [
 ]
 
 const notesSchema = {
+  id: 2,
   name: 'default',
   schema: `
   
@@ -45,6 +46,7 @@ const resolvers = [
     type: 'Query',
     field: '_',
     DataSourceId: 2,
+    GraphQLSchemaId: 2,
     requestMapping: '{{ null }}',
     responseMapping: '{{ null }}',
     createdAt: time,

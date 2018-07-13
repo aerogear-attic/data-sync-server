@@ -14,6 +14,7 @@ const datasources = [
 ]
 
 const notesSchema = {
+  id: 1,
   name: 'default',
   schema: `schema {
     query: Query
@@ -61,6 +62,7 @@ const resolvers = [
     type: 'Query',
     field: 'readNote',
     DataSourceId: 1,
+    GraphQLSchemaId: 1,
     requestMapping: '{"operation": "findOne","query": {"_id": "{{context.arguments.id}}"}}',
     responseMapping: '{{toJSON context.result}}',
     createdAt: time,
@@ -70,6 +72,7 @@ const resolvers = [
     type: 'Query',
     field: 'listNotes',
     DataSourceId: 1,
+    GraphQLSchemaId: 1,
     requestMapping: '{"operation": "find","query": {}}',
     responseMapping: '{{toJSON context.result}}',
     createdAt: time,
@@ -79,6 +82,7 @@ const resolvers = [
     type: 'Mutation',
     field: 'createNote',
     DataSourceId: 1,
+    GraphQLSchemaId: 1,
     requestMapping: '{"operation": "insert","doc": {"title": "{{context.arguments.title}}","content": "{{context.arguments.content}}"}}',
     responseMapping: '{{toJSON context.result}}',
     createdAt: time,
@@ -88,6 +92,7 @@ const resolvers = [
     type: 'Mutation',
     field: 'updateNote',
     DataSourceId: 1,
+    GraphQLSchemaId: 1,
     requestMapping: '{"operation": "update","query": {"_id": "{{context.arguments.id}}"}, "update":{"title": "{{context.arguments.title}}","content": "{{context.arguments.content}}"},"options":{}}',
     responseMapping: '{{toJSON context.result}}',
     createdAt: time,
@@ -95,6 +100,7 @@ const resolvers = [
   },
   {
     DataSourceId: 1,
+    GraphQLSchemaId: 1,
     field: 'deleteNote',
     type: 'Mutation',
     requestMapping: '{"operation": "remove","query": {"_id": "{{context.arguments.id}}"},"options":{}}',
