@@ -4,9 +4,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const {graphqlExpress, graphiqlExpress} = require('apollo-server-express')
 const cors = require('cors')
-const { log } = require('./lib/util/logger')
-const expressPino = require('express-pino-logger')({ logger: log })
-const { runHealthChecks } = require('./health')
+const {log} = require('./lib/util/logger')
+const expressPino = require('express-pino-logger')({logger: log})
+const {runHealthChecks} = require('./health')
 
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
@@ -96,10 +96,16 @@ async function buildSchema (models) {
   let graphQLSchemaString = null
 
   if (!_.isEmpty(graphQLSchemas)) {
-    if (_.size(graphQLSchemas) === 1) {
-      graphQLSchemaString = graphQLSchemas[0].schema
-    } else {
-      throw new Error('Found multiple schemas. This is not supported currently')
+    for (let graphQLSchema of graphQLSchemas) {
+      if (graphQLSchema.name === 'default') {
+        graphQLSchemaString = graphQLSchema.schema
+        break
+      }
+    }
+    if (!graphQLSchemaString) {
+      // only fail when there are schemas defined but there's none with the name 'default'
+      // things should work fine when there's no schema at all
+      throw new Error('No schema with name "default" found.')
     }
   }
 
