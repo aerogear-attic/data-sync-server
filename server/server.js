@@ -92,10 +92,15 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 }
 
 async function buildSchema (models) {
-  const graphQLSchema = await models.GraphQLSchema.findOne()
+  const graphQLSchemas = await models.GraphQLSchema.findAll()
   let graphQLSchemaString = null
-  if (graphQLSchema != null) {
-    graphQLSchemaString = graphQLSchema.schema
+
+  if (!_.isEmpty(graphQLSchemas)) {
+    if (_.size(graphQLSchemas) === 1) {
+      graphQLSchemaString = graphQLSchemas[0].schema
+    } else {
+      throw new Error('Found multiple schemas. This is not supported currently')
+    }
   }
 
   const dataSources = await models.DataSource.findAll()

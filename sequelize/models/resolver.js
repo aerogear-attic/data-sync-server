@@ -13,6 +13,13 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       }
     })
+
+    models.Resolver.belongsTo(models.GraphQLSchema, {
+      onDelete: 'CASCADE',
+      foreignKey: {
+        allowNull: false
+      }
+    })
   }
 
   return Resolver
