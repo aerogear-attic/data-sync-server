@@ -1,17 +1,3 @@
-query allProfiles{
-    allProfiles{
-        id
-        email
-        displayName
-        biography
-        avatarUrl
-        memes {
-          id
-          photoUrl
-        }
-    }
-}
-
 query allMemes{
   allMemes{
     id
@@ -19,32 +5,8 @@ query allMemes{
   }
 }
 
-mutation createProfile {
-    createProfile(email:"jordan@example.com", displayName:"Michael Jordan", biography:"Nr #23!", avatarUrl:"https://m.media-amazon.com/images/M/MV5BODgwZTQxNjctNWNjZC00ZTNiLWI2YTQtNzYzN2Y1N2IzZmMzXkEyXkFqcGdeQXVyNjcyODYyNzk@._V1_.jpg"){
-        id
-        email
-        displayName
-        biography
-        avatarUrl
-    }
-}
-
-mutation updateProfile {
-    updateProfile(id:"CHANGEME", email:"michael.jordan@example.com", displayName:"Michael Jordan", biography:"Nr #23!", avatarUrl:"https://m.media-amazon.com/images/M/MV5BODgwZTQxNjctNWNjZC00ZTNiLWI2YTQtNzYzN2Y1N2IzZmMzXkEyXkFqcGdeQXVyNjcyODYyNzk@._V1_.jpg"){
-        id
-        email
-        displayName
-        biography
-        avatarUrl
-    }
-}
-
-mutation deleteProfile {
-    deleteProfile(id:"CHANGEME")
-}
-
 mutation createMeme {
-  createMeme(ownerId: "u81R7GQxj7qTIH8H" photoUrl: "https://test.com"){
+  createMeme(photoUrl: "https://test.com"){
     id
     photoUrl
   }
