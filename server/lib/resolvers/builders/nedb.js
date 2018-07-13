@@ -10,11 +10,6 @@ function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledRe
         }
       })
 
-      console.log('obj', obj)
-      console.log('args', args)
-      console.log('context', context)
-      console.log('info', info)
-
       const parsedQuery = JSONParse(queryString)
 
       if (parsedQuery.error) {
