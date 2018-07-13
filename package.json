@@ -38,7 +38,6 @@
     "ava": "1.0.0-beta.6",
     "nodemon": "^1.17.5",
     "pre-commit": "^1.2.2",
-    "sequelize-cli": "^4.0.0",
     "standard": "^11.0.1"
   },
   "dependencies": {
@@ -59,6 +58,7 @@
     "pg-pubsub": "^0.4.0",
     "pino": "^4.17.3",
     "sequelize": "^4.38.0",
+    "sequelize-cli": "^4.0.0",
     "subscriptions-transport-ws": "^0.9.11"
   },
   "pre-commit": [

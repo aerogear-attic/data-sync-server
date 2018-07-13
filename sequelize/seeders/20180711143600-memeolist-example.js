@@ -14,6 +14,7 @@ const datasources = [
 ]
 
 const notesSchema = {
+  id: 2,
   name: 'default',
   schema: `
 
@@ -44,6 +45,7 @@ const resolvers = [
     type: 'Query',
     field: 'allMemes',
     DataSourceId: 2,
+    GraphQLSchemaId: 2,
     requestMapping: '{"operation": "find", "query": {"_type":"meme"}}',
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
@@ -53,6 +55,7 @@ const resolvers = [
     type: 'Mutation',
     field: 'createMeme',
     DataSourceId: 2,
+    GraphQLSchemaId: 2,
     requestMapping: `{
       "operation": "insert",
       "doc": {

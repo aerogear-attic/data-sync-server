@@ -4,9 +4,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const {graphqlExpress, graphiqlExpress} = require('apollo-server-express')
 const cors = require('cors')
-const { log } = require('./lib/util/logger')
-const expressPino = require('express-pino-logger')({ logger: log })
-const { runHealthChecks } = require('./health')
+const {log} = require('./lib/util/logger')
+const expressPino = require('express-pino-logger')({logger: log})
+const {runHealthChecks} = require('./health')
 
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
@@ -92,10 +92,21 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 }
 
 async function buildSchema (models) {
-  const graphQLSchema = await models.GraphQLSchema.findOne()
+  const graphQLSchemas = await models.GraphQLSchema.findAll()
   let graphQLSchemaString = null
-  if (graphQLSchema != null) {
-    graphQLSchemaString = graphQLSchema.schema
+
+  if (!_.isEmpty(graphQLSchemas)) {
+    for (let graphQLSchema of graphQLSchemas) {
+      if (graphQLSchema.name === 'default') {
+        graphQLSchemaString = graphQLSchema.schema
+        break
+      }
+    }
+    if (!graphQLSchemaString) {
+      // only fail when there are schemas defined but there's none with the name 'default'
+      // things should work fine when there's no schema at all
+      throw new Error('No schema with name "default" found.')
+    }
   }
 
   const dataSources = await models.DataSource.findAll()
