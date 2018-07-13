@@ -17,21 +17,20 @@ const notesSchema = {
   id: 2,
   name: 'default',
   schema: `
+
+  type Meme {
+    id: ID! @isUnique
+    photoUrl: String!
+  }
   
-  schema {
-    query: Query
-    mutation: Mutation
-    subscription: Subscription
-  }
-
   type Query {
-    _: Boolean
+    allMemes:[Meme!]!
   }
-
+  
   type Mutation {
-    _: Boolean
+    createMeme(photoUrl: String!):Meme!
   }
-
+  
   type Subscription {
     _: Boolean
   }
@@ -44,11 +43,27 @@ const notesSchema = {
 const resolvers = [
   {
     type: 'Query',
-    field: '_',
+    field: 'allMemes',
     DataSourceId: 2,
     GraphQLSchemaId: 2,
-    requestMapping: '{{ null }}',
-    responseMapping: '{{ null }}',
+    requestMapping: '{"operation": "find", "query": {"_type":"meme"}}',
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'createMeme',
+    DataSourceId: 2,
+    GraphQLSchemaId: 2,
+    requestMapping: `{
+      "operation": "insert",
+      "doc": {
+        "_type":"meme",
+        "photoUrl": "{{context.arguments.photoUrl}}"
+      }
+    }`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
   }
