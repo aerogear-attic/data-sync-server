@@ -25,6 +25,7 @@ Handlebars.registerHelper('convertNeDBIds', function (json) {
 
 function compileMappings (requestMapping, responseMapping) {
   // use Handlebars.precompile to fail early during initialization
+  const noEscape = true
   try {
     Handlebars.precompile(requestMapping)
   } catch (ex) {
@@ -41,8 +42,8 @@ function compileMappings (requestMapping, responseMapping) {
     throw (ex)
   }
 
-  const compiledRequestMapping = Handlebars.compile(requestMapping)
-  const compiledResponseMapping = Handlebars.compile(responseMapping)
+  const compiledRequestMapping = Handlebars.compile(requestMapping, { noEscape })
+  const compiledResponseMapping = Handlebars.compile(responseMapping, { noEscape })
 
   return { compiledRequestMapping, compiledResponseMapping }
 }
