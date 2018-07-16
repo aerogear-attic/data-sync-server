@@ -19,7 +19,8 @@
   "homepage": "https://github.com/aerogear/data-sync-server#readme",
   "main": "index.js",
   "scripts": {
-    "test": "ava",
+    "test": "ava '*.test.js' '**/*.test.js' '!integration_test/*'",
+    "test:integration": "ava integration_test/*.test.js",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino",
     "dev:memeo": "GRAPHIQL_QUERY_FILE='examples/memeolist.query.graphql' nodemon ./index.js | pino",
@@ -32,6 +33,7 @@
     "release:validate": "./scripts/validateRelease.sh",
     "db:init": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed 20180704100455-notes-example.js",
     "db:init:memeo": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed 20180711143600-memeolist-example.js",
+    "db:init:blank": "FORCE_DROP=true node ./scripts/sync_models",
     "db:shell": "docker exec -it aerogeardatasyncserver_postgres_1 psql -U postgresql -d aerogear_data_sync_db"
   },
   "devDependencies": {
