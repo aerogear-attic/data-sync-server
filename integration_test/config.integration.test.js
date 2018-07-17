@@ -33,7 +33,6 @@ test.before(async t => {
 
 test.serial('should run with empty schema when no config provided', async t => {
   // empty schema has a Query defined with name '_'
-
   const res = await fetch({
     query: '{ _ }'
   })
@@ -59,7 +58,7 @@ test.serial('should pick up config changes', async t => {
   t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
 })
 
-test.serial('should use prev config when there is a problem with the new one', async t => {
+test.serial('should use prev config when there is a schema syntax problem with the new config', async t => {
   // delete everything and feed a valid config
   await deleteConfig()
   await feedConfig('simple.inmem.valid.notes')
@@ -76,6 +75,74 @@ test.serial('should use prev config when there is a problem with the new one', a
 
   t.falsy(res.errors)
   t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
+})
+
+test.serial('should use prev config when there is a resolver not in the new schema', async t => {
+  // delete everything and feed a valid config
+  await deleteConfig()
+  await triggerReload() // make server pick it up: it will use the empty schema
+
+  // delete everything and feed an invalid config
+  await deleteConfig()
+  await feedConfig('simple.inmem.invalid.notes.resolver.not.in.schema')
+  await triggerReload() // make server try to pick it up. it should still use the the empty schema
+
+  let res = await fetch({
+    query: '{ listNotes {id} }'
+  })
+
+  t.truthy(res.errors)
+  t.falsy(res.data)
+
+  // empty schema has a Query defined with name '_'
+  res = await fetch({
+    query: '{ _ }'
+  })
+
+  t.falsy(res.errors)
+})
+
+// Apollo doesn't complain about this case in advance!
+test.serial('should return null when executing a query with missing resolver', async t => {
+  // delete everything and feed the config
+  await deleteConfig()
+  await feedConfig('simple.inmem.invalid.notes.no.resolver.for.query')
+  await triggerReload() // make server try to pick it up. it should be able to use the new schema.
+
+  let res = await fetch({
+    query: '{ listNotes {id} }'
+  })
+
+  t.falsy(res.errors)
+  t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
+
+  res = await fetch({
+    query: '{ foo }'
+  })
+
+  t.falsy(res.errors)
+  t.deepEqual(res.data, {foo: null})
+})
+
+test.serial('should return error when calling a query that does not exist', async t => {
+  // delete everything and feed the config
+  await deleteConfig()
+  await feedConfig('simple.inmem.valid.notes')
+  await triggerReload()
+
+  let res = await fetch({
+    query: '{ listNotes {id} }'
+  })
+
+  t.falsy(res.errors)
+  t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
+
+  res = await fetch({
+    query: '{ FOO }'
+  })
+
+  t.truthy(res.errors)
+  t.falsy(res.data)
 })
 
 async function deleteConfig () {
