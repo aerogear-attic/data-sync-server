@@ -16,7 +16,10 @@ const datasources = [
 const notesSchema = {
   id: 1,
   name: 'default',
-  schema: `schema {
+  // language=GraphQL
+  schema: `
+  
+  schema {
     query: Query
     mutation: Mutation
     subscription: Subscription
@@ -117,3 +120,6 @@ module.exports = {
     return queryInterface.bulkInsert('Resolvers', resolvers, {})
   }
 }
+
+// IMPORTANT: please describe the config here. things would be complicated for test maintainers otherwise
+module.exports.description = 'A valid config that uses a in-mem data source with notes schema'

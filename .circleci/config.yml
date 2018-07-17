@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run: npm install
       - run: npm run lint
-      - run: npm test
+      - run: npm run test:unit
 
   integration_test:
     docker:
@@ -23,7 +23,7 @@ jobs:
       - checkout
       - run: dockerize -wait tcp://127.0.0.1:5432 -timeout 120s
       - run: npm install
-      - run: npm run db:init:blank
+      - run: npm run db:init
       - run:
           command: npm run dev
           background: true
