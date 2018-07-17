@@ -19,18 +19,7 @@ const notesSchema = {
   // language=GraphQL
   schema: `
   
-  schema {
-    query: Query
-  }
-
-  type Query {
-    listNotes: [Note]
-  }
-
-  type Note {
-    id: String
-    title: String
-  }
+  FOO
     
   `,
   createdAt: time,
@@ -40,11 +29,11 @@ const notesSchema = {
 const resolvers = [
   {
     type: 'Query',
-    field: 'listNotes',
+    field: 'BAR',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: '{"operation": "find","query": {}}',
-    responseMapping: '{{toJSON context.result}}',
+    requestMapping: 'DOES NOT MATTER',
+    responseMapping: 'DOES NOT MATTER',
     createdAt: time,
     updatedAt: time
   }

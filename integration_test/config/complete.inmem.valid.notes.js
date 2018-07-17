@@ -25,13 +25,11 @@ const notesSchema = {
     subscription: Subscription
   }
 
-  # The query type, represents all of the entry points into our object graph
   type Query {
     readNote(id: String): Note
     listNotes: [Note]
   }
 
-  # The mutation type, represents all updates we can make to our data
   type Mutation {
     createNote(
       title: String,
