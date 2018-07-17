@@ -29,7 +29,7 @@ jobs:
           background: true
       - run: npm install tap-xunit --dev
       - run: mkdir -p ~/reports
-      - run: ./node_modules/.bin/ava --tap integration_test/*.test.js | ./node_modules/.bin/tap-xunit > ~/reports/ava.xml
+      - run: ./node_modules/.bin/ava  --concurrency=1 --tap integration_test/*.test.js | ./node_modules/.bin/tap-xunit > ~/reports/ava.xml
       - store_test_results:
           path: ~/reports
       - store_artifacts:
