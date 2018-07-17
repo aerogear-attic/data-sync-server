@@ -17,23 +17,7 @@ const notesSchema = {
   id: 1,
   name: 'default',
   // language=GraphQL
-  schema: `
-  
-  schema {
-    query: Query
-  }
-
-  type Query {
-    listNotes: [Note]
-    foo: Boolean            # no resolver for this
-  }
-
-  type Note {
-      id: String
-      title: String
-  }
-    
-  `,
+  schema: '',
   createdAt: time,
   updatedAt: time
 }
@@ -44,8 +28,8 @@ const resolvers = [
     field: 'listNotes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: '{"operation": "find","query": {}}',
-    responseMapping: '{{toJSON context.result}}',
+    requestMapping: 'DOES NOT MATTER',
+    responseMapping: 'DOES NOT MATTER',
     createdAt: time,
     updatedAt: time
   }
@@ -60,4 +44,4 @@ module.exports = {
 }
 
 // IMPORTANT: please describe the config here. things would be complicated for test maintainers otherwise
-module.exports.description = 'A simplified invalid config that uses a in-mem data source with a query which does not have a resolver'
+module.exports.description = 'A simplified valid config that uses a in-mem data source with empty schema'

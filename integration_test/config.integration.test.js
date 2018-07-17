@@ -31,8 +31,21 @@ test.before(async t => {
   await triggerReload()
 })
 
-test.serial('should run with empty schema when no config provided', async t => {
-  // empty schema has a Query defined with name '_'
+test.serial('should run with default empty schema when no config provided', async t => {
+  // default empty schema has a Query defined with name '_'
+  const res = await fetch({
+    query: '{ _ }'
+  })
+
+  t.falsy(res.errors)
+})
+
+test.serial('should run with default empty schema when no provided config has empty schema', async t => {
+  await deleteConfig()
+  await feedConfig('simple.inmem.valid.empty')
+  await triggerReload()
+
+  // default empty schema has a Query defined with name '_'
   const res = await fetch({
     query: '{ _ }'
   })
@@ -47,6 +60,7 @@ test.serial('should pick up config changes', async t => {
 
   t.truthy(res.errors)
 
+  await deleteConfig()
   await feedConfig('simple.inmem.valid.notes')
   await triggerReload()
 
@@ -66,7 +80,7 @@ test.serial('should use prev config when there is a schema syntax problem with t
 
   // delete everything and feed an invalid config
   await deleteConfig()
-  await feedConfig('simple.inmem.invalid.notes.bad.schema.syntax')
+  await feedConfig('simple.inmem.invalid.bad.schema.syntax')
   await triggerReload() // make server pick it up. it should still use the old valid config
 
   const res = await fetch({
@@ -80,11 +94,11 @@ test.serial('should use prev config when there is a schema syntax problem with t
 test.serial('should use prev config when there is a resolver not in the new schema', async t => {
   // delete everything and feed a valid config
   await deleteConfig()
-  await triggerReload() // make server pick it up: it will use the empty schema
+  await triggerReload() // make server pick it up: it will use the default empty schema
 
   // delete everything and feed an invalid config
   await deleteConfig()
-  await feedConfig('simple.inmem.invalid.notes.resolver.not.in.schema')
+  await feedConfig('simple.inmem.invalid.resolver.not.in.schema')
   await triggerReload() // make server try to pick it up. it should still use the the empty schema
 
   let res = await fetch({
@@ -94,7 +108,7 @@ test.serial('should use prev config when there is a resolver not in the new sche
   t.truthy(res.errors)
   t.falsy(res.data)
 
-  // empty schema has a Query defined with name '_'
+  // default empty schema has a Query defined with name '_'
   res = await fetch({
     query: '{ _ }'
   })
