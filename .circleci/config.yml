@@ -71,6 +71,7 @@ workflows:
       - docker_push_master:
           requires:
             - unit_test
+            - integration_test
           filters:
             branches:
               only:
@@ -78,6 +79,7 @@ workflows:
       - docker_push_release:
           requires:
             - unit_test
+            - integration_test
           filters:
             tags:
               only: /.*/ # allow anything because tag syntax is validated as part of validate-release.sh
