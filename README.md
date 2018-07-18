@@ -56,10 +56,40 @@ Going to remove aerogeardatasyncserver_postgres_1
 Are you sure? [yN] y
 ```
 
-### Running Tests
+### Running Unit Tests
 
 ```
-npm run test
+npm run test:unit
+```
+
+### Running Integration tests:
+
+Start the database first:
+```
+docker-compose up
+```
+
+Then, in a separate session, init the database (blank) and start the application:
+```
+npm run db:init
+npm run dev
+```
+
+In another session, run the tests:
+```
+npm run test:integration
+```
+
+### Running all tests with CircleCi CLI
+
+Install CircleCi CLI using this link: https://circleci.com/docs/2.0/local-cli/
+
+Then execute these command locally:
+
+```
+# CircleCi CLI doesn't support workflows yet
+circleci build --job unit_test
+circleci build --job integration_test
 ```
 
 ### Debugging Individual Tests

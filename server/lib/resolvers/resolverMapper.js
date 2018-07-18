@@ -4,9 +4,6 @@ const {compileMappings} = require('./compiler')
 
 module.exports = function (dataSources, resolverMappings) {
   const resolvers = {
-    Query: {},
-    Mutation: {},
-    Subscription: {}
   }
 
   _.forEach(resolverMappings, (resolverMapping) => {

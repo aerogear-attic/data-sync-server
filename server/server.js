@@ -49,15 +49,39 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     // we still wait for N ms after the notifications are over
     const onReceive = async () => {
       log.info('Received schema change notification. Rebuilding it')
+      let newSchema
       try {
-        await disconnectDataSources(dataSources) // disconnect existing ones first
-        const result = await buildSchema(models)
-        await connectDataSources(dataSources)
-        schema = result.schema
-        dataSources = result.dataSources
+        newSchema = await buildSchema(models)
       } catch (ex) {
-        log.error('Error while reloading schema')
+        log.error('Error while reloading config')
         log.error(ex)
+        log.error('Will continue using the old config')
+      }
+
+      if (newSchema) {
+        try {
+          await disconnectDataSources(dataSources) // disconnect existing ones first
+        } catch (ex) {
+          log.error('Error while disconnecting previous data sources')
+          log.error(ex)
+          log.error('Will continue connecting to new ones')
+        }
+
+        try {
+          await connectDataSources(dataSources)
+          schema = newSchema.schema
+          dataSources = newSchema.dataSources
+        } catch (ex) {
+          log.error('Error while connecting to new data sources')
+          log.error(ex)
+          log.error('Will use the old schema and the data sources')
+          try {
+            await connectDataSources(dataSources)
+          } catch (ex) {
+            log.error('Error while connecting to previous data sources')
+            log.error(ex)
+          }
+        }
       }
     }
     const debouncedOnReceive = _.debounce(onReceive, 500)

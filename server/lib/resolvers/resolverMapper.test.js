@@ -40,21 +40,17 @@ test('should create Postgres resolvers successfully with no Handlebars templates
 
   const resolvers = resolverMapper(dataSources, resolverMappings)
 
-  t.deepEqual(Object.keys(resolvers), ['Query', 'Mutation', 'Subscription'])
+  t.deepEqual(Object.keys(resolvers), ['Query', 'Mutation'])
 
   t.deepEqual(Object.keys(resolvers.Query), ['q1'])
   t.deepEqual(Object.keys(resolvers.Mutation), ['m1'])
-  t.deepEqual(Object.keys(resolvers.Subscription), [])
+  t.falsy(resolvers.Subscription)
 })
 
 test('should return empty when feeded empty', t => {
   const resolvers = resolverMapper({}, {})
 
-  t.deepEqual(resolvers, {
-    Query: {},
-    Mutation: {},
-    Subscription: {}
-  })
+  t.deepEqual(resolvers, {})
 })
 
 test('should allow unknown operations', t => {
@@ -67,30 +63,33 @@ test('should allow unknown operations', t => {
   }]
   const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
 
-  const resolverMappings = [{
-    'type': 'Query',
-    'field': 'q1',
-    'DataSource': {
-      'name': 'p1'
+  const resolverMappings = [
+    {
+      'type': 'Query',
+      'field': 'q1',
+      'DataSource': {
+        'name': 'p1'
+      },
+      'requestMapping': 'q1_requestMapping',
+      'responseMapping': 'q1_responseMapping'
     },
-    'requestMapping': 'q1_requestMapping',
-    'responseMapping': 'q1_responseMapping'
-  }, {
-    'type': 'UnknownOperation',
-    'field': 'foo',
-    'DataSource': {
-      'name': 'p1'
-    },
-    'requestMapping': 'm1_requestMapping  {{ var }}',
-    'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
-  }]
+    {
+      'type': 'UnknownOperation',
+      'field': 'foo',
+      'DataSource': {
+        'name': 'p1'
+      },
+      'requestMapping': 'm1_requestMapping  {{ var }}',
+      'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
+    }
+  ]
   const resolvers = resolverMapper(dataSources, resolverMappings)
 
-  t.deepEqual(Object.keys(resolvers), ['Query', 'Mutation', 'Subscription', 'UnknownOperation'])
+  t.deepEqual(Object.keys(resolvers), ['Query', 'UnknownOperation'])
 
   t.deepEqual(Object.keys(resolvers.Query), ['q1'])
-  t.deepEqual(Object.keys(resolvers.Mutation), [])
-  t.deepEqual(Object.keys(resolvers.Subscription), [])
+  t.falsy(resolvers.Mutation)
+  t.falsy(resolvers.Subscription)
 })
 
 test('should throw exception when data source is not defined', t => {
