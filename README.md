@@ -14,20 +14,37 @@ npm install
 
 ### Start and Initialize the Database
 
-Use docker compose to start the database.
+Use docker compose to start the database(s).
 
 ```
 docker-compose up
 ```
 
+There are 2 Postgres instances defined in docker-compose configuration:
+1. For storing the configuration of the sync server itself
+2. For storing the [Memeolist](#whats-memeolist) data.
+
+Since docker-compose is only used with development, starting up the Postgres instance for [Memeolist](#whats-memeolist)
+will not cause any harm. 
+
 Initialize the database in another terminal.
 
 ```
+# no sample schema/resolvers
 npm run db:init
+
+# sample schema/resolvers for memeolist - in-memory data source
+npm run db:init:memeo:inmem
+
+# sample schema/resolvers for memeolist - Postgres data source
+npm run db:init:memeo:postgres
 ```
 
-`npm run db:init` sets up the necessary tables and seeds the database with data useful for local development. **It is a destructive action.** It drops and recreates the tables every time.
+`npm run db:init*` commands set up the necessary tables.  **Those are destructive actions.** 
+They drop and recreate the tables every time.
 
+`npm run db:init:memeo:*` commands are useful for local development which and seed the database with config and tables
+for [Memeolist](#whats-memeolist) sample application. 
 
 ### Start the Server
 
@@ -165,8 +182,28 @@ The baseline architecture is shown below:
 
 ## Memeolist
 
-To start the application with MemeoList schema and queries run
+### What's Memeolist?
+
+Memeolist is an application where AeroGear team targets testing AeroGear mobile services and SDKs on it.
+
+You can see the specification for it here: https://github.com/aerogear/proposals/blob/master/dogfood.md 
+
+There is some tooling adjusted to create Memeolist app's backend within the project.
+
+### Memeolist - In memory 
+
+To start the application with MemeoList schema and queries with an in-memory data source, run these commands:
 ```
-npm run db:init:memeo
+docker-compose up
+npm run db:init:memeo:inmem
 npm run dev:memeo
 ```
+
+### Memeolist - Postgres 
+
+To start the application with MemeoList schema and queries with an Postgres source, run these commands:
+```
+docker-compose up
+npm run db:init:memeo:postgres
+npm run dev:memeo
+``` 
