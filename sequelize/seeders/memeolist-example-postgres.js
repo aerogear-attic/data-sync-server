@@ -1,6 +1,6 @@
 'use strict'
 
-const {memeoListSchema} = require('./memeolist-example-shared')
+const {schema} = require('./memeolist-example-shared')
 
 const time = new Date()
 
@@ -48,7 +48,7 @@ const resolvers = [
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert('DataSources', datasources, {})
-    await queryInterface.bulkInsert('GraphQLSchemas', [memeoListSchema], {})
+    await queryInterface.bulkInsert('GraphQLSchemas', [schema], {})
     return queryInterface.bulkInsert('Resolvers', resolvers, {})
   }
 }
