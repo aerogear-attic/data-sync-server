@@ -14,22 +14,49 @@ jobs:
     docker:
       # Node 8 LTS
       - image: circleci/node:carbon
+      # configuration database
       - image: circleci/postgres:9.6.2-alpine
+        name: config_postgres
         environment:
             POSTGRES_USER: postgresql
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: aerogear_data_sync_db
+      # memeolist database
+      - image: circleci/postgres:9.6.2-alpine
+        name: memeolist_postgres
+        environment:
+            POSTGRES_USER: postgresql
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: memeolist_db
     steps:
       - checkout
-      - run: dockerize -wait tcp://127.0.0.1:5432 -timeout 120s
+      - run:
+          name: Wait for configuration database to start up
+          command: dockerize -wait tcp://config_postgres:5432 -timeout 120s
+      - run:
+          name: Wait for memeolist database to start up
+          command: dockerize -wait tcp://memeolist_postgres:5432 -timeout 120s
       - run: npm install
-      - run: npm run db:init
+      - run:
+          command: npm run db:init
+          environment:
+            POSTGRES_HOST: 'config_postgres'
+            POSTGRES_PORT: '5432'
       - run:
           command: npm run dev
+          environment:
+            POSTGRES_HOST: 'config_postgres'
+            POSTGRES_PORT: '5432'
           background: true
       - run: npm install tap-xunit --dev
       - run: mkdir -p ~/reports
-      - run: ./node_modules/.bin/ava  --concurrency=1 --tap integration_test/*.test.js | ./node_modules/.bin/tap-xunit > ~/reports/ava.xml
+      - run:
+          command: ./node_modules/.bin/ava  --concurrency=1 --tap integration_test/*.test.js | ./node_modules/.bin/tap-xunit > ~/reports/ava.xml
+          environment:
+            POSTGRES_HOST: 'config_postgres'
+            POSTGRES_PORT: '5432'
+            MEMEOLIST_DB_HOST: 'memeolist_postgres'
+            MEMEOLIST_DB_PORT: '5432'
       - store_test_results:
           path: ~/reports
       - store_artifacts:
