@@ -17,7 +17,7 @@ npm install
 Use docker compose to start the database(s).
 
 ```
-docker-compose up
+docker-compose -p aerogeardatasyncserver up
 ```
 
 There are 2 Postgres instances defined in docker-compose configuration:
@@ -67,7 +67,7 @@ npm run db:shell
 The Postgres container started by `docker-compose` can be stopped with `Ctrl + C`. To remove it fully:
 
 ```
-docker-compose rm
+docker-compose -p aerogeardatasyncserver rm
 
 Going to remove aerogeardatasyncserver_postgres_1
 Are you sure? [yN] y
@@ -83,7 +83,7 @@ npm run test:unit
 
 Start the database first:
 ```
-docker-compose up
+docker-compose -p aerogeardatasyncserver up
 ```
 
 Then, in a separate session, init the database (blank) and start the application:
@@ -194,7 +194,7 @@ There is some tooling adjusted to create Memeolist app's backend within the proj
 
 To start the application with MemeoList schema and queries with an in-memory data source, run these commands:
 ```
-docker-compose up
+docker-compose -p aerogeardatasyncserver up
 npm run db:init:memeo:inmem
 npm run dev:memeo
 ```
@@ -203,7 +203,7 @@ npm run dev:memeo
 
 To start the application with MemeoList schema and queries with an Postgres source, run these commands:
 ```
-docker-compose up
+docker-compose -p aerogeardatasyncserver up
 npm run db:init:memeo:postgres
 npm run dev:memeo
 ``` 
