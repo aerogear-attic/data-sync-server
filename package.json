@@ -32,8 +32,10 @@
     "docker:push:release": "./scripts/docker_push_release.sh",
     "release:validate": "./scripts/validateRelease.sh",
     "db:init": "FORCE_DROP=true node ./scripts/sync_models",
-    "db:init:memeo": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed 20180711143600-memeolist-example.js",
-    "db:shell": "docker exec -it aerogeardatasyncserver_postgres_1 psql -U postgresql -d aerogear_data_sync_db"
+    "db:init:memeo:inmem": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-inmem.js",
+    "db:init:memeo:postgres": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-postgres.js && docker exec aerogeardatasyncserver_postgres_memeo_1 psql -U postgres -d memeolist_db -f /tmp/examples/memeolist.tables.sql",
+    "db:shell": "docker exec -it aerogeardatasyncserver_postgres_1 psql -U postgresql -d aerogear_data_sync_db",
+    "db:shell:memeo": "docker exec -it aerogeardatasyncserver_postgres_memeo_1 psql -U postgresql -d memeolist_db"
   },
   "devDependencies": {
     "apollo-fetch": "^0.7.0",

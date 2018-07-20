@@ -11,8 +11,6 @@ function buildPostgresResolver (dataSourceClient, compiledRequestMapping, compil
 
       dataSourceClient.query(queryString, [], (err, res) => {
         if (err) return reject(err)
-        // TODO: should we end the connection with each request?
-        // dataSourceClient.end()
 
         const responseString = compiledResponseMapping({
           context: {
