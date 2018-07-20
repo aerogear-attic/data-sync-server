@@ -68,7 +68,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
         }
 
         try {
-          await connectDataSources(dataSources)
+          await connectDataSources(newSchema.dataSources)
           schema = newSchema.schema
           dataSources = newSchema.dataSources
         } catch (ex) {
