@@ -1,10 +1,12 @@
 'use strict'
 
+const {memeoListSchema} = require('./memeolist-example-shared')
+
 const time = new Date()
 
 const datasources = [
   {
-    id: 2,
+    id: 1,
     name: 'nedb_postgres',
     type: 'Postgres',
     config: `{"options":{
@@ -20,39 +22,12 @@ const datasources = [
   }
 ]
 
-const memeoListSchema = {
-  id: 2,
-  name: 'default',
-  schema: `
-
-  type Meme {
-    id: ID! @isUnique
-    photoUrl: String!
-  }
-  
-  type Query {
-    allMemes:[Meme!]!
-  }
-  
-  type Mutation {
-    createMeme(photoUrl: String!):Meme!
-  }
-  
-  type Subscription {
-    _: Boolean
-  }
-  
-  `,
-  createdAt: time,
-  updatedAt: time
-}
-
 const resolvers = [
   {
     type: 'Query',
     field: 'allMemes',
-    DataSourceId: 2,
-    GraphQLSchemaId: 2,
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
     requestMapping: 'SELECT "id", "photoUrl" FROM "Meme"',
     responseMapping: '{{ toJSON context.result }}',
     createdAt: time,
@@ -61,8 +36,8 @@ const resolvers = [
   {
     type: 'Mutation',
     field: 'createMeme',
-    DataSourceId: 2,
-    GraphQLSchemaId: 2,
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
     requestMapping: `INSERT INTO "Meme" ("photoUrl") VALUES ('{{context.arguments.photoUrl}}') RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
