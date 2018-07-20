@@ -5,7 +5,8 @@ function buildPostgresResolver (dataSourceClient, compiledRequestMapping, compil
     return new Promise((resolve, reject) => {
       const queryString = compiledRequestMapping({
         context: {
-          arguments: args
+          arguments: args,
+          parent: obj
         }
       })
 
