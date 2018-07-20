@@ -13,7 +13,7 @@ const datasources = [
   }
 ]
 
-const notesSchema = {
+const memeoListSchema = {
   id: 2,
   name: 'default',
   schema: `
@@ -72,7 +72,7 @@ const resolvers = [
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert('DataSources', datasources, {})
-    await queryInterface.bulkInsert('GraphQLSchemas', [notesSchema], {})
+    await queryInterface.bulkInsert('GraphQLSchemas', [memeoListSchema], {})
     return queryInterface.bulkInsert('Resolvers', resolvers, {})
   }
 }
