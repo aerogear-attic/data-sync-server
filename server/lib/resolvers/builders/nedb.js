@@ -1,8 +1,10 @@
 const JSONParse = require('json-parse-safe')
 
-function buildNeDBResolver (dataSourceClient, compiledRequestMapping, compiledResponseMapping) {
+function buildNeDBResolver (dataSource, compiledRequestMapping, compiledResponseMapping) {
   return function resolve (obj, args, context, info) {
     return new Promise((resolve, reject) => {
+      const dataSourceClient = dataSource.getClient()
+
       const queryString = compiledRequestMapping({
         context: {
           arguments: args,

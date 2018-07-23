@@ -3,15 +3,25 @@ const Datastore = require('nedb')
 const type = 'InMemory'
 
 function NEDBDatasource (config = {}) {
-  this.client = new Datastore(config.options)
+  let client
   this.type = type
+
   this.connect = async () => {
-    // noop
+    if (!client) {
+      client = new Datastore(config.options)
+    }
   }
+
   this.disconnect = async () => {
-    this.client = undefined
+    client = undefined
   }
-  return this
+
+  this.getClient = () => {
+    if (!client) {
+      throw new Error('Data source is disconnected! Reconnect first')
+    }
+    return client
+  }
 }
 
 module.exports = NEDBDatasource
