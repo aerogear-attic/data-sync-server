@@ -23,31 +23,20 @@ Handlebars.registerHelper('convertNeDBIds', function (json) {
   return json
 })
 
-function compileMappings (requestMapping, responseMapping) {
+function compile (template) {
   // use Handlebars.precompile to fail early during initialization
   const noEscape = true
   try {
-    Handlebars.precompile(requestMapping)
+    Handlebars.precompile(template)
   } catch (ex) {
-    log.error('Compilation error in requestMapping: ' + requestMapping)
+    log.error('Compilation error in template: ' + template)
     log.error(ex)
     throw (ex)
   }
 
-  try {
-    Handlebars.precompile(responseMapping)
-  } catch (ex) {
-    log.error('Compilation error in response mapping: ' + responseMapping)
-    log.error(ex)
-    throw (ex)
-  }
-
-  const compiledRequestMapping = Handlebars.compile(requestMapping, { noEscape })
-  const compiledResponseMapping = Handlebars.compile(responseMapping, { noEscape })
-
-  return { compiledRequestMapping, compiledResponseMapping }
+  return Handlebars.compile(template, { noEscape })
 }
 
 module.exports = {
-  compileMappings
+  compile
 }
