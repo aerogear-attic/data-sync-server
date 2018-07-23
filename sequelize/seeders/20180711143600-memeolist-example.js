@@ -32,7 +32,7 @@ const notesSchema = {
   }
   
   type Subscription {
-    memeAdded(photoUrl: String!):Meme!
+    memeAdded(photoUrl: String):Meme!
   }
   
   `,
