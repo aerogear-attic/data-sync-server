@@ -32,13 +32,24 @@ const notesSchema = {
   }
   
   type Subscription {
-    _: Boolean
+    memeAdded(photoUrl: String!):Meme!
   }
   
   `,
   createdAt: time,
   updatedAt: time
 }
+
+const subscriptions = [
+  {
+    type: 'Subscription',
+    field: 'memeAdded',
+    GraphQLSchemaId: 2,
+    topic: 'memeCreated',
+    createdAt: time,
+    updatedAt: time
+  }
+]
 
 const resolvers = [
   {
@@ -64,6 +75,12 @@ const resolvers = [
       }
     }`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    publish: JSON.stringify({
+      topic: 'memeCreated',
+      payload: `{
+        "memeAdded": {{ toJSON context.result }},
+      }`
+    }),
     createdAt: time,
     updatedAt: time
   }
@@ -73,6 +90,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert('DataSources', datasources, {})
     await queryInterface.bulkInsert('GraphQLSchemas', [notesSchema], {})
+    await queryInterface.bulkInsert('Subscriptions', subscriptions, {})
     return queryInterface.bulkInsert('Resolvers', resolvers, {})
   }
 }

@@ -3,7 +3,8 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.STRING,
     field: DataTypes.STRING,
     requestMapping: DataTypes.TEXT,
-    responseMapping: DataTypes.TEXT
+    responseMapping: DataTypes.TEXT,
+    publish: DataTypes.JSON
   })
 
   Resolver.associate = (models) => {

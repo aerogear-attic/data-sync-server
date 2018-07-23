@@ -1,10 +1,10 @@
 const _ = require('lodash')
 const resolverBuilders = require('./builders')
-const {compileMappings} = require('./compiler')
+const { compile } = require('./compiler')
+const { log } = require('../util/logger')
 
-module.exports = function (dataSources, resolverMappings) {
-  const resolvers = {
-  }
+module.exports = function (dataSources, resolverMappings, pubsub) {
+  const resolvers = {}
 
   _.forEach(resolverMappings, (resolverMapping) => {
     const resolverMappingName = resolverMapping.field
@@ -33,13 +33,32 @@ module.exports = function (dataSources, resolverMappings) {
     let builder = resolverBuilders[dataSource.type]
 
     if (builder) {
-      const {compiledRequestMapping, compiledResponseMapping} = compileMappings(resolverMapping.requestMapping, resolverMapping.responseMapping)
+      const compiledRequestMapping = compile(resolverMapping.requestMapping)
+      const compiledResponseMapping = compile(resolverMapping.responseMapping)
       if (builder.buildResolver && typeof builder.buildResolver === 'function') {
-        const resolver = builder.buildResolver(
+        // This is the actual resolver function
+        const builtResolver = builder.buildResolver(
           dataSource.client,
           compiledRequestMapping,
           compiledResponseMapping
         )
+
+        let resolver = builtResolver
+
+        // If a publish option is specified we wrap the resolver function
+        if (resolverMapping.publish) {
+          const { topic, payload } = resolverMapping.publish
+
+          const publishOpts = {
+            pubsub,
+            topic,
+            compiledPayload: compile(payload)
+          }
+          // Build a wrapper function around the resolver
+          // This wrapper function will run the resolver
+          // And also publish a notification
+          resolver = resolveAndPublish(builtResolver, publishOpts)
+        }
 
         resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
         resolvers[resolverMapping.type][resolverMappingName] = resolver
@@ -52,4 +71,37 @@ module.exports = function (dataSources, resolverMappings) {
   })
 
   return resolvers
+}
+
+function resolveAndPublish (resolverFn, publishOpts) {
+  return (obj, args, context, info) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const result = await resolverFn(obj, args, context, info)
+        resolve(result)
+
+        const { pubsub, topic, compiledPayload } = publishOpts
+
+        let compileOpts = {
+          context: {
+            result: result
+          }
+        }
+
+        let payload = compiledPayload(compileOpts)
+
+        // The InMemory pubsub implementation wants an object
+        // Whereas the postgres one would expect a string
+        if (pubsub.type === 'InMemory') {
+          payload = JSON.parse(payload)
+        }
+
+        log.info('publishing to topic', { topic, payload })
+
+        pubsub.client.publish(topic, payload)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  }
 }

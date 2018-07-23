@@ -7,6 +7,8 @@ const cors = require('cors')
 const {log} = require('./lib/util/logger')
 const expressPino = require('express-pino-logger')({logger: log})
 const {runHealthChecks} = require('./health')
+const { subscribe, execute } = require('graphql')
+const { SubscriptionServer } = require('subscriptions-transport-ws')
 
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
@@ -112,6 +114,17 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   process.on('SIGQUIT', stopHandler)
   process.on('SIGINT', stopHandler)
 
+  // Set up the WebSocket for handling GraphQL subscriptions
+  /* eslint-disable no-new */
+  new SubscriptionServer({
+    execute: execute,
+    subscribe: subscribe,
+    schema
+  }, {
+    server: server,
+    path: '/subscriptions'
+  })
+
   return server
 }
 
@@ -133,10 +146,8 @@ async function buildSchema (models) {
     }
   }
 
-  const dataSources = await models.DataSource.findAll()
-  let dataSourcesJson = dataSources.map((dataSource) => {
-    return dataSource.toJSON()
-  })
+  let dataSourcesJson = await models.DataSource.findAll({raw: true})
+  const subscriptionsJson = await models.Subscription.findAll({raw: true})
 
   const resolvers = await models.Resolver.findAll({
     include: [models.DataSource]
@@ -173,7 +184,7 @@ async function buildSchema (models) {
   }
 
   try {
-    return schemaParser(graphQLSchemaString, dataSourcesJson, resolversJson)
+    return schemaParser(graphQLSchemaString, dataSourcesJson, resolversJson, subscriptionsJson)
   } catch (error) {
     log.error('Error while building schema.')
     log.error(error)
