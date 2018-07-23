@@ -36,7 +36,7 @@ module.exports = function (dataSources, resolverMappings) {
       const {compiledRequestMapping, compiledResponseMapping} = compileMappings(resolverMapping.requestMapping, resolverMapping.responseMapping)
       if (builder.buildResolver && typeof builder.buildResolver === 'function') {
         const resolver = builder.buildResolver(
-          dataSource.client,
+          dataSource,
           compiledRequestMapping,
           compiledResponseMapping
         )

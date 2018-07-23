@@ -28,6 +28,10 @@ module.exports = function (dataSourceDefs, connect = true) {
       throw new Error(`Data source for ${dataSourceDef.type} is missing "disconnect" function`)
     }
 
+    if (!dataSourceObj.getClient && typeof dataSourceObj.getClient !== 'function') {
+      throw new Error(`Data source for ${dataSourceDef.type} is missing "getClient" function`)
+    }
+
     dataSources[dataSourceName] = dataSourceObj
   })
 

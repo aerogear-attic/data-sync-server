@@ -1,4 +1,4 @@
-const { test } = require('ava')
+const {test} = require('ava')
 
 const dataSourceParser = require('./dataSourceParser')
 
@@ -19,9 +19,8 @@ test('should parse single data source successfully', t => {
   t.is(Object.keys(dataSources).length, 1)
   t.truthy(dataSources['p1'])
 
-  let { type, client } = dataSources['p1']
+  const type = dataSources['p1'].type
   t.deepEqual(type, 'Postgres')
-  t.truthy(client)
 })
 
 test('should parse multiple data sources successfully', t => {
