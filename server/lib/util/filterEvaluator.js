@@ -31,7 +31,7 @@ module.exports = function ExpressionParser () {
         throw Error('expression is not an object', expression)
       }
 
-      var keys = Object.keys(expression)
+      const keys = Object.keys(expression)
       if (keys.length !== 1) {
         throw Error('expression should only have one key', JSON.stringify(expression))
       }
@@ -76,9 +76,9 @@ module.exports = function ExpressionParser () {
     if (typeof str !== 'string' || str.length <= 1) {
       return str
     }
-    var c1 = str[0]
+    const c1 = str[0]
     if (c1 === '$') {
-      var cn = str.substring(1)
+      const cn = str.substring(1)
       return _.get(context, cn)
     } else {
       return str
