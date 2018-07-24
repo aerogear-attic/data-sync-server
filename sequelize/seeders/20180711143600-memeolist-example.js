@@ -78,7 +78,7 @@ const resolvers = [
     publish: JSON.stringify({
       topic: 'memeCreated',
       payload: `{
-        "memeAdded": {{ toJSON context.result }},
+        "memeAdded": {{ toJSON context.result }}
       }`
     }),
     createdAt: time,
