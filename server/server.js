@@ -20,6 +20,9 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
   const app = express()
 
+  // Wrap the Express server
+  const server = http.createServer(app)
+
   app.use('*', cors())
   app.use(expressPino)
 
@@ -53,6 +56,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
       log.info('Received schema change notification. Rebuilding it')
       let newSchema
       try {
+        newSubScriptionServer(server, schema)
         newSchema = await buildSchema(models, pubsub)
       } catch (ex) {
         log.error('Error while reloading config')
@@ -90,9 +94,6 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     schemaListener.start(debouncedOnReceive)
   }
 
-  // Wrap the Express server
-  const server = http.createServer(app)
-
   const stopHandler = async () => {
     try {
       log.info('SIGTERM received. Closing connections, stopping server')
@@ -114,17 +115,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   process.on('SIGQUIT', stopHandler)
   process.on('SIGINT', stopHandler)
 
-  // Set up the WebSocket for handling GraphQL subscriptions
-  /* eslint-disable no-new */
-  new SubscriptionServer({
-    execute: execute,
-    subscribe: subscribe,
-    schema
-  }, {
-    server: server,
-    path: '/subscriptions'
-  })
-
+  newSubScriptionServer(server, schema)
   return server
 }
 
@@ -218,4 +209,17 @@ async function disconnectDataSources (dataSources) {
       // swallow
     }
   }
+}
+
+function newSubScriptionServer (server, schema) {
+  // Set up the WebSocket for handling GraphQL subscriptions
+  /* eslint-disable no-new */
+  new SubscriptionServer({
+    execute: execute,
+    subscribe: subscribe,
+    schema
+  }, {
+    server: server,
+    path: '/subscriptions'
+  })
 }
