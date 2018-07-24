@@ -13,9 +13,9 @@ const { SubscriptionServer } = require('subscriptions-transport-ws')
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
-module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaListenerConfig}, models) => {
+module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaListenerConfig}, models, pubsub) => {
   const {tracing} = graphQLConfig
-  let {schema, dataSources} = await buildSchema(models)
+  let {schema, dataSources} = await buildSchema(models, pubsub)
   await connectDataSources(dataSources)
 
   const app = express()
@@ -53,7 +53,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
       log.info('Received schema change notification. Rebuilding it')
       let newSchema
       try {
-        newSchema = await buildSchema(models)
+        newSchema = await buildSchema(models, pubsub)
       } catch (ex) {
         log.error('Error while reloading config')
         log.error(ex)
@@ -128,7 +128,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   return server
 }
 
-async function buildSchema (models) {
+async function buildSchema (models, pubsub) {
   const graphQLSchemas = await models.GraphQLSchema.findAll()
   let graphQLSchemaString = null
 
@@ -184,7 +184,7 @@ async function buildSchema (models) {
   }
 
   try {
-    return schemaParser(graphQLSchemaString, dataSourcesJson, resolversJson, subscriptionsJson)
+    return schemaParser(graphQLSchemaString, dataSourcesJson, resolversJson, subscriptionsJson, pubsub)
   } catch (error) {
     log.error('Error while building schema.')
     log.error(error)

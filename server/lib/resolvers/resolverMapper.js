@@ -50,14 +50,13 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
           const { topic, payload } = resolverMapping.publish
 
           const publishOpts = {
-            pubsub,
             topic,
             compiledPayload: compile(payload)
           }
           // Build a wrapper function around the resolver
           // This wrapper function will run the resolver
           // And also publish a notification
-          resolver = resolveAndPublish(builtResolver, publishOpts)
+          resolver = resolveAndPublish(builtResolver, pubsub, publishOpts)
         }
 
         resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
@@ -73,33 +72,22 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
   return resolvers
 }
 
-function resolveAndPublish (resolverFn, publishOpts) {
+function resolveAndPublish (resolverFn, pubsub, publishOpts) {
   return (obj, args, context, info) => {
     return new Promise(async (resolve, reject) => {
       try {
         const result = await resolverFn(obj, args, context, info)
         resolve(result)
 
-        const { pubsub, topic, compiledPayload } = publishOpts
-
-        let compileOpts = {
+        const publishContext = {
           context: {
             result: result
           }
         }
 
-        let payload = compiledPayload(compileOpts)
-
-        // The InMemory pubsub implementation wants an object
-        // Whereas the postgres one would expect a string
-        if (pubsub.type === 'InMemory') {
-          payload = JSON.parse(payload)
-        }
-
-        log.info('publishing to topic', { topic, payload })
-
-        pubsub.client.publish(topic, payload)
+        pubsub.publish(publishOpts, publishContext)
       } catch (error) {
+        log.error(error)
         reject(error)
       }
     })
