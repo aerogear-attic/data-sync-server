@@ -56,7 +56,6 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
       log.info('Received schema change notification. Rebuilding it')
       let newSchema
       try {
-        newSubScriptionServer(server, schema)
         newSchema = await buildSchema(models, pubsub)
       } catch (ex) {
         log.error('Error while reloading config')
@@ -77,6 +76,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
           await connectDataSources(newSchema.dataSources)
           schema = newSchema.schema
           dataSources = newSchema.dataSources
+          newSubScriptionServer(server, schema)
         } catch (ex) {
           log.error('Error while connecting to new data sources')
           log.error(ex)
