@@ -76,10 +76,10 @@ module.exports = function ExpressionParser () {
     if (typeof str !== 'string' || str.length <= 1) {
       return str
     }
-    const c1 = str[0]
-    if (c1 === '$') {
-      const cn = str.substring(1)
-      return _.get(context, cn)
+    const firstChar = str[0]
+    if (firstChar === '$') {
+      const path = str.substring(1)
+      return _.get(context, path)
     } else {
       return str
     }
