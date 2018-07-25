@@ -32,41 +32,41 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
     let dataSource = dataSources[resolverMapping.DataSource.name]
     let builder = resolverBuilders[dataSource.type]
 
-    if (builder) {
-      const compiledRequestMapping = compile(resolverMapping.requestMapping)
-      const compiledResponseMapping = compile(resolverMapping.responseMapping)
-      if (builder.buildResolver && typeof builder.buildResolver === 'function') {
-        // This is the actual resolver function
-        const builtResolver = builder.buildResolver(
-          dataSource.client,
-          compiledRequestMapping,
-          compiledResponseMapping
-        )
-
-        let resolver = builtResolver
-
-        // If a publish option is specified we wrap the resolver function
-        if (resolverMapping.publish) {
-          const { topic, payload } = resolverMapping.publish
-
-          const publishOpts = {
-            topic,
-            compiledPayload: compile(payload)
-          }
-          // Build a wrapper function around the resolver
-          // This wrapper function will run the resolver
-          // And also publish a notification
-          resolver = resolveAndPublish(builtResolver, pubsub, publishOpts)
-        }
-
-        resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
-        resolvers[resolverMapping.type][resolverMappingName] = resolver
-      } else {
-        throw new Error(`Resolver builder for ${dataSource.type} missing buildResolver function`)
-      }
-    } else {
+    if (!builder) {
       throw new Error(`No resolver builder for type: ${dataSource.type}`)
     }
+
+    if (!builder.buildResolver || typeof builder.buildResolver !== 'function') {
+      throw new Error(`Resolver builder for ${dataSource.type} missing buildResolver function`)
+    }
+
+    const compiledRequestMapping = compile(resolverMapping.requestMapping)
+    const compiledResponseMapping = compile(resolverMapping.responseMapping)
+    // This is the actual resolver function
+    const builtResolver = builder.buildResolver(
+      dataSource.client,
+      compiledRequestMapping,
+      compiledResponseMapping
+    )
+
+    let resolver = builtResolver
+
+    // If a publish option is specified we wrap the resolver function
+    if (resolverMapping.publish) {
+      const { topic, payload } = resolverMapping.publish
+
+      const publishOpts = {
+        topic,
+        compiledPayload: compile(payload)
+      }
+      // Build a wrapper function around the resolver
+      // This wrapper function will run the resolver
+      // And also publish a notification
+      resolver = resolveAndPublish(builtResolver, pubsub, publishOpts)
+    }
+
+    resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
+    resolvers[resolverMapping.type][resolverMappingName] = resolver
   })
 
   return resolvers
