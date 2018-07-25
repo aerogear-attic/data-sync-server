@@ -14,7 +14,7 @@ module.exports = function mapSubscriptions (subsciptionMappings, pubsub) {
     const subscriptionMappingName = subscriptionMapping.field
 
     if (_.isEmpty(subscriptionMapping.topic)) {
-      throw new Error('Missing topic for subscription mapping: ' + subscriptionMappingName)
+      subscriptionMapping.topic = subscriptionMappingName
     }
 
     let resolver = {}
