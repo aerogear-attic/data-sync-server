@@ -212,7 +212,6 @@ async function disconnectDataSources (dataSources) {
 }
 
 function newSubScriptionServer (server, schema) {
-  // Set up the WebSocket for handling GraphQL subscriptions
   /* eslint-disable no-new */
   new SubscriptionServer({
     execute: execute,
