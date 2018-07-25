@@ -258,7 +258,7 @@ test('should create a resolver when resolverMapping.publish is a string', t => {
   t.falsy(resolvers.Subscription)
 })
 
-test('should throw resolverMapping.publish is an empty object', t => {
+test('should throw when resolverMapping.publish is an empty object', t => {
   const dataSourceDefs = [{
     'type': 'Postgres',
     'name': 'p1',
