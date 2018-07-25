@@ -1,4 +1,4 @@
-const {test} = require('ava')
+const { test } = require('ava')
 
 const dataSourceParser = require('../datasources/dataSourceParser')
 const resolverMapper = require('./resolverMapper')
@@ -224,6 +224,61 @@ test('should throw error when there is an error in response mapping Handlebars t
     'requestMapping': '{{ var }}',
     'responseMapping': 'q1_responseMapping {{ toJSON "foo" } }'
   }]
+  t.throws(() => {
+    resolverMapper(dataSources, resolverMappings)
+  })
+})
+
+test('should create a resolver when resolverMapping.publish is a string', t => {
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
+    }
+  }]
+  const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
+
+  const resolverMappings = [{
+    'type': 'Mutation',
+    'field': 'm1',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'publish': 'someAction',
+    'requestMapping': 'm1_requestMapping  {{ var }}',
+    'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
+  }]
+
+  const resolvers = resolverMapper(dataSources, resolverMappings)
+
+  t.deepEqual(Object.keys(resolvers), ['Mutation'])
+
+  t.deepEqual(Object.keys(resolvers.Mutation), ['m1'])
+  t.falsy(resolvers.Subscription)
+})
+
+test('should throw resolverMapping.publish is an empty object', t => {
+  const dataSourceDefs = [{
+    'type': 'Postgres',
+    'name': 'p1',
+    'config': {
+      'not_really_important': 'not_an_integration_test'
+    }
+  }]
+  const dataSources = dataSourceParser(dataSourceDefs, false) // do not connect!
+
+  const resolverMappings = [{
+    'type': 'Mutation',
+    'field': 'm1',
+    'DataSource': {
+      'name': 'p1'
+    },
+    'publish': '{}',
+    'requestMapping': 'm1_requestMapping  {{ var }}',
+    'responseMapping': 'm1_responseMapping {{ toJSON "foo" }}'
+  }]
+
   t.throws(() => {
     resolverMapper(dataSources, resolverMappings)
   })

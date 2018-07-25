@@ -1,15 +1,17 @@
 const { compile } = require('./compiler')
 const { log } = require('../util/logger')
+const JSONParse = require('json-parse-safe')
 
 exports.wrapResolverWithPublish = function wrapResolverWithPublish (resolver, resolverMapping, pubsub) {
-  try {
-    // If resolverMapping.publish is an object then parse it and build a custom publisher
-    resolverMapping.publish = JSON.parse(resolverMapping.publish)
-    return wrapResolverWithCustomPublish(resolver, resolverMapping, pubsub)
-  } catch (error) {
-    // If resolverMapping.publish is a string, then we build a default publisher
+  const publisherConfig = JSONParse(resolverMapping.publish)
+
+  if (publisherConfig.error) {
+    // If resolverMapping.publish is a regular (non-JSON) string, then we build a default publisher
     return wrapResolverWithDefaultPublish(resolver, resolverMapping, pubsub)
   }
+
+  resolverMapping.publish = publisherConfig.value
+  return wrapResolverWithCustomPublish(resolver, resolverMapping, pubsub)
 }
 
 function wrapResolverWithDefaultPublish (resolver, resolverMapping, pubsub) {
@@ -28,6 +30,8 @@ function wrapResolverWithDefaultPublish (resolver, resolverMapping, pubsub) {
   return resolveAndPublish(resolver, pubsub, publishOpts)
 }
 
+// Build a custom publisher. This is used when a resolverMapping has a publish config object
+// This object lets a user define how their payload looks and which topic to publish on
 function wrapResolverWithCustomPublish (resolver, resolverMapping, pubsub) {
   const { topic, payload } = resolverMapping.publish
 

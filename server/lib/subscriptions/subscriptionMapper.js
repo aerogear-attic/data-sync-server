@@ -17,6 +17,10 @@ module.exports = function mapSubscriptions (subsciptionMappings, pubsub) {
       subscriptionMapping.topic = subscriptionMappingName
     }
 
+    if (subscriptionMapping.type !== 'Subscription') {
+      throw Error(`subscriptionMapping ${subscriptionMappingName} has incorrect type. It must be 'Subscription'`)
+    }
+
     let resolver = {}
 
     // If the subscriptionMapping config object has a filter config
