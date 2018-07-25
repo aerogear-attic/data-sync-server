@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const resolverBuilders = require('./builders')
 const { compile } = require('./compiler')
-const { log } = require('../util/logger')
+const { wrapResolverWithPublish } = require('./wrapResolverWithPublisher')
 
 module.exports = function (dataSources, resolverMappings, pubsub) {
   const resolvers = {}
@@ -43,27 +43,17 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
 
     const compiledRequestMapping = compile(resolverMapping.requestMapping)
     const compiledResponseMapping = compile(resolverMapping.responseMapping)
+
     // This is the actual resolver function
-    const builtResolver = builder.buildResolver(
+    let resolver = builder.buildResolver(
       dataSource,
       compiledRequestMapping,
       compiledResponseMapping
     )
 
-    let resolver = builtResolver
-
     // If a publish option is specified we wrap the resolver function
-    if (resolverMapping.publish) {
-      const { topic, payload } = resolverMapping.publish
-
-      const publishOpts = {
-        topic,
-        compiledPayload: compile(payload)
-      }
-      // Build a wrapper function around the resolver
-      // This wrapper function will run the resolver
-      // And also publish a notification
-      resolver = resolveAndPublish(builtResolver, pubsub, publishOpts)
+    if (resolverMapping.publish && !_.isEmpty(resolverMapping.publish)) {
+      resolver = wrapResolverWithPublish(resolver, resolverMapping, pubsub)
     }
 
     resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
@@ -71,26 +61,4 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
   })
 
   return resolvers
-}
-
-function resolveAndPublish (resolverFn, pubsub, publishOpts) {
-  return (obj, args, context, info) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const result = await resolverFn(obj, args, context, info)
-        resolve(result)
-
-        const publishContext = {
-          context: {
-            result: result
-          }
-        }
-
-        pubsub.publish(publishOpts, publishContext)
-      } catch (error) {
-        log.error(error)
-        reject(error)
-      }
-    })
-  }
 }

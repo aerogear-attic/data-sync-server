@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     field: DataTypes.STRING,
     requestMapping: DataTypes.TEXT,
     responseMapping: DataTypes.TEXT,
-    publish: DataTypes.JSON
+    publish: DataTypes.TEXT
   })
 
   Resolver.associate = (models) => {
