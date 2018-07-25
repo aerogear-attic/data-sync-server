@@ -28,7 +28,7 @@ module.exports = function mapSubscriptions (subsciptionMappings, pubsub) {
     if (subscriptionMapping.filter) {
       resolver = {
         subscribe: withFilter(
-          () => pubsub.client.asyncIterator(subscriptionMapping.topic),
+          () => pubsub.getAsyncIterator(subscriptionMapping.topic),
           (payload, variables) => {
             try {
               // evaluate the filter DSL in the context of { payload, variables }
