@@ -2,6 +2,17 @@
 
 const time = new Date()
 
+const subscriptions = [
+  {
+    type: 'Subscription',
+    field: 'memeAdded',
+    GraphQLSchemaId: 1,
+    topic: 'memeCreated',
+    createdAt: time,
+    updatedAt: time
+  }
+]
+
 const memeoListSchema = {
   id: 1,
   name: 'default',
@@ -21,7 +32,7 @@ const memeoListSchema = {
   }
   
   type Subscription {
-    _: Boolean
+    memeAdded(photoUrl: String):Meme!
   }
   
   `,
@@ -30,5 +41,6 @@ const memeoListSchema = {
 }
 
 module.exports = {
-  schema: memeoListSchema
+  schema: memeoListSchema,
+  subscriptions
 }

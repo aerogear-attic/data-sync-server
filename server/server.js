@@ -7,16 +7,21 @@ const cors = require('cors')
 const {log} = require('./lib/util/logger')
 const expressPino = require('express-pino-logger')({logger: log})
 const {runHealthChecks} = require('./health')
+const { subscribe, execute } = require('graphql')
+const { SubscriptionServer } = require('subscriptions-transport-ws')
 
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
-module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaListenerConfig}, models) => {
+module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaListenerConfig}, models, pubsub) => {
   const {tracing} = graphQLConfig
-  let {schema, dataSources} = await buildSchema(models)
+  let {schema, dataSources} = await buildSchema(models, pubsub)
   await connectDataSources(dataSources)
 
   const app = express()
+
+  // Wrap the Express server
+  const server = http.createServer(app)
 
   app.use('*', cors())
   app.use(expressPino)
@@ -51,7 +56,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
       log.info('Received schema change notification. Rebuilding it')
       let newSchema
       try {
-        newSchema = await buildSchema(models)
+        newSchema = await buildSchema(models, pubsub)
       } catch (ex) {
         log.error('Error while reloading config')
         log.error(ex)
@@ -71,6 +76,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
           await connectDataSources(newSchema.dataSources)
           schema = newSchema.schema
           dataSources = newSchema.dataSources
+          newSubScriptionServer(server, schema)
         } catch (ex) {
           log.error('Error while connecting to new data sources')
           log.error(ex)
@@ -87,9 +93,6 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     const debouncedOnReceive = _.debounce(onReceive, 500)
     schemaListener.start(debouncedOnReceive)
   }
-
-  // Wrap the Express server
-  const server = http.createServer(app)
 
   const stopHandler = async () => {
     try {
@@ -112,10 +115,11 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   process.on('SIGQUIT', stopHandler)
   process.on('SIGINT', stopHandler)
 
+  newSubScriptionServer(server, schema)
   return server
 }
 
-async function buildSchema (models) {
+async function buildSchema (models, pubsub) {
   const graphQLSchemas = await models.GraphQLSchema.findAll()
   let graphQLSchemaString = null
 
@@ -133,10 +137,8 @@ async function buildSchema (models) {
     }
   }
 
-  const dataSources = await models.DataSource.findAll()
-  let dataSourcesJson = dataSources.map((dataSource) => {
-    return dataSource.toJSON()
-  })
+  let dataSourcesJson = await models.DataSource.findAll({raw: true})
+  const subscriptionsJson = await models.Subscription.findAll({raw: true})
 
   const resolvers = await models.Resolver.findAll({
     include: [models.DataSource]
@@ -173,7 +175,7 @@ async function buildSchema (models) {
   }
 
   try {
-    return schemaParser(graphQLSchemaString, dataSourcesJson, resolversJson)
+    return schemaParser(graphQLSchemaString, dataSourcesJson, resolversJson, subscriptionsJson, pubsub)
   } catch (error) {
     log.error('Error while building schema.')
     log.error(error)
@@ -207,4 +209,16 @@ async function disconnectDataSources (dataSources) {
       // swallow
     }
   }
+}
+
+function newSubScriptionServer (server, schema) {
+  /* eslint-disable no-new */
+  new SubscriptionServer({
+    execute: execute,
+    subscribe: subscribe,
+    schema
+  }, {
+    server: server,
+    path: '/subscriptions'
+  })
 }

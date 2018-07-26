@@ -1,6 +1,6 @@
 'use strict'
 
-const {schema} = require('./memeolist-example-shared')
+const { schema, subscriptions } = require('./memeolist-example-shared')
 
 const time = new Date()
 
@@ -40,6 +40,12 @@ const resolvers = [
     GraphQLSchemaId: 1,
     requestMapping: `INSERT INTO "Meme" ("photoUrl") VALUES ('{{context.arguments.photoUrl}}') RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
+    publish: JSON.stringify({
+      topic: 'memeCreated',
+      payload: `{
+        "memeAdded": {{ toJSON context.result }}
+      }`
+    }),
     createdAt: time,
     updatedAt: time
   }
@@ -49,6 +55,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert('DataSources', datasources, {})
     await queryInterface.bulkInsert('GraphQLSchemas', [schema], {})
+    await queryInterface.bulkInsert('Subscriptions', subscriptions, {})
     return queryInterface.bulkInsert('Resolvers', resolvers, {})
   }
 }

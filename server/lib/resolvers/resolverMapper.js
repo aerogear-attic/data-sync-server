@@ -1,10 +1,10 @@
 const _ = require('lodash')
 const resolverBuilders = require('./builders')
-const {compileMappings} = require('./compiler')
+const { compile } = require('./compiler')
+const { wrapResolverWithPublish } = require('./wrapResolverWithPublisher')
 
-module.exports = function (dataSources, resolverMappings) {
-  const resolvers = {
-  }
+module.exports = function (dataSources, resolverMappings, pubsub) {
+  const resolvers = {}
 
   _.forEach(resolverMappings, (resolverMapping) => {
     const resolverMappingName = resolverMapping.field
@@ -32,23 +32,31 @@ module.exports = function (dataSources, resolverMappings) {
     let dataSource = dataSources[resolverMapping.DataSource.name]
     let builder = resolverBuilders[dataSource.type]
 
-    if (builder) {
-      const {compiledRequestMapping, compiledResponseMapping} = compileMappings(resolverMapping.requestMapping, resolverMapping.responseMapping)
-      if (builder.buildResolver && typeof builder.buildResolver === 'function') {
-        const resolver = builder.buildResolver(
-          dataSource,
-          compiledRequestMapping,
-          compiledResponseMapping
-        )
-
-        resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
-        resolvers[resolverMapping.type][resolverMappingName] = resolver
-      } else {
-        throw new Error(`Resolver builder for ${dataSource.type} missing buildResolver function`)
-      }
-    } else {
+    if (!builder) {
       throw new Error(`No resolver builder for type: ${dataSource.type}`)
     }
+
+    if (!builder.buildResolver || typeof builder.buildResolver !== 'function') {
+      throw new Error(`Resolver builder for ${dataSource.type} missing buildResolver function`)
+    }
+
+    const compiledRequestMapping = compile(resolverMapping.requestMapping)
+    const compiledResponseMapping = compile(resolverMapping.responseMapping)
+
+    // This is the actual resolver function
+    let resolver = builder.buildResolver(
+      dataSource,
+      compiledRequestMapping,
+      compiledResponseMapping
+    )
+
+    // If a publish option is specified we wrap the resolver function
+    if (resolverMapping.publish && !_.isEmpty(resolverMapping.publish)) {
+      resolver = wrapResolverWithPublish(resolver, resolverMapping, pubsub)
+    }
+
+    resolvers[resolverMapping.type] = resolvers[resolverMapping.type] || {}
+    resolvers[resolverMapping.type][resolverMappingName] = resolver
   })
 
   return resolvers
