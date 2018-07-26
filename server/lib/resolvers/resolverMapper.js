@@ -32,7 +32,6 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
     let dataSource = dataSources[resolverMapping.DataSource.name]
     let builder = resolverBuilders[dataSource.type]
 
-
     if (!builder) {
       throw new Error(`No resolver builder for type: ${dataSource.type}`)
     }

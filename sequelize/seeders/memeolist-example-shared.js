@@ -6,7 +6,7 @@ const subscriptions = [
   {
     type: 'Subscription',
     field: 'memeAdded',
-    GraphQLSchemaId: 2,
+    GraphQLSchemaId: 1,
     topic: 'memeCreated',
     createdAt: time,
     updatedAt: time
@@ -32,7 +32,7 @@ const memeoListSchema = {
   }
   
   type Subscription {
-    memeAdded(photoUrl: String!):Meme!
+    memeAdded(photoUrl: String):Meme!
   }
   
   `,
