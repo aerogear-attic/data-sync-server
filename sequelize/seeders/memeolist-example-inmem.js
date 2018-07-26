@@ -21,6 +21,8 @@ const resolvers = [
     field: 'allMemes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
+    preHook: '',
+    postHook: '',
     requestMapping: '{"operation": "find", "query": {"_type":"meme"}}',
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
@@ -31,6 +33,8 @@ const resolvers = [
     field: 'createMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
+    preHook: '',
+    postHook: '',
     requestMapping: `{
       "operation": "insert",
       "doc": {
