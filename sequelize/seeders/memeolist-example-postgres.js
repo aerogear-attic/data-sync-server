@@ -28,6 +28,8 @@ const resolvers = [
     field: 'allMemes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
+    preHook: '',
+    postHook: '',
     requestMapping: 'SELECT "id", "photoUrl" FROM "Meme"',
     responseMapping: '{{ toJSON context.result }}',
     createdAt: time,
@@ -38,6 +40,8 @@ const resolvers = [
     field: 'createMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
+    preHook: '',
+    postHook: '',
     requestMapping: `INSERT INTO "Meme" ("photoUrl") VALUES ('{{context.arguments.photoUrl}}') RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     publish: JSON.stringify({
