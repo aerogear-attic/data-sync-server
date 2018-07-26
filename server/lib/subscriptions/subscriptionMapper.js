@@ -34,7 +34,9 @@ module.exports = function mapSubscriptions (subsciptionMappings, pubsub) {
               // evaluate the filter DSL in the context of { payload, variables }
               // This returns true/false. true results in a payload being published
               // to connected clients over websockets
-              return evalWithContext(subscriptionMapping.filter, { payload, variables })
+              let { filter } = subscriptionMapping
+              log.info('Evaluating Subscription filter', { filter, payload, variables })
+              return evalWithContext(filter, { payload, variables })
             } catch (error) {
               log.error('error evaluating subscription filter', error, subscriptionMapping.filter)
               return error

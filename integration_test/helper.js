@@ -11,7 +11,7 @@ const qi = sequelize.queryInterface
 
 function Helper () {
   const pubsubInstance = new PGPubsub({
-    user: postgresConfig.username,
+    user: postgresConfig.user,
     host: postgresConfig.host,
     database: postgresConfig.database,
     password: postgresConfig.password,

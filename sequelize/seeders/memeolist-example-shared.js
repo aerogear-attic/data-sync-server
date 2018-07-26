@@ -8,6 +8,9 @@ const subscriptions = [
     field: 'memeAdded',
     GraphQLSchemaId: 1,
     topic: 'memeCreated',
+    filter: JSON.stringify({
+      match: ['$payload.memeAdded.photoUrl', 'https://.*']
+    }),
     createdAt: time,
     updatedAt: time
   }

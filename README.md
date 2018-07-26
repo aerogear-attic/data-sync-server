@@ -149,7 +149,7 @@ $ echo '
   "config": {
     "channel": "aerogear-data-sync-config",
     "database": "aerogear_data_sync_db",
-    "username": "postgresql",
+    "user": "postgresql",
     "password": "postgres",
     "host": "127.0.0.1",
     "port": "5432" 

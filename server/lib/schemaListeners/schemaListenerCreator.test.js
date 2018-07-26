@@ -8,7 +8,7 @@ test('should get schemaListener successfully - no errors thrown', t => {
     config: {
       channel: 'aerogear-data-sync-config',
       database: 'aerogear_data_sync_db',
-      username: 'postgres',
+      user: 'postgres',
       password: 'postgres',
       host: '127.0.0.1',
       port: 5432
