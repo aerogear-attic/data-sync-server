@@ -24,7 +24,7 @@ class DataSyncService {
   }
 
   async start () {
-    await this.app.server.listen(this.port)
+    await this.app.server.startListening(this.port)
     this.log.info(`Server is now running on http://localhost:${this.port}`)
   }
 

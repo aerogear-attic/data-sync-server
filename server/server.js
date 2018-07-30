@@ -104,6 +104,13 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
   newSubScriptionServer(server, schema)
 
+  server.startListening = (port) => {
+    var server = this
+    return new Promise((resolve) => {
+      server.listen(port, resolve)
+    })
+  }
+
   return {
     server,
     cleanup

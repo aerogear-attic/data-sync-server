@@ -27,6 +27,7 @@ function Helper () {
   this.deleteConfig = async () => {
     await qi.bulkDelete('DataSources')
     await qi.bulkDelete('GraphQLSchemas')
+    await qi.bulkDelete('Subscriptions')
     await qi.bulkDelete('Resolvers')
   }
 

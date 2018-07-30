@@ -37,7 +37,7 @@ module.exports = {
       }
 
       type Subscription {
-          _: Boolean
+        memeAdded(photoUrl: String):Meme!
       }
 
   `,
