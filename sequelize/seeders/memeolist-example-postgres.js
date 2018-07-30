@@ -24,13 +24,31 @@ const datasources = [
 
 const resolvers = [
   {
+    type: 'Meme',
+    field: 'comments',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: 'SELECT * FROM "Comment" WHERE memeId={{context.parent.id}}',
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
     type: 'Query',
     field: 'allMemes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    preHook: '',
-    postHook: '',
-    requestMapping: 'SELECT "id", "photoUrl" FROM "Meme"',
+    requestMapping: 'SELECT "id", "photoUrl", "owner", "likes" FROM "Meme"',
+    responseMapping: '{{ toJSON context.result }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Query',
+    field: 'profile',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: 'SELECT * FROM "Profile" WHERE email = {{ context.arguments.email }}',
     responseMapping: '{{ toJSON context.result }}',
     createdAt: time,
     updatedAt: time
@@ -40,9 +58,7 @@ const resolvers = [
     field: 'createMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    preHook: '',
-    postHook: '',
-    requestMapping: `INSERT INTO "Meme" ("photoUrl") VALUES ('{{context.arguments.photoUrl}}') RETURNING *;`,
+    requestMapping: `INSERT INTO "Meme" ("photoUrl", "owner", "likes") VALUES ('{{context.arguments.photoUrl}}', '{{context.arguments.owner}}', 0) RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     publish: JSON.stringify({
       topic: 'memeCreated',
@@ -50,6 +66,35 @@ const resolvers = [
         "memeAdded": {{ toJSON context.result }}
       }`
     }),
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'createProfile',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `INSERT INTO "Profile" ("email", "displayName", "pictureUrl") VALUES ('{{context.arguments.email}}','{{context.arguments.displayName}}','{{context.arguments.pictureUrl}}') RETURNING *;`,
+    responseMapping: '{{ toJSON context.result.[0] }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'likeMeme',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `Update "Meme" SET likes=likes+1 WHERE id={{context.arguments.memeId}} RETURNING *;`,
+    responseMapping: '{{ toJSON context.result.[0] }}',
+    createdAt: time,
+    updatedAt: time
+  }, {
+    type: 'Mutation',
+    field: 'postComment',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `INSERT INTO "Comment" ("comment", "owner", "memeId") VALUES ('{{context.arguments.comment}}','{{context.arguments.owner}}','{{context.arguments.memeId}}') RETURNING *;`,
+    responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
     updatedAt: time
   }

@@ -2,12 +2,52 @@ query allMemes{
   allMemes{
     id
     photoUrl
+    owner
+    likes
+    comments
+  }
+}
+
+query profile {
+  profile(email:"wtr@redhit.com"){
+
   }
 }
 
 mutation createMeme {
-  createMeme(photoUrl: "https://test.com"){
+  createMeme(photoUrl: "https://i.imgur.com/W4dhL0b.jpg"){
     id
     photoUrl
+    likes
+  }
+}
+
+mutation createMeme {
+  createMeme(photoUrl: "https://i.imgur.com/W4dhL0b.jpg"){
+    id
+    photoUrl
+    likes
+  }
+}
+
+mutation createProfile {
+  createProfile(email: String!, displayName: "wojtek", pictureUrl: "https://cdn1.iconfinder.com/data/icons/panda-face-1/1000/panda_face_emoticon-12-128.png"){
+    id
+    email
+    displayName
+    pictureUrl
+  }
+}
+ 
+mutation postComment{
+  postComment(memeId: "1", comment: "Like it", owner: "Wojtek"){
+    id
+  }
+}
+ 
+mutation likeMeme{
+  likeMeme(memeId: "1"){
+    id
+    likes
   }
 }
