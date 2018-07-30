@@ -1,4 +1,4 @@
-const {test} = require('ava')
+const { test } = require('ava')
 
 /// //////////////// NOTE /////////////////////////////////////
 /// /////////// order of tests are imporant!///////////////////

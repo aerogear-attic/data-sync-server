@@ -30,9 +30,6 @@ const subscriptions = [
     type: 'Subscription',
     field: 'memeAdded',
     GraphQLSchemaId: 2,
-    filter: JSON.stringify({
-      match: ['$payload.memeAdded.photoUrl', 'https://.*']
-    }),
     createdAt: time,
     updatedAt: time
   }
@@ -69,6 +66,7 @@ const resolvers = [
       VALUES ('{{context.arguments.ownerId}}', '{{context.arguments.photoUrl}}') 
       RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
+    publish: 'memeAdded',
     createdAt: time,
     updatedAt: time
   },

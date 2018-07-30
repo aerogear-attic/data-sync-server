@@ -6,14 +6,13 @@ const fetch = require('node-fetch')
 const ws = require('ws')
 const { ApolloClient } = require('apollo-client')
 const { InMemoryCache } = require('apollo-cache-inmemory')
-const gql = require('graphql-tag')
 
 class TestApolloClient {
-  constructor() {
-    this.client = createApolloClient()
+  constructor (host = 'localhost:8000') {
+    this.client = createApolloClient(host)
   }
 
-  subscribe(query, timeout = 3000) {
+  subscribe (query, timeout = 3000) {
     return new Promise((resolve, reject) => {
       this.client.subscribe({
         query: query
@@ -21,23 +20,23 @@ class TestApolloClient {
         next: resolve,
         error: reject
       })
-      setTimeout(reject, timeout);
+      setTimeout(reject.bind(null, 'timed out while waiting for subscription result'), timeout)
     })
   }
 }
 
 module.exports = TestApolloClient
 
-function createApolloClient () {
+function createApolloClient (host) {
   // Create an http link:
   const httpLink = new HttpLink({
-    uri: 'http://localhost:8000/graphql',
+    uri: `http://${host}/graphql`,
     fetch: fetch
   })
 
   // Create a WebSocket link:
   const wsLink = new WebSocketLink({
-    uri: `ws://localhost:8000/subscriptions`,
+    uri: `ws://${host}/subscriptions`,
     options: {
       reconnect: true
     },

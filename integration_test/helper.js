@@ -1,4 +1,5 @@
 const PGPubsub = require('pg-pubsub')
+const RestartableSyncService = require('./util/restartableSyncService')
 const {createApolloFetch} = require('apollo-fetch')
 
 let config = require('../server/config')
@@ -18,10 +19,14 @@ function Helper () {
     port: postgresConfig.port
   })
 
+  this.syncService = new RestartableSyncService(config)
+
   this.initialize = async () => {
     this.fetch = createApolloFetch({
       uri: 'http://localhost:8000/graphql'
     })
+    await this.syncService.initialize()
+    await this.syncService.start()
   }
 
   this.deleteConfig = async () => {
@@ -43,6 +48,7 @@ function Helper () {
     await pubsubInstance.publish('aerogear-data-sync-config', {})
     // sleep 1000 ms so that sync server can pick up the changes
     await new Promise(resolve => setTimeout(resolve, 1000))
+    // await this.syncService.restart()
   }
 }
 
