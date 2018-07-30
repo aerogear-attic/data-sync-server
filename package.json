@@ -24,8 +24,8 @@
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino",
     "dev:memeo": "GRAPHIQL_QUERY_FILE='examples/memeolist.query.graphql' nodemon ./index.js | pino",
-    "lint": "standard",
-    "format": "standard --fix",
+    "lint": "eslint **/*.js",
+    "format": "eslint **/*.js --fix",
     "docker:build": "./scripts/docker_build.sh",
     "docker:build:release": "./scripts/docker_build_release.sh",
     "docker:push": "./scripts/docker_push.sh",
@@ -40,6 +40,11 @@
   "devDependencies": {
     "apollo-fetch": "^0.7.0",
     "ava": "1.0.0-beta.6",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
     "nodemon": "^1.17.5",
     "pre-commit": "^1.2.2",
     "standard": "^11.0.1"
