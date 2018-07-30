@@ -21,7 +21,7 @@ const resolvers = [
     field: 'comments',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: '{"operation": "find", "query": {"_type":"comment", "memeId": context.parent.id}}',
+    requestMapping: '{"operation": "find", "query": {"_type":"comment", "memeId": {{context.parent.id}} }}',
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -43,7 +43,7 @@ const resolvers = [
     field: 'profile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: '{"operation": "find", "query": {"_type":"profile", "_id": context.arguments.email }}',
+    requestMapping: '{"operation": "find", "query": {"_type":"profile", "email": "{{context.arguments.email}}" }}',
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -61,6 +61,7 @@ const resolvers = [
         "_type":"meme",
         "photoUrl": "{{context.arguments.photoUrl}}"
         "owner": "{{context.arguments.owner}}"
+        "likes": 0
       }
     }`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
@@ -98,8 +99,9 @@ const resolvers = [
     GraphQLSchemaId: 1,
     requestMapping: `{
       "operation": "update",
+      "query": {"_id": {{context.memeId}} }} }
       "doc": {
-        "_type":"profile",
+        "_type":"meme",
         $inc: { likes: 1 }
       }
     }`,
