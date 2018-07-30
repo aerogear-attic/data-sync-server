@@ -95,29 +95,19 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     schemaListener.start(debouncedOnReceive)
   }
 
-  const stopHandler = async () => {
-    try {
-      log.info('SIGTERM received. Closing connections, stopping server')
-      await models.sequelize.close()
-      if (schemaListener) await schemaListener.stop()
-      await disconnectDataSources(dataSources)
-      await server.close()
-      log.info('Shutting down')
-    } catch (ex) {
-      log.error('Error during graceful shutdown')
-      log.error(ex)
-    } finally {
-      process.exit(0)
-    }
+  const cleanup = async () => {
+    await models.sequelize.close()
+    if (schemaListener) await schemaListener.stop()
+    await disconnectDataSources(dataSources)
+    await server.close()
   }
 
-  process.on('SIGTERM', stopHandler)
-  process.on('SIGABRT', stopHandler)
-  process.on('SIGQUIT', stopHandler)
-  process.on('SIGINT', stopHandler)
-
   newSubScriptionServer(server, schema)
-  return server
+
+  return {
+    server,
+    cleanup
+  }
 }
 
 async function buildSchema (models, pubsub) {
