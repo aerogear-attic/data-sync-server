@@ -99,7 +99,7 @@ const resolvers = [
     GraphQLSchemaId: 1,
     requestMapping: `{
       "operation": "update",
-      "query": {"_id": {{context.memeId}} }} }
+      "query": {"_id": {{context.arguments.id}} }} }
       "doc": {
         "_type":"meme",
         $inc: { likes: 1 }

@@ -84,7 +84,7 @@ const resolvers = [
     field: 'likeMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `Update "Meme" SET likes=likes+1 WHERE id={{context.arguments.memeId}} RETURNING *;`,
+    requestMapping: `Update "Meme" SET likes=likes+1 WHERE id={{context.arguments.id}} RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
     updatedAt: time

@@ -4,34 +4,34 @@ query allMemes{
     photoUrl
     owner
     likes
-    comments
+    comments {
+      id
+    }
   }
 }
 
 query profile {
   profile(email:"wtr@redhit.com"){
-
+	  id
+    email
+    displayName
+    pictureUrl
   }
 }
 
 mutation createMeme {
-  createMeme(photoUrl: "https://i.imgur.com/W4dhL0b.jpg"){
+  createMeme(photoUrl: "https://i.imgur.com/W4dhL0b.jpg", owner:"Wojtek"){
     id
     photoUrl
     likes
   }
 }
 
-mutation createMeme {
-  createMeme(photoUrl: "https://i.imgur.com/W4dhL0b.jpg"){
-    id
-    photoUrl
-    likes
-  }
-}
 
 mutation createProfile {
-  createProfile(email: String!, displayName: "wojtek", pictureUrl: "https://cdn1.iconfinder.com/data/icons/panda-face-1/1000/panda_face_emoticon-12-128.png"){
+  createProfile(email: "wtr@redhit.com", 
+    displayName: "wojtek",
+    pictureUrl: "https://tinyurl.com/avataraerogear"){
     id
     email
     displayName
@@ -46,7 +46,7 @@ mutation postComment{
 }
  
 mutation likeMeme{
-  likeMeme(memeId: "1"){
+  likeMeme(id: 1) {
     id
     likes
   }
