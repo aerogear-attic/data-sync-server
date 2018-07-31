@@ -1,4 +1,5 @@
 const JSONParse = require('json-parse-safe')
+const { auditLog } = require('../../../lib/util/logger')
 
 function buildPostgresResolver (dataSource, compiledRequestMapping, compiledResponseMapping) {
   return function resolve (obj, args, context, info) {
@@ -25,9 +26,11 @@ function buildPostgresResolver (dataSource, compiledRequestMapping, compiledResp
 
         if (error) {
           // TODO better error message back to user when this happens
+          auditLog(false, context.request, info, obj, args, error.message)
           return reject(error)
         }
 
+        auditLog(true, context.request, info, obj, args, null)
         return resolve(value)
       })
     })

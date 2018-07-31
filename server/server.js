@@ -27,7 +27,8 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   app.use(expressPino)
 
   app.use('/graphql', bodyParser.json(), function (req, res, next) {
-    const graphql = graphqlExpress({schema, tracing})
+    const context = {request: req}
+    const graphql = graphqlExpress({schema, context, tracing})
     return graphql(req, res, next)
   })
 
