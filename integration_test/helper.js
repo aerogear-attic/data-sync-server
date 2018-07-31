@@ -4,15 +4,10 @@ const RestartableSyncService = require('./util/restartableSyncService')
 const {createApolloFetch} = require('apollo-fetch')
 
 let config = require('../server/config')
-let {postgresConfig} = config
-let models = require('../sequelize/models/index')(postgresConfig)
-
-const sequelize = models.sequelize
-// see http://docs.sequelizejs.com/class/lib/query-interface.js~QueryInterface.html
-const qi = sequelize.queryInterface
+let { postgresConfig } = config
 
 function Helper () {
-  const pubsubInstance = new PGPubsub({
+  this.pubsubInstance = new PGPubsub({
     user: postgresConfig.user,
     host: postgresConfig.host,
     database: postgresConfig.database,
@@ -21,6 +16,12 @@ function Helper () {
   })
 
   this.syncService = new RestartableSyncService(config)
+
+  this.models = require('../sequelize/models/index')(postgresConfig)
+  this.sequelize = this.models.sequelize
+
+  // see http://docs.sequelizejs.com/class/lib/query-interface.js~QueryInterface.html
+  this.qi = this.sequelize.queryInterface
 
   this.initialize = async () => {
     this.fetch = createApolloFetch({
@@ -31,10 +32,10 @@ function Helper () {
   }
 
   this.deleteConfig = async () => {
-    await qi.bulkDelete('DataSources')
-    await qi.bulkDelete('GraphQLSchemas')
-    await qi.bulkDelete('Subscriptions')
-    await qi.bulkDelete('Resolvers')
+    await this.qi.bulkDelete('DataSources')
+    await this.qi.bulkDelete('GraphQLSchemas')
+    await this.qi.bulkDelete('Subscriptions')
+    await this.qi.bulkDelete('Resolvers')
   }
 
   this.feedConfig = async (configFile) => {
@@ -42,20 +43,27 @@ function Helper () {
     if (!config.description) {
       throw new Error(`Please define the description in file ./config/${configFile}`)
     }
-    await config.up(qi, sequelize)
+    await config.up(this.qi, this.sequelize)
   }
 
   this.triggerReload = async () => {
-    await pubsubInstance.publish('aerogear-data-sync-config', {})
+    this.pubsubInstance.publish('aerogear-data-sync-config', {})
     // sleep 1000 ms so that sync server can pick up the changes
     await new Promise(resolve => setTimeout(resolve, 1000))
-    // await this.syncService.restart()
+  }
+
+  this.listenForPubsubNotification = (topic) => {
+    return new Promise((resolve, reject) => {
+      this.pubsubInstance.addChannel(topic)
+      this.pubsubInstance.on(topic, resolve)
+      setTimeout(reject.bind(null, new Error(`Timed out while listening for pubsub message on topic ${topic}`)), 3000)
+    })
   }
 
   this.cleanMemeolistDatabase = async (t) => {
     t.log('Going to prepare memeolist database for the integration tests')
 
-    const {Client} = pg
+    const { Client } = pg
 
     const memeoListDbHost = process.env.MEMEOLIST_DB_HOST || '127.0.0.1'
     const memeoListDbPort = process.env.MEMEOLIST_DB_PORT || '15432'
@@ -93,7 +101,7 @@ function Helper () {
         CREATE TABLE "Meme" (
           "id"       SERIAL PRIMARY KEY                NOT NULL,
           "photoUrl" CHARACTER VARYING(500)            NOT NULL,
-          "ownerId"  INTEGER REFERENCES "Profile" ("id")
+          "ownerId"  INTEGER
         );
       `)
     } catch (err) {

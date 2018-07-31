@@ -6,7 +6,7 @@ class RestartableSyncService extends DataSyncService {
     this.app.server = stoppable(this.app.server, 0)
     await this.app.server.listen(this.port)
     this.log.info(`Server is now running on http://localhost:${this.port}`)
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 200))
   }
 
   async restart () {
@@ -15,7 +15,7 @@ class RestartableSyncService extends DataSyncService {
     this.app.server.stop()
     await this.initialize()
     await this.start()
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 200))
   }
 }
 

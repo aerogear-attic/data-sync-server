@@ -20,7 +20,7 @@ class TestApolloClient {
         next: resolve,
         error: reject
       })
-      setTimeout(reject.bind(null, 'timed out while waiting for subscription result'), timeout)
+      setTimeout(reject.bind(null, new Error('timed out while waiting for subscription result')), timeout)
     })
   }
 }

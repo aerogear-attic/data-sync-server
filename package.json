@@ -20,7 +20,7 @@
   "main": "index.js",
   "scripts": {
     "test": "ava '*.test.js' '**/*.test.js' '!integration_test/*'",
-    "test:integration": "ava --concurrency=1 integration_test/*.test.js",
+    "test:integration": "npm run db:init && ava --concurrency=1 integration_test/*.test.js",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino",
     "dev:memeo": "GRAPHIQL_QUERY_FILE='examples/memeolist.query.graphql' nodemon ./index.js | pino",

@@ -6,7 +6,7 @@ const config = require('../server/config')
 
 module.exports = (context) => {
   test.serial('clients should receive updates from subscription resolvers', async (t) => {
-    const { apolloClient, helper } = context
+    const { apolloClient } = context
 
     let subscription = apolloClient.subscribe(gql`
       subscription memeAdded {
@@ -18,36 +18,12 @@ module.exports = (context) => {
       }
     `)
 
-    let res = await context.helper.fetch({
-      // language=GraphQL
-      query: `
-          mutation {
-              createProfile (
-                  email: "jordan@example.com",
-                  displayName: "Michael Jordan",
-                  biography:"Nr #23!",
-                  avatarUrl:"http://example.com/mj.jpg"
-              ) {
-                  id,
-                  email,
-                  displayName,
-                  biography,
-                  avatarUrl
-              }
-          }
-      `
-    })
-
-    t.falsy(res.errors)
-    t.truthy(res.data.createProfile)
-    t.truthy(res.data.createProfile.id)
-
-    const profileId = res.data.createProfile.id
+    const profileId = '1'
     const photoUrl = 'https://example.com/meme.jpg'
 
-    res = await helper.fetch({
+    await apolloClient.client.mutate({
       // language=GraphQL
-      query: `
+      mutation: gql`
         mutation {
             createMeme (
                 ownerId: "${profileId}",
@@ -91,34 +67,10 @@ module.exports = (context) => {
       }
     `)
 
-    let res = await clientB.client.mutate({
-      // language=GraphQL
-      mutation: gql`
-          mutation {
-              createProfile (
-                  email: "jordan@example.com",
-                  displayName: "Michael Jordan",
-                  biography:"Nr #23!",
-                  avatarUrl:"http://example.com/mj.jpg"
-              ) {
-                  id,
-                  email,
-                  displayName,
-                  biography,
-                  avatarUrl
-              }
-          }
-      `
-    })
-
-    t.falsy(res.errors)
-    t.truthy(res.data.createProfile)
-    t.truthy(res.data.createProfile.id)
-
-    const profileId = res.data.createProfile.id
+    const profileId = '1'
     const photoUrl = 'https://example.com/meme.jpg'
 
-    res = await clientB.client.mutate({
+    await clientB.client.mutate({
       // language=GraphQL
       mutation: gql`
         mutation {
@@ -139,5 +91,99 @@ module.exports = (context) => {
     t.truthy(result.data.memeAdded)
     t.deepEqual(result.data.memeAdded.photoUrl, photoUrl)
     t.deepEqual(result.data.memeAdded.ownerId, profileId)
+  })
+
+  test.serial('subscriptions can use a filtering mechanism', async (t) => {
+    const { apolloClient, helper } = context
+
+    const filter = {
+      'eq': ['$payload.memeAdded.photoUrl', '$variables.photoUrl']
+    }
+
+    const testPhotoUrl = 'http://testing.com'
+    const profileId = '1'
+
+    await helper.models.Subscription.update({ filter }, { where: { field: 'memeAdded' } })
+
+    await helper.syncService.restart()
+
+    let subscription = apolloClient.subscribe(gql`
+      subscription memeAdded {
+        memeAdded(photoUrl: "${testPhotoUrl}") {
+          photoUrl,
+          ownerId,
+          id
+        }
+      }
+    `)
+
+    await apolloClient.client.mutate({
+      // language=GraphQL
+      mutation: gql`
+        mutation {
+            createMeme (
+                ownerId: "${profileId}",
+                photoUrl:"${testPhotoUrl}"
+            ) {
+                id,
+                photoUrl,
+                ownerId
+            }
+        }
+    `
+    })
+
+    let result = await subscription
+
+    t.truthy(result.data.memeAdded)
+    t.deepEqual(result.data.memeAdded.photoUrl, testPhotoUrl)
+    t.deepEqual(result.data.memeAdded.ownerId, profileId)
+  })
+
+  test.serial('subscriptions will not receive updates when filters evaluate false', async (t) => {
+    const { apolloClient, helper } = context
+
+    const filter = {
+      'eq': ['$payload.memeAdded.photoUrl', '$variables.photoUrl']
+    }
+
+    const payloadUrl = 'http://someurl.com'
+    const variablesUrl = 'http://someotherurl.com'
+
+    const profileId = '1'
+
+    await helper.models.Subscription.update({ filter }, { where: { field: 'memeAdded' } })
+
+    await helper.syncService.restart()
+
+    let subscription = apolloClient.subscribe(gql`
+      subscription memeAdded {
+        memeAdded(photoUrl: "${variablesUrl}") {
+          photoUrl,
+          ownerId,
+          id
+        }
+      }
+    `)
+
+    await apolloClient.client.mutate({
+      // language=GraphQL
+      mutation: gql`
+        mutation {
+            createMeme (
+                ownerId: "${profileId}",
+                photoUrl:"${payloadUrl}"
+            ) {
+                id,
+                photoUrl,
+                ownerId
+            }
+        }
+    `
+    })
+
+    await t.throws(async () => {
+      await subscription
+    })
   })
 }
