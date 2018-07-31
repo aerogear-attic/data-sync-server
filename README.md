@@ -133,6 +133,7 @@ The DevTools window should automatically connect to the debugging session and ex
 
 This server requires a bunch of environment variables to be set. If they're not set, defaults for development will be used.
 
+* `AUDIT_LOGGING`:   : If true, audit logs of resolver operations will be logged to stdout. Defaults to true.
 * `POSTGRES_DATABASE`: Name of the Postgres database. Defaults to `aerogear_data_sync_db`
 * `POSTGRES_USERNAME`: Username to use when connecting Postgres. Defaults to `postgresql`
 * `POSTGRES_PASSWORD`: Password to use when connecting Postgres. Defaults to `postgres`
