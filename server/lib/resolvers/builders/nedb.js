@@ -16,6 +16,7 @@ function buildNeDBResolver (dataSource, compiledRequestMapping, compiledResponse
       const parsedQuery = JSONParse(queryString)
 
       if (parsedQuery.error) {
+        console.error('Error when parsing query', queryString, parsedQuery.error)
         // TODO better error message back to user when this happens
         // The goal is that this **should** never happen because
         // The sync UI should validate the JSON before it ever reaches the DB
@@ -48,6 +49,7 @@ function buildNeDBResolver (dataSource, compiledRequestMapping, compiledResponse
 
       function mapResponse (err, res) {
         if (err) return reject(err)
+        if (!res) return resolve()
 
         const responseString = compiledResponseMapping({
           context: {

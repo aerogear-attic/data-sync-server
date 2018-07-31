@@ -21,7 +21,8 @@ const resolvers = [
     field: 'comments',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: '{"operation": "find", "query": {"_type":"comment", "memeId": {{context.parent.id}} }}',
+    requestMapping: `{"operation": "find", "query": 
+                    {"_type":"comment", "memeId": "{{context.parent.id}}"}}`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -59,8 +60,8 @@ const resolvers = [
       "operation": "insert",
       "doc": {
         "_type":"meme",
-        "photoUrl": "{{context.arguments.photoUrl}}"
-        "owner": "{{context.arguments.owner}}"
+        "photoUrl": "{{context.arguments.photoUrl}}",
+        "owner": "{{context.arguments.owner}}",
         "likes": 0
       }
     }`,
@@ -83,8 +84,8 @@ const resolvers = [
       "operation": "insert",
       "doc": {
         "_type":"profile",
-        "email": "{{context.arguments.email}}"
-        "displayName": "{{context.arguments.displayName}}"
+        "email": "{{context.arguments.email}}",
+        "displayName": "{{context.arguments.displayName}}",
         "pictureUrl": "{{context.arguments.pictureUrl}}"
       }
     }`,
@@ -99,13 +100,12 @@ const resolvers = [
     GraphQLSchemaId: 1,
     requestMapping: `{
       "operation": "update",
-      "query": {"_id": {{context.arguments.id}} }} }
-      "doc": {
-        "_type":"meme",
-        $inc: { likes: 1 }
+      "query": {"_id": "{{context.arguments.id}}", "_type":"meme"},
+      "update": {
+        "$inc": { "likes" : 1 }
       }
     }`,
-    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    responseMapping: 'true',
     createdAt: time,
     updatedAt: time
   }, {
@@ -117,8 +117,8 @@ const resolvers = [
       "operation": "insert",
       "doc": {
         "_type":"comment",
-        "comment": "{{context.arguments.comment}}"
-        "owner": "{{context.arguments.displayName}}"
+        "comment": "{{context.arguments.comment}}",
+        "owner": "{{context.arguments.owner}}",
         "memeId": "{{context.arguments.memeId}}"
       }
     }`,

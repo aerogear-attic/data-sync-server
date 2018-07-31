@@ -42,13 +42,13 @@ const memeoListSchema = {
   
   type Query {
     allMemes:[Meme!]!
-    profile(email: String!):Profile!
+    profile(email: String!): [Profile]!
   }
   
   type Mutation {
     createProfile(email: String!, displayName: String!, pictureUrl: String!):Profile!
     createMeme(photoUrl: String!, owner: String!):Meme!
-    likeMeme(id: ID!): Meme!
+    likeMeme(id: ID!): Boolean
     postComment(memeId: ID!, comment: String!, owner: String!): Comment!
   }
 
