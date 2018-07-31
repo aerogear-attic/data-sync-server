@@ -1,3 +1,4 @@
+## MEMES section
 query allMemes{
   allMemes{
     id
@@ -6,16 +7,9 @@ query allMemes{
     likes
     comments {
       id
+      comment
+      owner
     }
-  }
-}
-
-query profile {
-  profile(email:"wtr@redhit.com"){
-	  id
-    email
-    displayName
-    pictureUrl
   }
 }
 
@@ -27,27 +21,30 @@ mutation createMeme {
   }
 }
 
+mutation postComment{
+  postComment(memeId: "Fha32ppqLNWEfX3b", comment: "Like it", owner: "Wojtek"){
+    id
+  }
+}
+ 
+mutation likeMeme{
+  likeMeme(id: "Fha32ppqLNWEfX3b") 
+}
 
+## Profile section
 mutation createProfile {
-  createProfile(email: "wtr@redhit.com", 
-    displayName: "wojtek",
-    pictureUrl: "https://tinyurl.com/avataraerogear"){
+  createProfile(email: "wtr1@redhit.com", displayName: "wojtek", pictureUrl: "https://tinyurl.com/avataraerogear") {
     id
     email
     displayName
     pictureUrl
   }
 }
- 
-mutation postComment{
-  postComment(memeId: "1", comment: "Like it", owner: "Wojtek"){
-    id
-  }
-}
- 
-mutation likeMeme{
-  likeMeme(id: 1) {
-    id
-    likes
+
+query profile {
+  profile(email:"wtr1@redhit.com"){
+    email
+    displayName
+    pictureUrl
   }
 }
