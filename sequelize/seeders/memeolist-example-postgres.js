@@ -28,7 +28,7 @@ const resolvers = [
     field: 'comments',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: 'SELECT * FROM "Comment" WHERE memeId={{context.parent.id}}',
+    requestMapping: `SELECT * FROM Comment WHERE memeid='{{context.parent.id}}'`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -38,7 +38,7 @@ const resolvers = [
     field: 'allMemes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: 'SELECT "id", "photoUrl", "owner", "likes" FROM "Meme"',
+    requestMapping: 'SELECT * FROM Meme',
     responseMapping: '{{ toJSON context.result }}',
     createdAt: time,
     updatedAt: time
@@ -48,7 +48,7 @@ const resolvers = [
     field: 'profile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: 'SELECT * FROM "Profile" WHERE email = {{ context.arguments.email }}',
+    requestMapping: `SELECT * FROM Profile WHERE email='{{context.arguments.email}}'`,
     responseMapping: '{{ toJSON context.result }}',
     createdAt: time,
     updatedAt: time
@@ -58,7 +58,7 @@ const resolvers = [
     field: 'createMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `INSERT INTO "Meme" ("photoUrl", "owner", "likes") VALUES ('{{context.arguments.photoUrl}}', '{{context.arguments.owner}}', 0) RETURNING *;`,
+    requestMapping: `INSERT INTO Meme ("ownerid","photourl", "owner", "likes") VALUES ('{{context.arguments.ownerid}}','{{context.arguments.photourl}}', '{{context.arguments.owner}}', 0) RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     publish: JSON.stringify({
       topic: 'memeCreated',
@@ -74,7 +74,7 @@ const resolvers = [
     field: 'createProfile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `INSERT INTO "Profile" ("email", "displayName", "pictureUrl") VALUES ('{{context.arguments.email}}','{{context.arguments.displayName}}','{{context.arguments.pictureUrl}}') RETURNING *;`,
+    requestMapping: `INSERT INTO Profile ("email", "displayname", "pictureurl") VALUES ('{{context.arguments.email}}','{{context.arguments.displayname}}','{{context.arguments.pictureUrl}}') RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
     updatedAt: time
@@ -84,7 +84,7 @@ const resolvers = [
     field: 'likeMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `UPDATE "Meme" SET likes=likes+1 WHERE id={{context.arguments.id}} RETURNING *;`,
+    requestMapping: `UPDATE Meme SET likes=likes+1 WHERE id={{context.arguments.id}} RETURNING *;`,
     responseMapping: 'true',
     createdAt: time,
     updatedAt: time
@@ -93,7 +93,7 @@ const resolvers = [
     field: 'postComment',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `INSERT INTO "Comment" ("comment", "owner", "memeId") VALUES ('{{context.arguments.comment}}','{{context.arguments.owner}}','{{context.arguments.memeId}}') RETURNING *;`,
+    requestMapping: `INSERT INTO Comment ("comment", "owner", "memeid") VALUES ('{{context.arguments.comment}}','{{context.arguments.owner}}','{{context.arguments.memeid}}') RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
     updatedAt: time

@@ -22,7 +22,7 @@ const resolvers = [
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `{"operation": "find", "query": 
-                    {"_type":"comment", "memeId": "{{context.parent.id}}"}}`,
+                    {"_type":"comment", "memeid": "{{context.parent.id}}"}}`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -60,7 +60,7 @@ const resolvers = [
       "operation": "insert",
       "doc": {
         "_type":"meme",
-        "photoUrl": "{{context.arguments.photoUrl}}",
+        "photourl": "{{context.arguments.photourl}}",
         "owner": "{{context.arguments.owner}}",
         "likes": 0
       }
@@ -85,8 +85,8 @@ const resolvers = [
       "doc": {
         "_type":"profile",
         "email": "{{context.arguments.email}}",
-        "displayName": "{{context.arguments.displayName}}",
-        "pictureUrl": "{{context.arguments.pictureUrl}}"
+        "displayname": "{{context.arguments.displayname}}",
+        "pictureurl": "{{context.arguments.pictureurl}}"
       }
     }`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
@@ -119,7 +119,7 @@ const resolvers = [
         "_type":"comment",
         "comment": "{{context.arguments.comment}}",
         "owner": "{{context.arguments.owner}}",
-        "memeId": "{{context.arguments.memeId}}"
+        "memeid": "{{context.arguments.memeid}}"
       }
     }`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',

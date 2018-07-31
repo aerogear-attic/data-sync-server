@@ -20,15 +20,15 @@ const memeoListSchema = {
   type Profile {
     id: ID! @isUnique
     email: String! @isUnique
-    displayName: String
-    pictureUrl: String
+    displayname: String
+    pictureurl: String
     memes: [Meme!]!
   }
   
   type Meme {
     id: ID! @isUnique
-    ownerId: ID!
-    photoUrl: String!
+    ownerid: ID!
+    photourl: String!
     owner: String
     likes: Int!
     comments: [Comment!]!
@@ -46,14 +46,14 @@ const memeoListSchema = {
   }
   
   type Mutation {
-    createProfile(email: String!, displayName: String!, pictureUrl: String!):Profile!
-    createMeme(photoUrl: String!, owner: String!):Meme!
+    createProfile(email: String!, displayname: String!, pictureurl: String!):Profile!
+    createMeme(ownerid: ID!, photourl: String!, owner: String!):Meme!
     likeMeme(id: ID!): Boolean
-    postComment(memeId: ID!, comment: String!, owner: String!): Comment!
+    postComment(memeid: ID!, comment: String!, owner: String!): Comment!
   }
 
   type Subscription {
-    memeAdded(photoUrl: String):Meme!
+    memeAdded(photourl: String):Meme!
   }
   `,
   createdAt: time,
