@@ -2,10 +2,16 @@ const Prometheus = require('prom-client')
 
 Prometheus.collectDefaultMetrics()
 
-const resolverTiming = new Prometheus.Gauge({
+const resolverTimingMetric = new Prometheus.Gauge({
   name: 'resolver_timing_ms',
   help: 'Time period between request and response in milliseconds',
   labelNames: ['type', 'name']
+})
+
+const requestsResolvedMetric = new Prometheus.Counter({
+  name: 'requests_resolved',
+  help: 'Number of requests resolved by server',
+  labelNames: ['type']
 })
 
 exports.getMetrics = async (req, res) => {
@@ -14,7 +20,12 @@ exports.getMetrics = async (req, res) => {
 }
 
 exports.updateResolverMetrics = (resolverMapping, responseTime) => {
-  resolverTiming
-    .labels(resolverMapping.type, resolverMapping.field)
+  let {type: resolverMappingType, field: resolverMappingName} = resolverMapping
+
+  resolverTimingMetric
+    .labels(resolverMappingType, resolverMappingName)
     .set(responseTime)
+  requestsResolvedMetric
+    .labels(resolverMappingType)
+    .inc(1)
 }
