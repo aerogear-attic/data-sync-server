@@ -7,6 +7,7 @@ const cors = require('cors')
 const {log} = require('./lib/util/logger')
 const expressPino = require('express-pino-logger')({logger: log})
 const {runHealthChecks} = require('./health')
+const {getMetrics} = require('./metrics')
 const { subscribe, execute } = require('graphql')
 const { SubscriptionServer } = require('subscriptions-transport-ws')
 
@@ -43,6 +44,8 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     }
     res.json(result)
   })
+
+  app.get('/metrics', getMetrics)
 
   const schemaListener = schemaListenerCreator(schemaListenerConfig)
   if (schemaListener) {
