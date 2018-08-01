@@ -31,4 +31,4 @@ function buildPath (path) {
   return pathItems.join('.')
 }
 
-module.exports = {log, auditLog}
+module.exports = {log, auditLog, buildPath}

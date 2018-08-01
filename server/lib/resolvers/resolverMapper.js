@@ -47,8 +47,7 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
     let resolver = builder.buildResolver(
       dataSource,
       compiledRequestMapping,
-      compiledResponseMapping,
-      resolverMapping
+      compiledResponseMapping
     )
 
     // If a publish option is specified we wrap the resolver function

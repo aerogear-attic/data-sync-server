@@ -2,7 +2,7 @@ const JSONParse = require('json-parse-safe')
 const { auditLog } = require('../../../lib/util/logger')
 const { updateResolverMetrics } = require('../../../metrics')
 
-function buildPostgresResolver (dataSource, compiledRequestMapping, compiledResponseMapping, resolverMapping) {
+function buildPostgresResolver (dataSource, compiledRequestMapping, compiledResponseMapping) {
   return function resolve (obj, args, context, info) {
     return new Promise((resolve, reject) => {
       const dataSourceClient = dataSource.getClient()
@@ -19,7 +19,7 @@ function buildPostgresResolver (dataSource, compiledRequestMapping, compiledResp
         if (err) return reject(err)
 
         // Update metrics with resolver's reponse time
-        updateResolverMetrics(resolverMapping, Date.now() - requestTimeStart)
+        updateResolverMetrics(info, Date.now() - requestTimeStart)
 
         const responseString = compiledResponseMapping({
           context: {
