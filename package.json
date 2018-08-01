@@ -20,7 +20,7 @@
   "main": "index.js",
   "scripts": {
     "test": "ava '*.test.js' '**/*.test.js' '!integration_test/*'",
-    "test:integration": "ava --concurrency=1 integration_test/*.test.js",
+    "test:integration": "npm run db:init && ava --concurrency=1 integration_test/*.test.js",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino",
     "dev:memeo": "GRAPHIQL_QUERY_FILE='examples/memeolist.query.graphql' nodemon ./index.js | pino",
@@ -38,16 +38,25 @@
     "db:shell:memeo": "docker exec -it aerogeardatasyncserver_postgres_memeo_1 psql -U postgresql -d memeolist_db"
   },
   "devDependencies": {
-    "apollo-fetch": "^0.7.0",
+    "apollo-client": "^2.3.7",
+    "apollo-cache-inmemory": "^1.3.0-beta.6",
+    "apollo-link": "^1.2.2",
+    "apollo-link-http": "^1.5.4",
+    "apollo-link-ws": "^1.0.8",
+    "apollo-utilities": "^1.0.17",
     "ava": "1.0.0-beta.6",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
+    "graphql-tag": "^2.9.2",
+    "node-fetch": "^2.2.0",
     "nodemon": "^1.17.5",
     "pre-commit": "^1.2.2",
-    "standard": "^11.0.1"
+    "standard": "^11.0.1",
+    "stoppable": "^1.0.6",
+    "ws": "^6.0.0"
   },
   "dependencies": {
     "apollo-server-express": "^1.3.6",

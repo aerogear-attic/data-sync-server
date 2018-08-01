@@ -1,4 +1,4 @@
-const {test} = require('ava')
+const { test } = require('ava')
 const base = require('./datasource.integration.test.base')
 
 const context = {

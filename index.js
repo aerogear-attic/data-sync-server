@@ -1,21 +1,20 @@
 const config = require('./server/config')
+const DataSyncService = require('./DataSyncService')
 const { log } = require('./server/lib/util/logger')
-const PubSub = require('./server/lib/pubsubNotifiers/pubsubNotifier')
-
-let { pubsubConfig, postgresConfig } = config
-let { port } = config.server
-
-process.on('uncaughtException', err => log.error('uncaught exception:', err))
-process.on('unhandledRejection', error => log.error('unhandled rejection:', error))
 
 async function start () {
-  const models = require('./sequelize/models/index')(postgresConfig)
-  await models.sequelize.sync({ logging: false })
-  const pubsub = PubSub(pubsubConfig)
+  const syncService = new DataSyncService(config)
+  await syncService.initialize()
+  await syncService.start()
 
-  const server = await require('./server/server')(config, models, pubsub)
-  await server.listen(port)
-  log.info(`Server is now running on http://localhost:${port}`)
+  const stopSignals = ['SIGTERM', 'SIGABRT', 'SIGQUIT', 'SIGINT']
+
+  stopSignals.forEach(signal => {
+    process.on(signal, syncService.gracefulShutdown.bind(syncService, signal))
+  })
+
+  process.on('uncaughtException', log.error.bind(log))
+  process.on('unhandledRejection', log.error.bind(log))
 }
 
 start()

@@ -1,4 +1,5 @@
 const {test} = require('ava')
+const gql = require('graphql-tag')
 
 let helper
 
@@ -16,11 +17,11 @@ test.before(async t => {
 
 test.serial('should run with default empty schema when no config provided', async t => {
   // default empty schema has a Query defined with name '_'
-  const res = await helper.fetch({
-    query: '{ _ }'
+  const res = await helper.apolloClient.client.query({
+    query: gql`{ _ }`
   })
 
-  t.falsy(res.errors)
+  t.truthy(res)
 })
 
 test.serial('should run with default empty schema when no provided config has empty schema', async t => {
@@ -29,29 +30,28 @@ test.serial('should run with default empty schema when no provided config has em
   await helper.triggerReload()
 
   // default empty schema has a Query defined with name '_'
-  const res = await helper.fetch({
-    query: '{ _ }'
+  const res = await helper.apolloClient.client.query({
+    query: gql`{ _ }`
   })
 
-  t.falsy(res.errors)
+  t.truthy(res)
 })
 
 test.serial('should pick up config changes', async t => {
-  let res = await helper.fetch({
-    query: '{ listNotes {id} }'
+  const query = helper.apolloClient.client.query({
+    query: gql`{ listNotes {id} }`
   })
 
-  t.truthy(res.errors)
+  t.throws(query)
 
   await helper.deleteConfig()
   await helper.feedConfig('simple.inmem.valid.notes')
   await helper.triggerReload()
 
-  res = await helper.fetch({
-    query: '{ listNotes {id} }'
+  let res = await helper.apolloClient.client.query({
+    query: gql`{ listNotes {id} }`
   })
 
-  t.falsy(res.errors)
   t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
 })
 
@@ -66,11 +66,10 @@ test.serial('should use prev config when there is a schema syntax problem with t
   await helper.feedConfig('simple.inmem.invalid.bad.schema.syntax')
   await helper.triggerReload() // make server pick it up. it should still use the old valid config
 
-  const res = await helper.fetch({
-    query: '{ listNotes {id} }'
+  const res = await helper.apolloClient.client.query({
+    query: gql`{ listNotes {id} }`
   })
 
-  t.falsy(res.errors)
   t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
 })
 
@@ -84,19 +83,18 @@ test.serial('should use prev config when there is a resolver not in the new sche
   await helper.feedConfig('simple.inmem.invalid.resolver.not.in.schema')
   await helper.triggerReload() // make server try to pick it up. it should still use the the empty schema
 
-  let res = await helper.fetch({
-    query: '{ listNotes {id} }'
+  const query = helper.apolloClient.client.query({
+    query: gql`{ listNotes {id} }`
   })
 
-  t.truthy(res.errors)
-  t.falsy(res.data)
+  t.throws(query)
 
   // default empty schema has a Query defined with name '_'
-  res = await helper.fetch({
-    query: '{ _ }'
+  const res = await helper.apolloClient.client.query({
+    query: gql`{ _ }`
   })
 
-  t.falsy(res.errors)
+  t.truthy(res)
 })
 
 // Apollo doesn't complain about this case in advance!
@@ -106,18 +104,16 @@ test.serial('should return null when executing a query with missing resolver', a
   await helper.feedConfig('simple.inmem.invalid.notes.no.resolver.for.query')
   await helper.triggerReload() // make server try to pick it up. it should be able to use the new schema.
 
-  let res = await helper.fetch({
-    query: '{ listNotes {id} }'
+  let res = await helper.apolloClient.client.query({
+    query: gql`{ listNotes {id} }`
   })
 
-  t.falsy(res.errors)
   t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
 
-  res = await helper.fetch({
-    query: '{ foo }'
+  res = await helper.apolloClient.client.query({
+    query: gql`{ foo }`
   })
 
-  t.falsy(res.errors)
   t.deepEqual(res.data, {foo: null})
 })
 
@@ -127,17 +123,15 @@ test.serial('should return error when calling a query that does not exist', asyn
   await helper.feedConfig('simple.inmem.valid.notes')
   await helper.triggerReload()
 
-  let res = await helper.fetch({
-    query: '{ listNotes {id} }'
+  const res = await helper.apolloClient.client.query({
+    query: gql`{ listNotes {id} }`
   })
 
-  t.falsy(res.errors)
   t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
 
-  res = await helper.fetch({
-    query: '{ FOO }'
+  const query = helper.apolloClient.client.query({
+    query: gql`{ FOO }`
   })
 
-  t.truthy(res.errors)
-  t.falsy(res.data)
+  return t.throws(query)
 })

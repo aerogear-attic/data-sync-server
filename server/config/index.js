@@ -33,14 +33,12 @@ const config = {
   },
   postgresConfig: {
     database: process.env.POSTGRES_DATABASE || 'aerogear_data_sync_db',
-    username: process.env.POSTGRES_USERNAME || 'postgresql',
+    user: process.env.POSTGRES_USERNAME || 'postgresql',
     password: process.env.POSTGRES_PASSWORD || 'postgres',
     host: process.env.POSTGRES_HOST || '127.0.0.1',
     port: process.env.POSTGRES_PORT || '5432'
   },
-  pubsubConfig: {
-    type: 'InMemory'
-  },
+  pubsubConfig: {},
   schemaListenerConfig: undefined
 }
 
@@ -62,12 +60,17 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
 } else {
   log.info(`Using default schemaListener since SCHEMA_LISTENER_CONFIG environment variable is not defined`)
 
+  config.pubsubConfig = {
+    type: 'Postgres',
+    config: config.postgresConfig
+  }
+
   config.schemaListenerConfig = {
     type: 'postgres',
     config: {
       channel: 'aerogear-data-sync-config',
       database: config.postgresConfig.database,
-      username: config.postgresConfig.username,
+      user: config.postgresConfig.user,
       password: config.postgresConfig.password,
       host: config.postgresConfig.host,
       port: config.postgresConfig.port

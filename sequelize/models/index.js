@@ -7,7 +7,7 @@ const basename = path.basename(module.filename)
 const db = {}
 
 module.exports = (config) => {
-  const sequelize = new Sequelize(config.database, config.username, config.password, {
+  const sequelize = new Sequelize(config.database, config.user, config.password, {
     host: config.host,
     port: config.port,
     dialect: 'postgres',

@@ -25,6 +25,16 @@ const datasources = [
 
 const schema = require('./complete.valid.memeo.schema.only')
 
+const subscriptions = [
+  {
+    type: 'Subscription',
+    field: 'memeAdded',
+    GraphQLSchemaId: 2,
+    createdAt: time,
+    updatedAt: time
+  }
+]
+
 const resolvers = [
   {
     type: 'Query',
@@ -56,6 +66,7 @@ const resolvers = [
       VALUES ('{{context.arguments.ownerId}}', '{{context.arguments.photoUrl}}') 
       RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
+    publish: 'memeAdded',
     createdAt: time,
     updatedAt: time
   },
@@ -64,6 +75,7 @@ const resolvers = [
     field: 'memes',
     GraphQLSchemaId: 2,
     DataSourceId: 2,
+    publish: 'memeAdded',
     requestMapping: `SELECT "id", "ownerId", "photoUrl" FROM "Meme" where "ownerId"={{context.parent.id}}`,
     responseMapping: '{{ toJSON context.result }}',
     createdAt: time,
@@ -129,6 +141,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert('DataSources', datasources, {})
     await queryInterface.bulkInsert('GraphQLSchemas', [schema], {})
+    await queryInterface.bulkInsert('Subscriptions', subscriptions, {})
     return queryInterface.bulkInsert('Resolvers', resolvers, {})
   }
 }
