@@ -1,7 +1,7 @@
 const PGPubsub = require('pg-pubsub')
 const pg = require('pg')
 const RestartableSyncService = require('./util/restartableSyncService')
-const {createApolloFetch} = require('apollo-fetch')
+const TestApolloClient = require('./util/testApolloClient')
 
 let config = require('../server/config')
 let { postgresConfig } = config
@@ -24,9 +24,7 @@ function Helper () {
   this.qi = this.sequelize.queryInterface
 
   this.initialize = async () => {
-    this.fetch = createApolloFetch({
-      uri: 'http://localhost:8000/graphql'
-    })
+    this.apolloClient = new TestApolloClient()
     await this.syncService.initialize()
     await this.syncService.start()
   }

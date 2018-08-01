@@ -1,4 +1,5 @@
 const { test } = require('ava')
+const gql = require('graphql-tag')
 
 /// //////////////// NOTE /////////////////////////////////////
 /// /////////// order of tests are imporant!///////////////////
@@ -6,12 +7,12 @@ const { test } = require('ava')
 
 module.exports = function (context) {
   test.serial('should return empty list when no Profiles created yet', async t => {
-    const res = await context.helper.fetch({
+    const res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `{
-          allProfiles{
-              id
-          }
+      query: gql`{
+        allProfiles {
+            id
+        }
       }`
     })
 
@@ -20,9 +21,9 @@ module.exports = function (context) {
   })
 
   test.serial('should create a Profile', async t => {
-    let res = await context.helper.fetch({
+    let res = await context.helper.apolloClient.client.mutate({
       // language=GraphQL
-      query: `
+      mutation: gql`
           mutation {
               createProfile (
                   email: "jordan@example.com",
@@ -40,6 +41,8 @@ module.exports = function (context) {
       `
     })
 
+    t.log(res)
+
     t.falsy(res.errors)
     t.truthy(res.data.createProfile)
     t.truthy(res.data.createProfile.id)
@@ -50,15 +53,14 @@ module.exports = function (context) {
 
     const createdId = res.data.createProfile.id
 
-    res = await context.helper.fetch({
+    res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `{
-          allProfiles{
-              id
-          }
-      }`
+      query: gql`{
+        allProfiles{
+            id
+        }
+        }`
     })
-
     t.falsy(res.errors)
     t.truthy(res.data.allProfiles)
     t.is(res.data.allProfiles.length, 1)
@@ -66,18 +68,17 @@ module.exports = function (context) {
   })
 
   test.serial('should get a Profile by email', async t => {
-    let res = await context.helper.fetch({
+    let res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `
-          query {
-              profile (email: "jordan@example.com") {
-                  id,
-                  email,
-                  displayName,
-                  biography,
-                  avatarUrl
-              }
-          }
+      query: gql`{
+        profile (email: "jordan@example.com") {
+            id,
+            email,
+            displayName,
+            biography,
+            avatarUrl
+        }
+    }
       `
     })
 
@@ -91,12 +92,12 @@ module.exports = function (context) {
   })
 
   test.serial('should update a Profile', async t => {
-    let res = await context.helper.fetch({
+    let res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `{
-          allProfiles{
-              id
-          }
+      query: gql`{
+        allProfiles{
+            id
+        }
       }`
     })
 
@@ -105,24 +106,24 @@ module.exports = function (context) {
     t.falsy(res.errors)
     t.truthy(profileId)
 
-    res = await context.helper.fetch({
+    res = await context.helper.apolloClient.client.mutate({
       // language=GraphQL
-      query: `
-        mutation {
-            updateProfile (
-                id: "${profileId}",
-                email: "mj@example.com",
-                displayName: "Michael Jordan",
-                biography:"Nr #23!",
-                avatarUrl:"http://example.com/mj.jpg"
-            ) {
-                id,
-                email,
-                displayName,
-                biography,
-                avatarUrl
-            }
+      mutation: gql`
+      mutation {
+        updateProfile (
+            id: "${profileId}",
+            email: "mj@example.com",
+            displayName: "Michael Jordan",
+            biography:"Nr #23!",
+            avatarUrl:"http://example.com/mj.jpg"
+        ) {
+            id,
+            email,
+            displayName,
+            biography,
+            avatarUrl
         }
+    }
     `
     })
 
@@ -134,16 +135,16 @@ module.exports = function (context) {
     t.deepEqual(res.data.updateProfile.biography, 'Nr #23!')
     t.deepEqual(res.data.updateProfile.avatarUrl, 'http://example.com/mj.jpg')
 
-    res = await context.helper.fetch({
+    res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `{
-          allProfiles{
-              id,
-              email,
-              displayName,
-              biography,
-              avatarUrl
-          }
+      query: gql`{
+        allProfiles{
+            id,
+            email,
+            displayName,
+            biography,
+            avatarUrl
+        }
       }`
     })
 
@@ -158,12 +159,12 @@ module.exports = function (context) {
   })
 
   test.serial('should delete a Profile', async t => {
-    let res = await context.helper.fetch({
+    let res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `{
-          allProfiles{
-              id
-          }
+      query: gql`{
+        allProfiles{
+            id
+        }
       }`
     })
 
@@ -172,30 +173,30 @@ module.exports = function (context) {
     t.falsy(res.errors)
     t.truthy(profileId)
 
-    res = await context.helper.fetch({
+    res = await context.helper.apolloClient.client.mutate({
       // language=GraphQL
-      query: `
-        mutation {
-            deleteProfile (
-                id: "${profileId}"
-            )
-        }
+      mutation: gql`
+      mutation {
+        deleteProfile (
+            id: "${profileId}"
+        )
+    }
     `
     })
 
     t.falsy(res.errors)
     t.deepEqual(res.data.deleteProfile.true)
 
-    res = await context.helper.fetch({
+    res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `{
-          allProfiles{
-              id,
-              email,
-              displayName,
-              biography,
-              avatarUrl
-          }
+      query: gql`{
+        allProfiles {
+            id,
+            email,
+            displayName,
+            biography,
+            avatarUrl
+        }
       }`
     })
 
@@ -205,12 +206,12 @@ module.exports = function (context) {
   })
 
   test.serial('should return empty list when no Memes created yet', async t => {
-    const res = await context.helper.fetch({
+    const res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `{
-          allMemes{
-              id
-          }
+      query: gql`{
+        allMemes {
+            id
+        }
       }`
     })
 
@@ -219,23 +220,23 @@ module.exports = function (context) {
   })
 
   test.serial('should create a Profile and a Meme', async t => {
-    let res = await context.helper.fetch({
+    let res = await context.helper.apolloClient.client.mutate({
       // language=GraphQL
-      query: `
-          mutation {
-              createProfile (
-                  email: "jordan@example.com",
-                  displayName: "Michael Jordan",
-                  biography:"Nr #23!",
-                  avatarUrl:"http://example.com/mj.jpg"
-              ) {
-                  id,
-                  email,
-                  displayName,
-                  biography,
-                  avatarUrl
-              }
-          }
+      mutation: gql`
+      mutation {
+        createProfile (
+            email: "jordan@example.com",
+            displayName: "Michael Jordan",
+            biography:"Nr #23!",
+            avatarUrl:"http://example.com/mj.jpg"
+        ) {
+            id,
+            email,
+            displayName,
+            biography,
+            avatarUrl
+        }
+        }
       `
     })
 
@@ -245,10 +246,10 @@ module.exports = function (context) {
 
     const profileId = res.data.createProfile.id
 
-    res = await context.helper.fetch({
+    res = await context.helper.apolloClient.client.mutate({
       // language=GraphQL
-      query: `
-        mutation {
+      mutation: gql`
+      mutation {
             createMeme (
                 ownerId: "${profileId}",
                 photoUrl:"http://example.com/meme.jpg"
@@ -261,6 +262,8 @@ module.exports = function (context) {
     `
     })
 
+    t.log(res)
+
     t.falsy(res.errors)
     t.truthy(res.data.createMeme)
     t.truthy(res.data.createMeme.id)
@@ -269,14 +272,14 @@ module.exports = function (context) {
 
     const memeId = res.data.createMeme.id
 
-    res = await context.helper.fetch({
+    res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `{
-          allMemes{
-              id,
-              photoUrl,
-              ownerId
-          }
+      query: gql`{
+            allMemes {
+                id,
+                photoUrl,
+                ownerId
+            }
       }`
     })
 
@@ -287,10 +290,9 @@ module.exports = function (context) {
     t.is(res.data.allMemes[0].ownerId, profileId)
     t.is(res.data.allMemes[0].photoUrl, 'http://example.com/meme.jpg')
 
-    res = await context.helper.fetch({
+    res = await context.helper.apolloClient.client.query({
       // language=GraphQL
-      query: `
-          query {
+      query: gql`{
               profile (email: "jordan@example.com") {
                   id,
                   email,
