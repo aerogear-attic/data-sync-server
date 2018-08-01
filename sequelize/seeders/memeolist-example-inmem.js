@@ -17,6 +17,17 @@ const datasources = [
 
 const resolvers = [
   {
+    type: 'Meme',
+    field: 'comments',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `{"operation": "find", "query": 
+                    {"_type":"comment", "memeid": "{{context.parent.id}}"}}`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
     type: 'Query',
     field: 'allMemes',
     DataSourceId: 1,
@@ -24,6 +35,16 @@ const resolvers = [
     preHook: '',
     postHook: '',
     requestMapping: '{"operation": "find", "query": {"_type":"meme"}}',
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Query',
+    field: 'profile',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: '{"operation": "find", "query": {"_type":"profile", "email": "{{context.arguments.email}}" }}',
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -39,7 +60,9 @@ const resolvers = [
       "operation": "insert",
       "doc": {
         "_type":"meme",
-        "photoUrl": "{{context.arguments.photoUrl}}"
+        "photourl": "{{context.arguments.photourl}}",
+        "owner": "{{context.arguments.owner}}",
+        "likes": 0
       }
     }`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
@@ -49,6 +72,57 @@ const resolvers = [
         "memeAdded": {{ toJSON context.result }}
       }`
     }),
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'createProfile',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `{
+      "operation": "insert",
+      "doc": {
+        "_type":"profile",
+        "email": "{{context.arguments.email}}",
+        "displayname": "{{context.arguments.displayname}}",
+        "pictureurl": "{{context.arguments.pictureurl}}"
+      }
+    }`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'likeMeme',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `{
+      "operation": "update",
+      "query": {"_id": "{{context.arguments.id}}", "_type":"meme"},
+      "update": {
+        "$inc": { "likes" : 1 }
+      }
+    }`,
+    responseMapping: 'true',
+    createdAt: time,
+    updatedAt: time
+  }, {
+    type: 'Mutation',
+    field: 'postComment',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `{
+      "operation": "insert",
+      "doc": {
+        "_type":"comment",
+        "comment": "{{context.arguments.comment}}",
+        "owner": "{{context.arguments.owner}}",
+        "memeid": "{{context.arguments.memeid}}"
+      }
+    }`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
   }
