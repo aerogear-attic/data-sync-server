@@ -1,4 +1,4 @@
-const DataSyncService = require('../../index')
+const DataSyncService = require('../../DataSyncService')
 const stoppable = require('stoppable')
 
 class RestartableSyncService extends DataSyncService {
