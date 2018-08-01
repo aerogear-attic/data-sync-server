@@ -86,12 +86,6 @@ Start the database first:
 docker-compose -p aerogeardatasyncserver up
 ```
 
-Then, in a separate session, init the database (blank) and start the application:
-```
-npm run db:init
-npm run dev
-```
-
 In another session, run the tests:
 ```
 npm run test:integration
@@ -108,6 +102,16 @@ Then execute these command locally:
 circleci build --job unit_test
 circleci build --job integration_test
 ```
+
+### Running Individual Tests
+
+Assuming you have `npm@5.2.0` or greater you can do the following:
+
+```
+npx ava /path/to/test.js
+```
+
+`npx` will ensure the correct version of ava (specified in package.json) is used.
 
 ### Debugging Individual Tests
 
