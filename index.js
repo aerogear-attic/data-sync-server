@@ -5,8 +5,8 @@ const PubSub = require('./server/lib/pubsubNotifiers/pubsubNotifier')
 let { pubsubConfig, postgresConfig } = config
 let { port } = config.server
 
-process.on('uncaughtException', err => console.error('uncaught exception:', err))
-process.on('unhandledRejection', error => console.error('unhandled rejection:', error))
+process.on('uncaughtException', err => log.error('uncaught exception:', err))
+process.on('unhandledRejection', error => log.error('unhandled rejection:', error))
 
 async function start () {
   const models = require('./sequelize/models/index')(postgresConfig)
