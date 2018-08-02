@@ -13,10 +13,6 @@ const { SubscriptionServer } = require('subscriptions-transport-ws')
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
-http.Server.prototype.startListening = function (port) {
-
-}
-
 module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaListenerConfig}, models, pubsub) => {
   const {tracing} = graphQLConfig
   let {schema, dataSources} = await buildSchema(models, pubsub)
