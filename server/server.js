@@ -7,7 +7,7 @@ const cors = require('cors')
 const {log} = require('./lib/util/logger')
 const expressPino = require('express-pino-logger')({logger: log})
 const {runHealthChecks} = require('./health')
-const {getMetrics} = require('./metrics')
+const {getMetrics, responseLoggingMetric} = require('./metrics')
 const { subscribe, execute } = require('graphql')
 const { SubscriptionServer } = require('subscriptions-transport-ws')
 
@@ -24,6 +24,8 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
   // Wrap the Express server
   const server = http.createServer(app)
   let subscriptionServer = null // will be instantiated later
+
+  app.use(responseLoggingMetric)
 
   app.use('*', cors())
   app.use(expressPino)
