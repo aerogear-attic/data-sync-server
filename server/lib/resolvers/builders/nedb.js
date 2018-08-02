@@ -1,10 +1,13 @@
 const JSONParse = require('json-parse-safe')
 const { auditLog, log } = require('../../../lib/util/logger')
+const { updateResolverMetrics } = require('../../../metrics')
 
 function buildNeDBResolver (dataSource, compiledRequestMapping, compiledResponseMapping) {
   return function resolve (obj, args, context, info) {
     return new Promise((resolve, reject) => {
       const dataSourceClient = dataSource.getClient()
+      const requestTimeStart = Date.now()
+      info['dataSourceType'] = dataSource.type
 
       const queryString = compiledRequestMapping({
         context: {
@@ -50,6 +53,9 @@ function buildNeDBResolver (dataSource, compiledRequestMapping, compiledResponse
       function mapResponse (err, res) {
         if (err) return reject(err)
         if (!res) return resolve()
+
+        // Update metrics with resolver's reponse time
+        updateResolverMetrics(info, Date.now() - requestTimeStart)
 
         const responseString = compiledResponseMapping({
           context: {

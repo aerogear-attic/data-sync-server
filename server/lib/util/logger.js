@@ -14,7 +14,8 @@ function auditLog (success, request, info, parent, args, msg) {
       path: buildPath(info.path),
       success: success,
       parent: parent,
-      arguments: args
+      arguments: args,
+      dataSourceType: info.dataSourceType || ''
     })
   }
 }
@@ -31,4 +32,4 @@ function buildPath (path) {
   return pathItems.join('.')
 }
 
-module.exports = {log, auditLog}
+module.exports = {log, auditLog, buildPath}
