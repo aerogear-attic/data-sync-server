@@ -7,6 +7,7 @@ function buildPostgresResolver (dataSource, compiledRequestMapping, compiledResp
     return new Promise((resolve, reject) => {
       const dataSourceClient = dataSource.getClient()
       const requestTimeStart = Date.now()
+      info['dataSourceType'] = dataSource.type
 
       const queryString = compiledRequestMapping({
         context: {

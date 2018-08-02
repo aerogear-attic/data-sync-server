@@ -6,13 +6,13 @@ Prometheus.collectDefaultMetrics()
 const resolverTimingMetric = new Prometheus.Gauge({
   name: 'resolver_timing_ms',
   help: 'Time period between request and response in milliseconds',
-  labelNames: ['type', 'name']
+  labelNames: ['datasource_type', 'operation_type', 'name']
 })
 
 const requestsResolvedMetric = new Prometheus.Counter({
   name: 'requests_resolved',
   help: 'Number of requests resolved by server',
-  labelNames: ['type', 'path']
+  labelNames: ['datasource_type', 'operation_type', 'path']
 })
 
 exports.getMetrics = async (req, res) => {
@@ -25,13 +25,19 @@ exports.updateResolverMetrics = (resolverInfo, responseTime) => {
     operation: {operation: resolverMappingType},
     fieldName: resolverMappingName,
     path: resolverWholePath,
-    parentType: resolverParentType
+    parentType: resolverParentType,
+    dataSourceType
   } = resolverInfo
 
   resolverTimingMetric
-    .labels(resolverMappingType, resolverMappingName)
+    .labels(dataSourceType, resolverMappingType, resolverMappingName)
     .set(responseTime)
+
   requestsResolvedMetric
-    .labels(resolverMappingType, `${resolverParentType}.${buildPath(resolverWholePath)}`)
+    .labels(
+      dataSourceType,
+      resolverMappingType,
+      `${resolverParentType}.${buildPath(resolverWholePath)}`
+    )
     .inc(1)
 }
