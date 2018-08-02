@@ -9,7 +9,7 @@ const subscriptions = [
     GraphQLSchemaId: 1,
     topic: 'memeCreated',
     filter: JSON.stringify({
-      match: ['$payload.memeAdded.photoUrl', 'https://.*']
+      match: ['$payload.memeAdded.photourl', 'https://.*']
     }),
     createdAt: time,
     updatedAt: time

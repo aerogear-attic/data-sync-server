@@ -22,6 +22,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
   // Wrap the Express server
   const server = http.createServer(app)
+  let subscriptionServer = null // will be instantiated later
 
   app.use('*', cors())
   app.use(expressPino)
@@ -65,6 +66,10 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
       }
 
       if (newSchema) {
+        schema = newSchema.schema
+        subscriptionServer.close()
+        subscriptionServer = newSubscriptionServer(server, schema)
+
         try {
           await disconnectDataSources(dataSources) // disconnect existing ones first
         } catch (ex) {
@@ -75,9 +80,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
         try {
           await connectDataSources(newSchema.dataSources)
-          schema = newSchema.schema
           dataSources = newSchema.dataSources
-          newSubScriptionServer(server, schema)
         } catch (ex) {
           log.error('Error while connecting to new data sources')
           log.error(ex)
@@ -102,14 +105,16 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     await server.close()
   }
 
-  newSubScriptionServer(server, schema)
+  subscriptionServer = newSubscriptionServer(server, schema)
 
-  server.startListening = (port) => {
+  function startListening (port) {
     var server = this
     return new Promise((resolve) => {
       server.listen(port, resolve)
     })
   }
+
+  server.startListening = startListening.bind(server)
 
   return {
     server,
@@ -209,9 +214,9 @@ async function disconnectDataSources (dataSources) {
   }
 }
 
-function newSubScriptionServer (server, schema) {
+function newSubscriptionServer (server, schema) {
   /* eslint-disable no-new */
-  new SubscriptionServer({
+  return new SubscriptionServer({
     execute: execute,
     subscribe: subscribe,
     schema
