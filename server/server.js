@@ -66,6 +66,10 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
       }
 
       if (newSchema) {
+        schema = newSchema.schema
+        subscriptionServer.close()
+        subscriptionServer = newSubscriptionServer(server, schema)
+
         try {
           await disconnectDataSources(dataSources) // disconnect existing ones first
         } catch (ex) {
@@ -76,10 +80,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
         try {
           await connectDataSources(newSchema.dataSources)
-          schema = newSchema.schema
           dataSources = newSchema.dataSources
-          subscriptionServer.close()
-          subscriptionServer = newSubscriptionServer(server, schema)
         } catch (ex) {
           log.error('Error while connecting to new data sources')
           log.error(ex)
