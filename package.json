@@ -23,7 +23,7 @@
     "test:integration": "npm run db:init && ava --concurrency=1 integration_test/*.test.js",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino",
-    "dev:memeo": "GRAPHIQL_QUERY_FILE='examples/memeolist.query.graphql' nodemon ./index.js | pino",
+    "dev:memeo": "GRAPHIQL_QUERY_FILE='examples/memeolist.query.graphql' GRAPHIQL_VARIABLES_FILE='examples/memeolist.variables.json' nodemon ./index.js | pino",
     "lint": "eslint .",
     "format": "eslint . --fix",
     "docker:build": "./scripts/docker_build.sh",

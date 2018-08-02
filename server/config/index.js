@@ -7,12 +7,23 @@ const { log } = require('../lib/util/logger')
 require('dotenv').config()
 
 let graphiqlQueryFileContent = ''
+let graphiqlVariableFileContent = ''
 
 if (process.env.GRAPHIQL_QUERY_FILE) {
   try {
     graphiqlQueryFileContent = fs.readFileSync(process.env.GRAPHIQL_QUERY_FILE, 'utf-8')
   } catch (ex) {
     log.error(`Unable to read GRAPHIQL_QUERY_FILE ${process.env.GRAPHIQL_QUERY_FILE} . Skipping it.`)
+    log.error(ex)
+  }
+}
+
+if (process.env.GRAPHIQL_VARIABLES_FILE) {
+  try {
+    graphiqlVariableFileContent = fs.readFileSync(process.env.GRAPHIQL_VARIABLES_FILE, 'utf-8')
+    graphiqlVariableFileContent = JSON.parse(graphiqlVariableFileContent)
+  } catch (ex) {
+    log.error(`Unable to read GRAPHIQL_VARIABLES_FILE ${process.env.GRAPHIQL_VARIABLES_FILE} . Skipping it.`)
     log.error(ex)
   }
 }
@@ -29,6 +40,7 @@ const config = {
   graphiqlConfig: {
     endpointURL: '/graphql', // if you want GraphiQL enabled
     query: graphiqlQueryFileContent,
+    variables: graphiqlVariableFileContent,
     subscriptionsEndpoint: `ws://${hostname()}:${port}/subscriptions`
   },
   postgresConfig: {
