@@ -2,6 +2,7 @@ const _ = require('lodash')
 const resolverBuilders = require('./builders')
 const { compile } = require('./compiler')
 const { wrapResolverWithPublish } = require('./wrapResolverWithPublisher')
+const { wrapResolverWithHooks } = require('./wrapResolverWithHooks')
 
 module.exports = function (dataSources, resolverMappings, pubsub) {
   const resolvers = {}
@@ -49,6 +50,8 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
       compiledRequestMapping,
       compiledResponseMapping
     )
+
+    resolver = wrapResolverWithHooks(resolver, resolverMapping)
 
     // If a publish option is specified we wrap the resolver function
     if (resolverMapping.publish && !_.isEmpty(resolverMapping.publish)) {
