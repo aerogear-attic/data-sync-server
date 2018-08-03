@@ -28,7 +28,7 @@ const resolvers = [
     field: 'comments',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `SELECT * FROM comment WHERE memeid='{{context.parent.id}}'`,
+    requestMapping: `SELECT * FROM comment WHERE memeid='{{context.parent.id}}' ORDER BY id DESC`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -38,7 +38,7 @@ const resolvers = [
     field: 'allMemes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: 'SELECT * FROM meme',
+    requestMapping: 'SELECT * FROM meme ORDER BY id DESC',
     responseMapping: '{{ toJSON context.result }}',
     createdAt: time,
     updatedAt: time

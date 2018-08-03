@@ -1,51 +1,55 @@
-## MEMES section
-query allMemes{
-  allMemes{
-    id
-    photourl
-    owner
-    likes
-    comments {
+
+  query allMemes {
+    allMemes {
       id
-      comment
+      photoUrl
       owner
+      likes
+      comments {
+        id
+        comment
+        owner
+      }
     }
   }
-}
 
-mutation createMeme {
-  createMeme(ownerid: "1", photourl: "https://i.imgur.com/W4dhL0b.jpg", owner:"Wojtek"){
-    id
-    photourl
-    likes
+  mutation createMeme($ownerid: ID!, $photoUrl: String!, $owner: String!) {
+    createMeme(ownerid: $ownerid, photoUrl: $photoUrl, owner: $owner) {
+        id
+        photoUrl
+        owner
+        likes
+    }
   }
-}
 
-mutation postComment{
-  postComment(memeid: "Fha32ppqLNWEfX3b", comment: "Like it", owner: "Wojtek"){
-    id
-  }
-}
- 
-mutation likeMeme{
-  likeMeme(id: "Fha32ppqLNWEfX3b") 
-}
 
-## Profile section
-mutation createProfile {
-  createProfile(email: "wtr1@redhit.com", displayname: "wojtek", pictureurl: "https://tinyurl.com/avataraerogear") {
-    id
-    email
-    displayname
-    pictureurl
+  mutation postComment($memeid: ID!, $comment: String!, $owner: String!){
+    postComment(memeid: $memeid, comment: $comment, owner: $owner){
+        id
+        comment
+        owner
+    }
   }
-}
 
-query profile {
-  profile(email:"wtr1@redhit.com"){
-    id
-    email
-    displayname
-    pictureurl
+  mutation likeMeme($memeid: ID!){
+    likeMeme(id: $memeid)
   }
-}
+
+  ## Profile section
+  mutation createProfile($email: String!, $displayName: String!, $pictureUrl: String!) {
+    createProfile(email: $email, displayName: $displayName, pictureUrl: $pictureUrl) {
+      id
+      email
+      displayName
+      pictureUrl
+    }
+  }
+
+  query profile($email: String!) {
+    profile(email:$email){
+      id
+      email
+      displayName
+      pictureUrl
+    }
+  }
