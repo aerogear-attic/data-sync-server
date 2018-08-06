@@ -11,11 +11,9 @@ function wrapResolverWithMappingHooks (resolverFn, resolverMapping) {
     return new Promise(async (resolve, reject) => {
       if (resolverMapping.preHook && !_.isEmpty(resolverMapping.preHook)) {
         log.info(resolverMapping.preHook)
-        try {
-          request.get(resolverMapping.preHook)
-        } catch (e) {
-          log.error(e)
-        }
+        request.get(resolverMapping.preHook).on('error', function (err) {
+          log.err(err)
+        })
       }
 
       try {
@@ -28,7 +26,9 @@ function wrapResolverWithMappingHooks (resolverFn, resolverMapping) {
     }).then(function (result) {
       if (resolverMapping.postHook && !_.isEmpty(resolverMapping.postHook)) {
         log.info(resolverMapping.postHook)
-        request.get(resolverMapping.postHook)
+        request.get(resolverMapping.preHook).on('error', function (err) {
+          log.err(err)
+        })
       }
       return result
     })
