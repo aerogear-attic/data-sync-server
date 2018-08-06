@@ -51,7 +51,9 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
       compiledResponseMapping
     )
 
-    resolver = wrapResolverWithHooks(resolver, resolverMapping)
+    if (resolverMapping.preHook || resolverMapping.postHook) {
+      resolver = wrapResolverWithHooks(resolver, resolverMapping)
+    }
 
     // If a publish option is specified we wrap the resolver function
     if (resolverMapping.publish && !_.isEmpty(resolverMapping.publish)) {
