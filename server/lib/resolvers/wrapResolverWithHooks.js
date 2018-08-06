@@ -2,11 +2,7 @@ const _ = require('lodash')
 const {log} = require('../util/logger')
 const request = require('request')
 
-exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolver, resolverMapping) {
-  return wrapResolverWithMappingHooks(resolver, resolverMapping)
-}
-
-function wrapResolverWithMappingHooks (resolverFn, resolverMapping) {
+exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, resolverMapping) {
   return (obj, args, context, info) => {
     return new Promise(async (resolve, reject) => {
       if (resolverMapping.preHook && !_.isEmpty(resolverMapping.preHook)) {
