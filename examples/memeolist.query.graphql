@@ -1,55 +1,55 @@
 
-  query allMemes {
-    allMemes {
+query allMemes {
+  allMemes {
+    id
+    photourl
+    owner
+    likes
+    comments {
       id
-      photoUrl
+      comment
+      owner
+    }
+  }
+}
+
+mutation createMeme($ownerid: ID!, $photourl: String!, $owner: String!) {
+  createMeme(ownerid: $ownerid, photourl: $photourl, owner: $owner) {
+      id
+      photourl
       owner
       likes
-      comments {
-        id
-        comment
-        owner
-      }
-    }
   }
-
-  mutation createMeme($ownerid: ID!, $photoUrl: String!, $owner: String!) {
-    createMeme(ownerid: $ownerid, photoUrl: $photoUrl, owner: $owner) {
-        id
-        photoUrl
-        owner
-        likes
-    }
-  }
+}
 
 
-  mutation postComment($memeid: ID!, $comment: String!, $owner: String!){
-    postComment(memeid: $memeid, comment: $comment, owner: $owner){
-        id
-        comment
-        owner
-    }
-  }
-
-  mutation likeMeme($memeid: ID!){
-    likeMeme(id: $memeid)
-  }
-
-  ## Profile section
-  mutation createProfile($email: String!, $displayName: String!, $pictureUrl: String!) {
-    createProfile(email: $email, displayName: $displayName, pictureUrl: $pictureUrl) {
+mutation postComment($memeid: ID!, $comment: String!, $owner: String!){
+  postComment(memeid: $memeid, comment: $comment, owner: $owner){
       id
-      email
-      displayName
-      pictureUrl
-    }
+      comment
+      owner
   }
+}
 
-  query profile($email: String!) {
-    profile(email:$email){
-      id
-      email
-      displayName
-      pictureUrl
-    }
+mutation likeMeme($memeid: ID!){
+  likeMeme(id: $memeid)
+}
+
+## Profile section
+mutation createProfile($email: String!, $displayname: String!, $pictureurl: String!) {
+  createProfile(email: $email, displayname: $displayname, pictureurl: $pictureurl) {
+    id
+    email
+    displayname
+    pictureurl
   }
+}
+
+query profile($email: String!) {
+  profile(email:$email){
+    id
+    email
+    displayname
+    pictureurl
+  }
+}
