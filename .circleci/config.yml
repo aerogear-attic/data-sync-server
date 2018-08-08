@@ -55,6 +55,46 @@ jobs:
           path: ~/reports
       - store_artifacts:
           path: ~/reports
+  
+  test_coverage:
+    docker:
+      # Node 8 LTS
+      - image: circleci/node:carbon
+      # configuration database
+      - image: circleci/postgres:9.6.2-alpine
+        name: config_postgres
+        environment:
+            POSTGRES_USER: postgresql
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: aerogear_data_sync_db
+      # memeolist database
+      - image: circleci/postgres:9.6.2-alpine
+        name: memeolist_postgres
+        environment:
+            POSTGRES_USER: postgresql
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: memeolist_db
+    steps:
+      - checkout
+      - run:
+          name: Wait for configuration database to start up
+          command: dockerize -wait tcp://config_postgres:5432 -timeout 120s
+      - run:
+          name: Wait for memeolist database to start up
+          command: dockerize -wait tcp://memeolist_postgres:5432 -timeout 120s
+      - run: npm install
+      - run:
+          command: npm run db:init
+          environment:
+            POSTGRES_HOST: 'config_postgres'
+            POSTGRES_PORT: '5432'
+      - run:
+          command: npm run test:cover
+          environment:
+            POSTGRES_HOST: 'config_postgres'
+            POSTGRES_PORT: '5432'
+            MEMEOLIST_DB_HOST: 'memeolist_postgres'
+            MEMEOLIST_DB_PORT: '5432'
 
   docker_push_master:
     docker:
@@ -86,6 +126,10 @@ workflows:
             tags:
               only: /.*/
       - integration_test:
+          filters:
+            tags:
+              only: /.*/
+      - test_coverage:
           filters:
             tags:
               only: /.*/

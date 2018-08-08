@@ -2,6 +2,8 @@
 
 GraphQL based data sync server for mobile, with backend integration capabilities
 
+[![CircleCI](https://circleci.com/gh/aerogear/data-sync-server.svg?style=svg)](https://circleci.com/gh/aerogear/data-sync-server)
+[![Coverage Status](https://coveralls.io/repos/github/aerogear/data-sync-server/badge.svg)](https://coveralls.io/github/aerogear/data-sync-server)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Getting Started
