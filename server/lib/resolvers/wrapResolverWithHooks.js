@@ -1,12 +1,11 @@
 const _ = require('lodash')
 const {log} = require('../util/logger')
-const axios = require('axios')
 
-exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, resolverMapping) {
+exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, resolverMapping, requestObject) {
   return (obj, args, context, info) => {
     return new Promise(async (resolve, reject) => {
       if (resolverMapping.preHook && !_.isEmpty(resolverMapping.preHook)) {
-        axios.post(resolverMapping.preHook, {args})
+        requestObject.post(resolverMapping.preHook, {args})
           .then(function (response) {
             log.info(response)
           })
@@ -24,7 +23,7 @@ exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, reso
       }
     }).then(function (result) {
       if (resolverMapping.postHook && !_.isEmpty(resolverMapping.postHook)) {
-        axios.post(resolverMapping.postHook, {result})
+        requestObject.post(resolverMapping.postHook, {result})
           .then(function (response) {
             log.info(response)
           })
