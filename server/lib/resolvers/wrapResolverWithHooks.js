@@ -6,7 +6,10 @@ exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, reso
   return (obj, args, context, info) => {
     return new Promise(async (resolve, reject) => {
       if (resolverMapping.preHook && !_.isEmpty(resolverMapping.preHook)) {
-        axios.get(resolverMapping.preHook)
+        axios.post(resolverMapping.preHook, {args})
+          .then(function (response) {
+            log.info(response)
+          })
           .catch(function (error) {
             log.err(error)
           })
@@ -21,7 +24,10 @@ exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, reso
       }
     }).then(function (result) {
       if (resolverMapping.postHook && !_.isEmpty(resolverMapping.postHook)) {
-        axios.get(resolverMapping.postHook)
+        axios.post(resolverMapping.postHook, {result})
+          .then(function (response) {
+            log.info(response)
+          })
           .catch(function (error) {
             log.err(error)
           })
