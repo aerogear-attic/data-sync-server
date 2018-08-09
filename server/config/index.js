@@ -41,7 +41,7 @@ const config = {
     endpointURL: '/graphql', // if you want GraphiQL enabled
     query: graphiqlQueryFileContent,
     variables: graphiqlVariableFileContent,
-    subscriptionsEndpoint: `ws://${hostname()}:${port}/subscriptions`
+    subscriptionsEndpoint: process.env.GRAPHIQL_SUBS_ENDPOINT || `ws://${hostname()}:${port}/subscriptions`
   },
   postgresConfig: {
     database: process.env.POSTGRES_DATABASE || 'aerogear_data_sync_db',

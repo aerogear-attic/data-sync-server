@@ -7,7 +7,7 @@ const time = new Date()
 const datasources = [
   {
     id: 1,
-    name: 'nedb_postgres',
+    name: 'memeolist_postgres',
     type: 'Postgres',
     config: `{"options":{
       "user": "postgresql",
