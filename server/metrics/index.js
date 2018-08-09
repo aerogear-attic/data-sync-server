@@ -42,7 +42,7 @@ exports.responseLoggingMetric = (req, res, next) => {
     const responseTime = Date.now() - this.requestStart
 
     serverResponseMetric
-      .labels(requestMethod, err === true)
+      .labels(requestMethod, err !== undefined || res.statusCode > 299)
       .set(responseTime)
   }
 }
