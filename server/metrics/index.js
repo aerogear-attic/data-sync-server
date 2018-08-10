@@ -3,7 +3,7 @@ const { buildPath } = require('../lib/util/logger')
 
 Prometheus.collectDefaultMetrics()
 
-const resolverTimingMetric = new Prometheus.Gauge({
+const resolverTimingMetric = new Prometheus.Histogram({
   name: 'resolver_timing_ms',
   help: 'Resolver response time in milliseconds',
   labelNames: ['datasource_type', 'operation_type', 'name']
@@ -15,7 +15,13 @@ const resolverRequestsMetric = new Prometheus.Counter({
   labelNames: ['datasource_type', 'operation_type', 'path']
 })
 
-const serverResponseMetric = new Prometheus.Gauge({
+const resolverRequestsTotalMetric = new Prometheus.Counter({
+  name: 'requests_resolved_total',
+  help: 'Number of requests resolved by server in total',
+  labelNames: ['datasource_type', 'operation_type', 'path']
+})
+
+const serverResponseMetric = new Prometheus.Histogram({
   name: 'server_response_ms',
   help: 'Server response time in milliseconds',
   labelNames: ['request_type', 'error']
@@ -24,6 +30,10 @@ const serverResponseMetric = new Prometheus.Gauge({
 exports.getMetrics = (req, res) => {
   res.set('Content-Type', Prometheus.register.contentType)
   res.end(Prometheus.register.metrics())
+
+  resolverTimingMetric.reset()
+  resolverRequestsMetric.reset()
+  serverResponseMetric.reset()
 }
 
 exports.responseLoggingMetric = (req, res, next) => {
@@ -42,8 +52,8 @@ exports.responseLoggingMetric = (req, res, next) => {
     const responseTime = Date.now() - this.requestStart
 
     serverResponseMetric
-      .labels(requestMethod, err === true)
-      .set(responseTime)
+      .labels(requestMethod, err !== undefined || res.statusCode > 299)
+      .observe(responseTime)
   }
 }
 
@@ -58,9 +68,17 @@ exports.updateResolverMetrics = (resolverInfo, responseTime) => {
 
   resolverTimingMetric
     .labels(dataSourceType, resolverMappingType, resolverMappingName)
-    .set(responseTime)
+    .observe(responseTime)
 
   resolverRequestsMetric
+    .labels(
+      dataSourceType,
+      resolverMappingType,
+      `${resolverParentType}.${buildPath(resolverWholePath)}`
+    )
+    .inc(1)
+
+  resolverRequestsTotalMetric
     .labels(
       dataSourceType,
       resolverMappingType,
