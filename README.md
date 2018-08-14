@@ -23,59 +23,64 @@ The baseline architecture is shown below:
 
 ## Getting Started
 
-### Install Dependencies
+1. Install Dependencies
 
-```
-npm install
-```
+   ```shell
+   npm install
+   ```
 
-### Start and Initialize the Database
+1. Start and initialize the database
 
-Use docker compose to start the database(s).
+   Use docker compose to start the database(s).
 
-```
-docker-compose -p aerogeardatasyncserver up
-```
+   ```shell
+   docker-compose -p aerogeardatasyncserver up -d
+   ```
 
-There are 2 Postgres instances defined in docker-compose configuration:
-1. For storing the configuration of the sync server itself
-2. For storing the [Memeolist](#whats-memeolist) data.
+   There are 2 Postgres instances defined in docker-compose configuration:
 
-Since docker-compose is only used with development, starting up the Postgres instance for [Memeolist](#whats-memeolist)
-will not cause any harm. 
+   1. For storing the configuration of the sync server itself
+   1. For storing the [Memeolist](#whats-memeolist) data.
 
-Initialize the database in another terminal.
+   Since docker-compose is only used with development, starting up the Postgres instance for [Memeolist](#whats-memeolist) will not cause any harm. 
 
-```
-# no sample schema/resolvers
-npm run db:init
+1. Initialize the database.
 
-# sample schema/resolvers for memeolist - in-memory data source
-npm run db:init:memeo:inmem
+   > **Those are destructive actions.** They drop and recreate the tables every time.
 
-# sample schema/resolvers for memeolist - Postgres data source
-npm run db:init:memeo:postgres
-```
+   No sample schema/resolvers
 
-`npm run db:init*` commands set up the necessary tables.  **Those are destructive actions.** 
-They drop and recreate the tables every time.
+   ```shell   
+   npm run db:init
+   ```
 
-`npm run db:init:memeo:*` commands are useful for local development which and seed the database with config and tables
+   Commands below are useful for **local development** which and seed the database with config and tables
 for [Memeolist](#whats-memeolist) sample application. 
 
-### Start the Server
+   Sample schema/resolvers for memeolist - in-memory data source
+   ```shell
+   npm run db:init:memeo:inmem
+   ```
 
-```
-npm run dev
-```
+   Sample schema/resolvers for memeolist - Postgres data source
+   ```shell
+   npm run db:init:memeo:postgres
+   ```
 
-Go to http://localhost:8000/graphiql for an interactive query brower.
-The graphql endpoint is at `/graphql`.
-The subscriptions websocket is at `/subscriptions`.
+1. Start the Server
 
-### Inspecting Postgres
+   ```shell
+   npm run dev
+   ```
 
-```
+1. Go to http://localhost:8000/graphiql for an interactive query brower.
+
+   The **graphql endpoint** is at `/graphql`.   
+   The **subscriptions websocket** is at `/subscriptions`.
+
+## Inspecting Postgres
+
+  ```shell
 npm run db:shell
 ```
 
