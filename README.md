@@ -7,6 +7,20 @@
 
 GraphQL based data sync server for mobile, with backend integration capabilities
 
+## Architecture
+
+The baseline architecture is shown below:
+
+![Initial Data Sync Architecture](./initial_architecture_flow.png)
+
+1. The [GraphQL](http://graphql.github.io/) Data Schema, Resolvers etc.. are defined in the [Data Sync UI](https://github.com/aerogear/data-sync-ui)
+1. All this config is deployed to the Data Sync GraphQL Server
+1. The developer generates typed Models for use in their App based on the schema defined
+1. The developer executes queries, mutations & subsdcriptions in their App, which uses the [Apollo GraphQL client](https://www.apollographql.com/client/) to talk to the server. [The Apollo GraphQL Client](https://www.apollographql.com/client/) is auto configured by the AeroGear SDK e.g. it knows what the Data Sync GraphQL Server url is.
+1. The Data Sync GraphQL Server executes the corresponding resolvers for queries, mutations & subscriptions.
+1. Configured Authentication & Autohorizatin checks are applied
+1. Logging & Metrics data is gathered from the Server & connected Clients
+
 ## Getting Started
 
 ### Install Dependencies
@@ -172,21 +186,6 @@ Currently only Postgres channel listening is supported.
 ## Running on Kubernetes
 
 TODO
-
-## Architecture
-
-The baseline architecture is shown below:
-
-![Initial Data Sync Architecture](./initial_architecture_flow.png)
-
-1. The GraphQL Data Schema, Resolvers etc.. are defined in the Data Sync Admin UI
-2. All this config is deployed to the Data Sync GraphQL Server
-3. The developer generates typed Models for use in their App based on the schema defined
-4. The developer executes queries, mutations & subsdcriptions in their App, which uses the Apollo GraphQL client to talk to the server. The Apollo GraphQL Client is auto configured by the AeroGear SDK e.g. it knows what the Data Sync GraphQL Server url is.
-5. The Data Sync GraphQL Server executes the corresponding resolvers for queries, mutations & subscriptions.
-6. Configured Authentication & Autohorizatin checks are applied
-7. Logging & Metrics data is gathered from the Server & connected Clients
-
 
 ## Memeolist
 
