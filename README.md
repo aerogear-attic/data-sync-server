@@ -1,10 +1,11 @@
-# aerogear-data-sync-server
+# AeroGear Sync Server
+
+[![circle-ci](https://img.shields.io/circleci/project/github/aerogear/data-sync-server/master.svg)](https://circleci.com/gh/aerogear/data-sync-server)
+[![Coverage Status](https://coveralls.io/repos/github/aerogear/data-sync-server/badge.svg)](https://coveralls.io/github/aerogear/data-sync-server)
+[![License](https://img.shields.io/:license-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 GraphQL based data sync server for mobile, with backend integration capabilities
-
-[![CircleCI](https://circleci.com/gh/aerogear/data-sync-server.svg?style=svg)](https://circleci.com/gh/aerogear/data-sync-server)
-[![Coverage Status](https://coveralls.io/repos/github/aerogear/data-sync-server/badge.svg)](https://coveralls.io/github/aerogear/data-sync-server)
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Getting Started
 
