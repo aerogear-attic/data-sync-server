@@ -7,6 +7,25 @@
 
 GraphQL based data sync server for mobile, with backend integration capabilities
 
+## Table of content
+
+* [Architecture](#architecture)
+* [Configuration](#configuration)
+* [Getting Started](#getting-started)
+* [Postgres](#postgres)
+  + [Inspecting](#inspecting)
+  + [Cleanup Postgres](#cleanup-postgres)
+* [Tests](#tests)
+  + [Running Unit Tests](#running-unit-tests)
+  + [Running Integration tests:](#running-integration-tests-)
+  + [Running all tests with CircleCi CLI](#running-all-tests-with-circleci-cli)
+  + [Running Individual Tests](#running-individual-tests)
+  + [Debugging Individual Tests](#debugging-individual-tests)
+* [Memeolist](#memeolist)
+  + [What's Memeolist?](#what-s-memeolist-)
+  + [In memory](#in-memory)
+  + [Postgres](#postgres-1)
+
 ## Architecture
 
 The baseline architecture is shown below:
