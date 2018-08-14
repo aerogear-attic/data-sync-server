@@ -34,7 +34,7 @@ The baseline architecture is shown below:
    Use docker compose to start the database(s).
 
    ```shell
-   docker-compose -p aerogeardatasyncserver up -d
+   docker-compose -p aerogeardatasyncserver up
    ```
 
    There are 2 Postgres instances defined in docker-compose configuration:
@@ -46,7 +46,7 @@ The baseline architecture is shown below:
 
 1. Initialize the database.
 
-   > **Those are destructive actions.** They drop and recreate the tables every time.
+   **Those are destructive actions.** They drop and recreate the tables every time.
 
    No sample schema/resolvers
 
@@ -78,9 +78,11 @@ for [Memeolist](#whats-memeolist) sample application.
    The **graphql endpoint** is at `/graphql`.   
    The **subscriptions websocket** is at `/subscriptions`.
 
-## Inspecting Postgres
+## Postgres
 
-  ```shell
+### Inspecting 
+
+```shell
 npm run db:shell
 ```
 
@@ -88,48 +90,51 @@ npm run db:shell
 
 The Postgres container started by `docker-compose` can be stopped with `Ctrl + C`. To remove it fully:
 
-```
+```shell
 docker-compose -p aerogeardatasyncserver rm
 
 Going to remove aerogeardatasyncserver_postgres_1
 Are you sure? [yN] y
 ```
 
+## Tests
+
 ### Running Unit Tests
 
-```
+```shell
 npm run test:unit
 ```
 
 ### Running Integration tests:
 
-Start the database first:
-```
-docker-compose -p aerogeardatasyncserver up
-```
+   Start the database first:
 
-In another session, run the tests:
-```
-npm run test:integration
-```
+   ```shell
+   docker-compose -p aerogeardatasyncserver up
+   ```
+
+   In another session, run the tests:
+   
+   ```shell
+   npm run test:integration
+   ```
 
 ### Running all tests with CircleCi CLI
 
-Install CircleCi CLI using this link: https://circleci.com/docs/2.0/local-cli/
+1. Install [CircleCi CLI](https://circleci.com/docs/2.0/local-cli/)
+1. Execute these command locally:
 
-Then execute these command locally:
-
-```
-# CircleCi CLI doesn't support workflows yet
-circleci build --job unit_test
-circleci build --job integration_test
-```
+   ```shell
+   # CircleCi CLI doesn't support workflows yet
+   circleci build --job unit_test
+   circleci build --job integration_test
+   ```
 
 ### Running Individual Tests
 
 Assuming you have `npm@5.2.0` or greater you can do the following:
 
-```
+```shell
 npx ava /path/to/test.js
 ```
 
@@ -137,19 +142,19 @@ npx ava /path/to/test.js
 
 ### Debugging Individual Tests
 
-The easiest way to debug tests is using Chrome DevTools. Use [inspect-process](https://npm.im/inspect-process) to easily launch a debugging session with Chrome DevTools.
+The easiest way to debug tests is using [Chrome DevTools](https://developers.google.com/web/tools/chrome-devtools/). Use [inspect-process](https://npm.im/inspect-process) to easily launch a debugging session with Chrome DevTools.
 
-```
+```shell
 npm install -g inspect-process
 ```
 
-* In chrome go to [`chrome://inspect`](chrome://inspect/)
-* Click on 'Open dedicated DevTools for Node.' This will open a new DevTools window.
-* Click on 'add folder to workspace' and use the wizard to open this project.
-* Go to the appropriate test file (or code that's being tested) and set a breakpoint
-* Now run the individual test as follows:
+1. In chrome go to [`chrome://inspect`](chrome://inspect/)
+1. Click on 'Open dedicated DevTools for Node.' This will open a new DevTools window.
+1. Click on 'add folder to workspace' and use the wizard to open this project.
+1. Go to the appropriate test file (or code that's being tested) and set a breakpoint
+1. Now run the individual test as follows:
 
-```
+```shell
 inspect node_modules/ava/profile.js some/test/file.js
 ```
 
