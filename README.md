@@ -21,6 +21,38 @@ The baseline architecture is shown below:
 1. Configured Authentication & Autohorizatin checks are applied
 1. Logging & Metrics data is gathered from the Server & connected Clients
 
+## Configuration
+
+This server requires a bunch of environment variables to be set. If they're not set, defaults for development will be used.
+
+* `AUDIT_LOGGING`:   : If true, audit logs of resolver operations will be logged to stdout. Defaults to true.
+* `POSTGRES_DATABASE`: Name of the Postgres database. Defaults to `aerogear_data_sync_db`
+* `POSTGRES_USERNAME`: Username to use when connecting Postgres. Defaults to `postgresql`
+* `POSTGRES_PASSWORD`: Password to use when connecting Postgres. Defaults to `postgres`
+* `POSTGRES_HOST`: Postgres host name. Defaults to `127.0.0.1`
+* `POSTGRES_PORT`: Postgres port. Defaults to `5432`
+* `SCHEMA_LISTENER_CONFIG`: Configuration of the config listening mechanism. Defaults to listening to a Postgres channel.
+   Value of this environment variable must be a base64 encoded JSON. See below for an example.
+ 
+```shell
+$ echo '
+{
+  "type": "postgres",
+  "config": {
+    "channel": "aerogear-data-sync-config",
+    "database": "aerogear_data_sync_db",
+    "user": "postgresql",
+    "password": "postgres",
+    "host": "127.0.0.1",
+    "port": "5432" 
+  } 
+}
+' | base64 --wrap=0
+
+> CnsKICAidHlwZSI6ICJwb3N0Z3JlcyIsCiAgImNvbmZpZyI6IHsKICAgICJjaGFubmVsIjogImFlcm9nZWFyLWRhdGEtc3luYy1jb25maWciLAogICAgImRhdGFiYXNlIjogImFlcm9nZWFyX2RhdGFfc3luY19kYiIsCiAgICAidXNlcm5hbWUiOiAicG9zdGdyZXNxbCIsCiAgICAicGFzc3dvcmQiOiAicG9zdGdyZXMiLAogICAgImhvc3QiOiAiMTI3LjAuMC4xIiwKICAgICJwb3J0IjogIjU0MzIiIAogIH0gCn0KCg==
+```
+Currently only Postgres channel listening is supported.
+
 ## Getting Started
 
 1. Install Dependencies
@@ -159,43 +191,6 @@ inspect node_modules/ava/profile.js some/test/file.js
 ```
 
 The DevTools window should automatically connect to the debugging session and execution should pause if some breakpoints are set.
-
-# Configuration
-
-This server requires a bunch of environment variables to be set. If they're not set, defaults for development will be used.
-
-* `AUDIT_LOGGING`:   : If true, audit logs of resolver operations will be logged to stdout. Defaults to true.
-* `POSTGRES_DATABASE`: Name of the Postgres database. Defaults to `aerogear_data_sync_db`
-* `POSTGRES_USERNAME`: Username to use when connecting Postgres. Defaults to `postgresql`
-* `POSTGRES_PASSWORD`: Password to use when connecting Postgres. Defaults to `postgres`
-* `POSTGRES_HOST`: Postgres host name. Defaults to `127.0.0.1`
-* `POSTGRES_PORT`: Postgres port. Defaults to `5432`
-* `SCHEMA_LISTENER_CONFIG`: Configuration of the config listening mechanism. Defaults to listening to a Postgres channel.
-   Value of this environment variable must be a base64 encoded JSON. See below for an example.
- 
-```
-$ echo '
-{
-  "type": "postgres",
-  "config": {
-    "channel": "aerogear-data-sync-config",
-    "database": "aerogear_data_sync_db",
-    "user": "postgresql",
-    "password": "postgres",
-    "host": "127.0.0.1",
-    "port": "5432" 
-  } 
-}
-' | base64 --wrap=0
-
-> CnsKICAidHlwZSI6ICJwb3N0Z3JlcyIsCiAgImNvbmZpZyI6IHsKICAgICJjaGFubmVsIjogImFlcm9nZWFyLWRhdGEtc3luYy1jb25maWciLAogICAgImRhdGFiYXNlIjogImFlcm9nZWFyX2RhdGFfc3luY19kYiIsCiAgICAidXNlcm5hbWUiOiAicG9zdGdyZXNxbCIsCiAgICAicGFzc3dvcmQiOiAicG9zdGdyZXMiLAogICAgImhvc3QiOiAiMTI3LjAuMC4xIiwKICAgICJwb3J0IjogIjU0MzIiIAogIH0gCn0KCg==
-```
-Currently only Postgres channel listening is supported.
-
-
-## Running on Kubernetes
-
-TODO
 
 ## Memeolist
 
