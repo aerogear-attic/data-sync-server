@@ -1,141 +1,46 @@
-# aerogear-data-sync-server
+# AeroGear Sync Server
+
+[![circle-ci](https://img.shields.io/circleci/project/github/aerogear/data-sync-server/master.svg)](https://circleci.com/gh/aerogear/data-sync-server)
+[![Coverage Status](https://coveralls.io/repos/github/aerogear/data-sync-server/badge.svg)](https://coveralls.io/github/aerogear/data-sync-server)
+[![License](https://img.shields.io/:license-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 GraphQL based data sync server for mobile, with backend integration capabilities
 
-[![CircleCI](https://circleci.com/gh/aerogear/data-sync-server.svg?style=svg)](https://circleci.com/gh/aerogear/data-sync-server)
-[![Coverage Status](https://coveralls.io/repos/github/aerogear/data-sync-server/badge.svg)](https://coveralls.io/github/aerogear/data-sync-server)
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+## Table of content
 
-## Getting Started
+* [Architecture](#architecture)
+* [Configuration](#configuration)
+* [Getting Started](#getting-started)
+* [Postgres](#postgres)
+  + [Inspecting](#inspecting)
+  + [Cleanup Postgres](#cleanup-postgres)
+* [Tests](#tests)
+  + [Running Unit Tests](#running-unit-tests)
+  + [Running Integration tests:](#running-integration-tests-)
+  + [Running all tests with CircleCi CLI](#running-all-tests-with-circleci-cli)
+  + [Running Individual Tests](#running-individual-tests)
+  + [Debugging Individual Tests](#debugging-individual-tests)
+* [Memeolist](#memeolist)
+  + [What's Memeolist?](#what-s-memeolist-)
+  + [In memory](#in-memory)
+  + [Postgres](#postgres-1)
 
-### Install Dependencies
+## Architecture
 
-```
-npm install
-```
+The baseline architecture is shown below:
 
-### Start and Initialize the Database
+![Initial Data Sync Architecture](./initial_architecture_flow.png)
 
-Use docker compose to start the database(s).
+1. The [GraphQL](http://graphql.github.io/) Data Schema, Resolvers etc.. are defined in the [Data Sync UI](https://github.com/aerogear/data-sync-ui)
+1. All this config is deployed to the Data Sync GraphQL Server
+1. The developer generates typed Models for use in their App based on the schema defined
+1. The developer executes queries, mutations & subsdcriptions in their App, which uses the [Apollo GraphQL client](https://www.apollographql.com/client/) to talk to the server. [The Apollo GraphQL Client](https://www.apollographql.com/client/) is auto configured by the AeroGear SDK e.g. it knows what the Data Sync GraphQL Server url is.
+1. The Data Sync GraphQL Server executes the corresponding resolvers for queries, mutations & subscriptions.
+1. Configured Authentication & Autohorizatin checks are applied
+1. Logging & Metrics data is gathered from the Server & connected Clients
 
-```
-docker-compose -p aerogeardatasyncserver up
-```
-
-There are 2 Postgres instances defined in docker-compose configuration:
-1. For storing the configuration of the sync server itself
-2. For storing the [Memeolist](#whats-memeolist) data.
-
-Since docker-compose is only used with development, starting up the Postgres instance for [Memeolist](#whats-memeolist)
-will not cause any harm. 
-
-Initialize the database in another terminal.
-
-```
-# no sample schema/resolvers
-npm run db:init
-
-# sample schema/resolvers for memeolist - in-memory data source
-npm run db:init:memeo:inmem
-
-# sample schema/resolvers for memeolist - Postgres data source
-npm run db:init:memeo:postgres
-```
-
-`npm run db:init*` commands set up the necessary tables.  **Those are destructive actions.** 
-They drop and recreate the tables every time.
-
-`npm run db:init:memeo:*` commands are useful for local development which and seed the database with config and tables
-for [Memeolist](#whats-memeolist) sample application. 
-
-### Start the Server
-
-```
-npm run dev
-```
-
-Go to http://localhost:8000/graphiql for an interactive query brower.
-The graphql endpoint is at `/graphql`.
-The subscriptions websocket is at `/subscriptions`.
-
-### Inspecting Postgres
-
-```
-npm run db:shell
-```
-
-### Cleanup Postgres
-
-The Postgres container started by `docker-compose` can be stopped with `Ctrl + C`. To remove it fully:
-
-```
-docker-compose -p aerogeardatasyncserver rm
-
-Going to remove aerogeardatasyncserver_postgres_1
-Are you sure? [yN] y
-```
-
-### Running Unit Tests
-
-```
-npm run test:unit
-```
-
-### Running Integration tests:
-
-Start the database first:
-```
-docker-compose -p aerogeardatasyncserver up
-```
-
-In another session, run the tests:
-```
-npm run test:integration
-```
-
-### Running all tests with CircleCi CLI
-
-Install CircleCi CLI using this link: https://circleci.com/docs/2.0/local-cli/
-
-Then execute these command locally:
-
-```
-# CircleCi CLI doesn't support workflows yet
-circleci build --job unit_test
-circleci build --job integration_test
-```
-
-### Running Individual Tests
-
-Assuming you have `npm@5.2.0` or greater you can do the following:
-
-```
-npx ava /path/to/test.js
-```
-
-`npx` will ensure the correct version of ava (specified in package.json) is used.
-
-### Debugging Individual Tests
-
-The easiest way to debug tests is using Chrome DevTools. Use [inspect-process](https://npm.im/inspect-process) to easily launch a debugging session with Chrome DevTools.
-
-```
-npm install -g inspect-process
-```
-
-* In chrome go to [`chrome://inspect`](chrome://inspect/)
-* Click on 'Open dedicated DevTools for Node.' This will open a new DevTools window.
-* Click on 'add folder to workspace' and use the wizard to open this project.
-* Go to the appropriate test file (or code that's being tested) and set a breakpoint
-* Now run the individual test as follows:
-
-```
-inspect node_modules/ava/profile.js some/test/file.js
-```
-
-The DevTools window should automatically connect to the debugging session and execution should pause if some breakpoints are set.
-
-# Configuration
+## Configuration
 
 This server requires a bunch of environment variables to be set. If they're not set, defaults for development will be used.
 
@@ -148,7 +53,7 @@ This server requires a bunch of environment variables to be set. If they're not 
 * `SCHEMA_LISTENER_CONFIG`: Configuration of the config listening mechanism. Defaults to listening to a Postgres channel.
    Value of this environment variable must be a base64 encoded JSON. See below for an example.
  
-```
+```shell
 $ echo '
 {
   "type": "postgres",
@@ -167,50 +72,167 @@ $ echo '
 ```
 Currently only Postgres channel listening is supported.
 
+## Getting Started
 
-## Running on Kubernetes
+1. Install Dependencies
 
-TODO
+   ```shell
+   npm install
+   ```
 
-## Architecture
+1. Start and initialize the database
 
-The baseline architecture is shown below:
+   Use docker compose to start the database(s).
 
-![Initial Data Sync Architecture](./initial_architecture_flow.png)
+   ```shell
+   docker-compose -p aerogeardatasyncserver up
+   ```
 
-1. The GraphQL Data Schema, Resolvers etc.. are defined in the Data Sync Admin UI
-2. All this config is deployed to the Data Sync GraphQL Server
-3. The developer generates typed Models for use in their App based on the schema defined
-4. The developer executes queries, mutations & subsdcriptions in their App, which uses the Apollo GraphQL client to talk to the server. The Apollo GraphQL Client is auto configured by the AeroGear SDK e.g. it knows what the Data Sync GraphQL Server url is.
-5. The Data Sync GraphQL Server executes the corresponding resolvers for queries, mutations & subscriptions.
-6. Configured Authentication & Autohorizatin checks are applied
-7. Logging & Metrics data is gathered from the Server & connected Clients
+   There are 2 Postgres instances defined in docker-compose configuration:
 
+   1. For storing the configuration of the sync server itself
+   1. For storing the [Memeolist](#whats-memeolist) data.
+
+   Since docker-compose is only used with development, starting up the Postgres instance for [Memeolist](#whats-memeolist) will not cause any harm. 
+
+1. Initialize the database.
+
+   **Those are destructive actions.** They drop and recreate the tables every time.
+
+   No sample schema/resolvers
+
+   ```shell   
+   npm run db:init
+   ```
+
+   Commands below are useful for **local development** which and seed the database with config and tables
+for [Memeolist](#whats-memeolist) sample application. 
+
+   Sample schema/resolvers for memeolist - in-memory data source
+   ```shell
+   npm run db:init:memeo:inmem
+   ```
+
+   Sample schema/resolvers for memeolist - Postgres data source
+   ```shell
+   npm run db:init:memeo:postgres
+   ```
+
+1. Start the Server
+
+   ```shell
+   npm run dev
+   ```
+
+1. Go to http://localhost:8000/graphiql for an interactive query brower.
+
+   The **graphql endpoint** is at `/graphql`.   
+   The **subscriptions websocket** is at `/subscriptions`.
+
+## Postgres
+
+### Inspecting 
+
+```shell
+npm run db:shell
+```
+
+### Cleanup Postgres
+
+The Postgres container started by `docker-compose` can be stopped with `Ctrl + C`. To remove it fully:
+
+```shell
+docker-compose -p aerogeardatasyncserver rm
+
+Going to remove aerogeardatasyncserver_postgres_1
+Are you sure? [yN] y
+```
+
+## Tests
+
+### Running Unit Tests
+
+```shell
+npm run test:unit
+```
+
+### Running Integration tests:
+
+   Start the database first:
+
+   ```shell
+   docker-compose -p aerogeardatasyncserver up
+   ```
+
+   In another session, run the tests:
+   
+   ```shell
+   npm run test:integration
+   ```
+
+### Running all tests with CircleCi CLI
+
+1. Install [CircleCi CLI](https://circleci.com/docs/2.0/local-cli/)
+1. Execute these command locally:
+
+   ```shell
+   # CircleCi CLI doesn't support workflows yet
+   circleci build --job unit_test
+   circleci build --job integration_test
+   ```
+
+### Running Individual Tests
+
+Assuming you have `npm@5.2.0` or greater you can do the following:
+
+```shell
+npx ava /path/to/test.js
+```
+
+`npx` will ensure the correct version of ava (specified in package.json) is used.
+
+### Debugging Individual Tests
+
+The easiest way to debug tests is using [Chrome DevTools](https://developers.google.com/web/tools/chrome-devtools/). Use [inspect-process](https://npm.im/inspect-process) to easily launch a debugging session with Chrome DevTools.
+
+```shell
+npm install -g inspect-process
+```
+
+1. In chrome go to [`chrome://inspect`](chrome://inspect/)
+1. Click on 'Open dedicated DevTools for Node.' This will open a new DevTools window.
+1. Click on 'add folder to workspace' and use the wizard to open this project.
+1. Go to the appropriate test file (or code that's being tested) and set a breakpoint
+1. Now run the individual test as follows:
+
+```shell
+inspect node_modules/ava/profile.js some/test/file.js
+```
+
+The DevTools window should automatically connect to the debugging session and execution should pause if some breakpoints are set.
 
 ## Memeolist
 
 ### What's Memeolist?
 
-Memeolist is an application where AeroGear team targets testing AeroGear mobile services and SDKs on it.
+Memeolist is an application where AeroGear team targets testing AeroGear mobile Sync services and SDKs on it [based on the dogfood proposal](https://github.com/aerogear/proposals/blob/master/dogfood.md)
 
-You can see the specification for it here: https://github.com/aerogear/proposals/blob/master/dogfood.md 
-
-There is some tooling adjusted to create Memeolist app's backend within the project.
-
-### Memeolist - In memory 
+### In memory 
 
 To start the application with MemeoList schema and queries with an in-memory data source, run these commands:
-```
-docker-compose -p aerogeardatasyncserver up
+
+```shell
+docker-compose -p aerogeardatasyncserver up -d
 npm run db:init:memeo:inmem
 npm run dev:memeo
 ```
 
-### Memeolist - Postgres 
+### Postgres 
 
 To start the application with MemeoList schema and queries with an Postgres source, run these commands:
-```
-docker-compose -p aerogeardatasyncserver up
+
+```shell
+docker-compose -p aerogeardatasyncserver up -d
 npm run db:init:memeo:postgres
 npm run dev:memeo
 ``` 
