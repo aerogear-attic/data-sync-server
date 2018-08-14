@@ -196,26 +196,24 @@ The DevTools window should automatically connect to the debugging session and ex
 
 ### What's Memeolist?
 
-Memeolist is an application where AeroGear team targets testing AeroGear mobile services and SDKs on it.
+Memeolist is an application where AeroGear team targets testing AeroGear mobile Sync services and SDKs on it [based on the dogfood proposal](https://github.com/aerogear/proposals/blob/master/dogfood.md)
 
-You can see the specification for it here: https://github.com/aerogear/proposals/blob/master/dogfood.md 
-
-There is some tooling adjusted to create Memeolist app's backend within the project.
-
-### Memeolist - In memory 
+### In memory 
 
 To start the application with MemeoList schema and queries with an in-memory data source, run these commands:
-```
-docker-compose -p aerogeardatasyncserver up
+
+```shell
+docker-compose -p aerogeardatasyncserver up -d
 npm run db:init:memeo:inmem
 npm run dev:memeo
 ```
 
-### Memeolist - Postgres 
+### Postgres 
 
 To start the application with MemeoList schema and queries with an Postgres source, run these commands:
-```
-docker-compose -p aerogeardatasyncserver up
+
+```shell
+docker-compose -p aerogeardatasyncserver up -d
 npm run db:init:memeo:postgres
 npm run dev:memeo
 ``` 
