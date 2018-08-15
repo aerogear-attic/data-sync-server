@@ -1,11 +1,19 @@
 const _ = require('lodash')
-const {log} = require('../util/logger')
+const { log, buildPath } = require('../util/logger')
 
-exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, resolverMapping, requestObject) {
+exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, resolverMapping, httpClient) {
   return (obj, args, context, info) => {
     return new Promise(async (resolve, reject) => {
       if (resolverMapping.preHook && !_.isEmpty(resolverMapping.preHook)) {
-        requestObject.post(resolverMapping.preHook, {args})
+        const payload = {
+          hookType: 'preHook',
+          operationType: info.operation.operation,
+          fieldName: info.fieldname,
+          parentTypeName: info.parentType.name,
+          path: buildPath(info.path),
+          args: args
+        }
+        httpClient.post(resolverMapping.preHook, payload)
           .then(function (response) {
             log.info(response)
           })
@@ -23,7 +31,15 @@ exports.wrapResolverWithHooks = function wrapResolverWithHooks (resolverFn, reso
       }
     }).then(function (result) {
       if (resolverMapping.postHook && !_.isEmpty(resolverMapping.postHook)) {
-        requestObject.post(resolverMapping.postHook, {result})
+        const payload = {
+          hookType: 'postHook',
+          operationType: info.operation.operation,
+          fieldName: info.fieldname,
+          parentTypeName: info.parentType.name,
+          path: buildPath(info.path),
+          result: result
+        }
+        httpClient.post(resolverMapping.postHook, payload)
           .then(function (response) {
             log.info(response)
           })
