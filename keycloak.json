@@ -1,0 +1,7 @@
+{
+    "realm": "Memeolist",
+    "auth-server-url": "https://keycloak.security.feedhenry.org/auth",
+    "ssl-required": "external",
+    "resource": "sync-server",
+    "public-client": true
+  }
