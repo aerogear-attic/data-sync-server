@@ -1,8 +1,8 @@
 const _ = require('lodash')
+const axios = require('axios')
 const resolverBuilders = require('./builders')
 const { compile } = require('./compiler')
 const { wrapResolverWithPublish } = require('./wrapResolverWithPublisher')
-const axios = require('axios')
 const { wrapResolverWithHooks } = require('./wrapResolverWithHooks')
 
 module.exports = function (dataSources, resolverMappings, pubsub) {
