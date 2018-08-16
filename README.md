@@ -1,7 +1,7 @@
 # AeroGear Sync Server
 
 [![circle-ci](https://img.shields.io/circleci/project/github/aerogear/data-sync-server/master.svg)](https://circleci.com/gh/aerogear/data-sync-server)
-[![Coverage Status](https://coveralls.io/repos/github/aerogear/data-sync-server/badge.svg)](https://coveralls.io/github/aerogear/data-sync-server)
+[![Coverage Status](https://img.shields.io/coveralls/github/aerogear/data-sync-server.svg)](https://coveralls.io/github/aerogear/data-sync-server)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Docker Hub](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/aerogear/data-sync-server/)
 [![Docker Stars](https://img.shields.io/docker/stars/aerogear/data-sync-server.svg)](https://registry.hub.docker.com/v2/repositories/aerogear/data-sync-server/stars/count/)
