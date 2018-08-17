@@ -54,15 +54,6 @@ module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig},
   let app = newExpressApp(schema, server, tracing, playgroundConfig)
   server.on('request', app)
 
-  // app.use('/graphql', bodyParser.json(), function (req, res, next) {
-  //   const context = {request: req}
-  //   const graphql = graphqlExpress({schema, context, tracing})
-  //   return graphql(req, res, next)
-  // })
-
-  // TODO Move this to the Admin UI
-  // app.get('/graphiql', graphiqlExpress(graphiqlConfig))
-
   app.get('/healthz', async (req, res) => {
     const result = await runHealthChecks(models)
     if (!result.ok) {
@@ -100,8 +91,6 @@ module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig},
         server.removeListener('request', app)
         server.on('request', newApp)
         app = newApp
-        // subscriptionServer.close()
-        // subscriptionServer = newSubscriptionServer(server, schema)
 
         try {
           await disconnectDataSources(dataSources) // disconnect existing ones first
@@ -137,8 +126,6 @@ module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig},
     await disconnectDataSources(dataSources)
     await server.close()
   }
-
-  // subscriptionServer = newSubscriptionServer(server, schema)
 
   function startListening (port) {
     var server = this
