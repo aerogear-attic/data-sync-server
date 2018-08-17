@@ -6,24 +6,24 @@ const { log } = require('../lib/util/logger')
 
 require('dotenv').config()
 
-let graphiqlQueryFileContent = ''
-let graphiqlVariableFileContent = ''
+let playgroundQueryFileContent = ''
+let playgroundVariableFileContent = ''
 
-if (process.env.GRAPHIQL_QUERY_FILE) {
+if (process.env.PLAYGROUND_QUERY_FILE) {
   try {
-    graphiqlQueryFileContent = fs.readFileSync(process.env.GRAPHIQL_QUERY_FILE, 'utf-8')
+    playgroundQueryFileContent = fs.readFileSync(process.env.PLAYGROUND_QUERY_FILE, 'utf-8')
   } catch (ex) {
-    log.error(`Unable to read GRAPHIQL_QUERY_FILE ${process.env.GRAPHIQL_QUERY_FILE} . Skipping it.`)
+    log.error(`Unable to read PLAYGROUND_QUERY_FILE ${process.env.PLAYGROUND_QUERY_FILE} . Skipping it.`)
     log.error(ex)
   }
 }
 
-if (process.env.GRAPHIQL_VARIABLES_FILE) {
+if (process.env.PLAYGROUND_VARIABLES_FILE) {
   try {
-    graphiqlVariableFileContent = fs.readFileSync(process.env.GRAPHIQL_VARIABLES_FILE, 'utf-8')
-    graphiqlVariableFileContent = JSON.parse(graphiqlVariableFileContent)
+    playgroundVariableFileContent = fs.readFileSync(process.env.PLAYGROUND_VARIABLES_FILE, 'utf-8')
+    playgroundVariableFileContent = JSON.parse(playgroundVariableFileContent)
   } catch (ex) {
-    log.error(`Unable to read GRAPHIQL_VARIABLES_FILE ${process.env.GRAPHIQL_VARIABLES_FILE} . Skipping it.`)
+    log.error(`Unable to read PLAYGROUND_VARIABLES_FILE ${process.env.PLAYGROUND_VARIABLES_FILE} . Skipping it.`)
     log.error(ex)
   }
 }
@@ -37,11 +37,11 @@ const config = {
   graphQLConfig: {
     tracing: true
   },
-  graphiqlConfig: {
-    endpointURL: '/graphql', // if you want GraphiQL enabled
-    query: graphiqlQueryFileContent,
-    variables: graphiqlVariableFileContent,
-    subscriptionsEndpoint: process.env.GRAPHIQL_SUBS_ENDPOINT || `ws://${hostname()}:${port}/subscriptions`
+  playgroundConfig: {
+    endpoint: '/graphql', // if you want GraphiQL enabled
+    query: playgroundQueryFileContent,
+    variables: playgroundVariableFileContent,
+    subscriptionEndpoint: process.env.PLAYGROUND_SUBS_ENDPOINT || `ws://${hostname()}:${port}/subscriptions`
   },
   postgresConfig: {
     database: process.env.POSTGRES_DATABASE || 'aerogear_data_sync_db',

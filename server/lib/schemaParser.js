@@ -1,5 +1,4 @@
-const graphqlTools = require('graphql-tools')
-
+const { makeExecutableSchema } = require('graphql-tools')
 const dataSourceParser = require('./datasources/dataSourceParser')
 const resolverMapper = require('./resolvers/resolverMapper')
 const subscriptionsMapper = require('./subscriptions/subscriptionMapper')
@@ -11,9 +10,9 @@ module.exports = function (schemaString, dataSourcesJson, resolverMappingsJson, 
 
   const resolvers = {...subscriptionResolvers, ...dataResolvers}
 
-  const schema = graphqlTools.makeExecutableSchema({
+  const schema = makeExecutableSchema({
     typeDefs: [schemaString],
-    resolvers: resolvers
+    resolvers
   })
 
   return {schema, dataSources}

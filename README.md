@@ -127,7 +127,7 @@ for [Memeolist](#whats-memeolist) sample application.
    npm run dev
    ```
 
-1. Go to http://localhost:8000/graphiql for an interactive query brower.
+1. Go to http://localhost:8000/graphql for an interactive query browser.
 
    The **graphql endpoint** is at `/graphql`.   
    The **subscriptions websocket** is at `/subscriptions`.
