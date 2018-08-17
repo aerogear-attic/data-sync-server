@@ -11,12 +11,8 @@ const {getMetrics, responseLoggingMetric} = require('./metrics')
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
-function newExpressApp (schema, httpServer, tracing, playgroundConfig) {
+function init (schema, httpServer, tracing, playgroundConfig) {
   let app = express()
-
-  // Wrap the Express server
-  // const server = http.createServer(app)
-  // let subscriptionServer = null // will be instantiated later
 
   app.use(responseLoggingMetric)
 
@@ -35,7 +31,8 @@ function newExpressApp (schema, httpServer, tracing, playgroundConfig) {
       tabs: [
         {
           endpoint: playgroundConfig.endpoint,
-          query: playgroundConfig.query
+          query: playgroundConfig.query,
+          variables: JSON.stringify(playgroundConfig.variables)
         }
       ]
     }
@@ -51,7 +48,7 @@ module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig},
   let {schema, dataSources} = await buildSchema(models, pubsub)
   await connectDataSources(dataSources)
   let server = http.createServer()
-  let app = newExpressApp(schema, server, tracing, playgroundConfig)
+  let app = init(schema, server, tracing, playgroundConfig)
   server.on('request', app)
 
   app.get('/healthz', async (req, res) => {
@@ -87,7 +84,7 @@ module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig},
 
       if (newSchema) {
         schema = newSchema.schema
-        const newApp = newExpressApp(schema, server)
+        const newApp = init(schema, server, tracing, playgroundConfig)
         server.removeListener('request', app)
         server.on('request', newApp)
         app = newApp
