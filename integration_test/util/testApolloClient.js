@@ -36,7 +36,7 @@ function createApolloClient (host) {
 
   // Create a WebSocket link:
   const wsLink = new WebSocketLink({
-    uri: `ws://${host}/subscriptions`,
+    uri: `ws://${host}/graphql`,
     options: {
       reconnect: true
     },

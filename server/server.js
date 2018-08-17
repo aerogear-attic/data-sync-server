@@ -11,7 +11,7 @@ const {getMetrics, responseLoggingMetric} = require('./metrics')
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
-function init (schema, httpServer, tracing, playgroundConfig) {
+function newExpressApp () {
   let app = express()
 
   app.use(responseLoggingMetric)
@@ -19,6 +19,10 @@ function init (schema, httpServer, tracing, playgroundConfig) {
   app.use('*', cors())
   app.use(expressPino)
 
+  return app
+}
+
+function newApolloServer (app, schema, httpServer, tracing, playgroundConfig) {
   let apolloServer = new ApolloServer({
     schema,
     context: async ({ req }) => {
@@ -40,15 +44,18 @@ function init (schema, httpServer, tracing, playgroundConfig) {
   apolloServer.applyMiddleware({ app })
   apolloServer.installSubscriptionHandlers(httpServer)
 
-  return app
+  return apolloServer
 }
 
 module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig}, models, pubsub) => {
-  const {tracing} = graphQLConfig
-  let {schema, dataSources} = await buildSchema(models, pubsub)
+  const { tracing } = graphQLConfig
+  let { schema, dataSources } = await buildSchema(models, pubsub)
   await connectDataSources(dataSources)
+
   let server = http.createServer()
-  let app = init(schema, server, tracing, playgroundConfig)
+
+  let app = newExpressApp()
+  let apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig)
   server.on('request', app)
 
   app.get('/healthz', async (req, res) => {
@@ -83,11 +90,14 @@ module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig},
       }
 
       if (newSchema) {
-        schema = newSchema.schema
-        const newApp = init(schema, server, tracing, playgroundConfig)
+        // first do some cleaning up
+        apolloServer.subscriptionServer.close()
         server.removeListener('request', app)
-        server.on('request', newApp)
-        app = newApp
+        // reinitialize the server objects
+        schema = newSchema.schema
+        app = newExpressApp()
+        apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig)
+        server.on('request', app)
 
         try {
           await disconnectDataSources(dataSources) // disconnect existing ones first
