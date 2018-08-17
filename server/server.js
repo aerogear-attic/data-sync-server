@@ -1,43 +1,67 @@
 const _ = require('lodash')
 const http = require('http')
 const express = require('express')
-const bodyParser = require('body-parser')
-const {graphqlExpress, graphiqlExpress} = require('apollo-server-express')
+const { ApolloServer } = require('apollo-server-express')
 const cors = require('cors')
 const {log} = require('./lib/util/logger')
 const expressPino = require('express-pino-logger')({logger: log})
 const {runHealthChecks} = require('./health')
 const {getMetrics, responseLoggingMetric} = require('./metrics')
-const { subscribe, execute } = require('graphql')
-const { SubscriptionServer } = require('subscriptions-transport-ws')
 
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
-module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaListenerConfig}, models, pubsub) => {
-  const {tracing} = graphQLConfig
-  let {schema, dataSources} = await buildSchema(models, pubsub)
-  await connectDataSources(dataSources)
-
-  const app = express()
+function newExpressApp (schema, httpServer, tracing, playgroundConfig) {
+  let app = express()
 
   // Wrap the Express server
-  const server = http.createServer(app)
-  let subscriptionServer = null // will be instantiated later
+  // const server = http.createServer(app)
+  // let subscriptionServer = null // will be instantiated later
 
   app.use(responseLoggingMetric)
 
   app.use('*', cors())
   app.use(expressPino)
 
-  app.use('/graphql', bodyParser.json(), function (req, res, next) {
-    const context = {request: req}
-    const graphql = graphqlExpress({schema, context, tracing})
-    return graphql(req, res, next)
+  let apolloServer = new ApolloServer({
+    schema,
+    context: async ({ req }) => {
+      return {
+        request: req
+      }
+    },
+    tracing,
+    playground: {
+      tabs: [
+        {
+          endpoint: playgroundConfig.endpoint,
+          query: playgroundConfig.query
+        }
+      ]
+    }
   })
+  apolloServer.applyMiddleware({ app })
+  apolloServer.installSubscriptionHandlers(httpServer)
+
+  return app
+}
+
+module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig}, models, pubsub) => {
+  const {tracing} = graphQLConfig
+  let {schema, dataSources} = await buildSchema(models, pubsub)
+  await connectDataSources(dataSources)
+  let server = http.createServer()
+  let app = newExpressApp(schema, server, tracing, playgroundConfig)
+  server.on('request', app)
+
+  // app.use('/graphql', bodyParser.json(), function (req, res, next) {
+  //   const context = {request: req}
+  //   const graphql = graphqlExpress({schema, context, tracing})
+  //   return graphql(req, res, next)
+  // })
 
   // TODO Move this to the Admin UI
-  app.get('/graphiql', graphiqlExpress(graphiqlConfig))
+  // app.get('/graphiql', graphiqlExpress(graphiqlConfig))
 
   app.get('/healthz', async (req, res) => {
     const result = await runHealthChecks(models)
@@ -72,8 +96,12 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
 
       if (newSchema) {
         schema = newSchema.schema
-        subscriptionServer.close()
-        subscriptionServer = newSubscriptionServer(server, schema)
+        const newApp = newExpressApp(schema, server)
+        server.removeListener('request', app)
+        server.on('request', newApp)
+        app = newApp
+        // subscriptionServer.close()
+        // subscriptionServer = newSubscriptionServer(server, schema)
 
         try {
           await disconnectDataSources(dataSources) // disconnect existing ones first
@@ -110,7 +138,7 @@ module.exports = async ({graphQLConfig, graphiqlConfig, postgresConfig, schemaLi
     await server.close()
   }
 
-  subscriptionServer = newSubscriptionServer(server, schema)
+  // subscriptionServer = newSubscriptionServer(server, schema)
 
   function startListening (port) {
     var server = this
@@ -217,16 +245,4 @@ async function disconnectDataSources (dataSources) {
       // swallow
     }
   }
-}
-
-function newSubscriptionServer (server, schema) {
-  /* eslint-disable no-new */
-  return new SubscriptionServer({
-    execute: execute,
-    subscribe: subscribe,
-    schema
-  }, {
-    server: server,
-    path: '/subscriptions'
-  })
 }

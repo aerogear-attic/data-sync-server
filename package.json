@@ -34,7 +34,7 @@
     "release:validate": "./scripts/validateRelease.sh",
     "db:init": "FORCE_DROP=true node ./scripts/sync_models",
     "db:init:memeo:inmem": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-inmem.js",
-    "db:init:memeo:postgres": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-postgres.js && docker exec aerogeardatasyncserver_postgres_memeo_1 psql -U postgres -d memeolist_db -f /tmp/examples/memeolist.tables.sql",
+    "db:init:memeo:postgres": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-postgres.js && docker exec datasyncserver_postgres_memeo_1 psql -U postgres -d memeolist_db -f /tmp/examples/memeolist.tables.sql",
     "db:shell": "docker exec -it aerogeardatasyncserver_postgres_1 psql -U postgresql -d aerogear_data_sync_db",
     "db:shell:memeo": "docker exec -it aerogeardatasyncserver_postgres_memeo_1 psql -U postgresql -d memeolist_db"
   },
@@ -63,7 +63,7 @@
     "ws": "^6.0.0"
   },
   "dependencies": {
-    "apollo-server-express": "1.3.6",
+    "apollo-server-express": "^2.0.2",
     "apollo-server-module-graphiql": "1.3.4",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",

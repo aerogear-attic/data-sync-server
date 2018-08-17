@@ -37,11 +37,11 @@ const config = {
   graphQLConfig: {
     tracing: true
   },
-  graphiqlConfig: {
-    endpointURL: '/graphql', // if you want GraphiQL enabled
+  playgroundConfig: {
+    endpoint: '/graphql', // if you want GraphiQL enabled
     query: graphiqlQueryFileContent,
     variables: graphiqlVariableFileContent,
-    subscriptionsEndpoint: process.env.GRAPHIQL_SUBS_ENDPOINT || `ws://${hostname()}:${port}/subscriptions`
+    subscriptionEndpoint: process.env.GRAPHIQL_SUBS_ENDPOINT || `ws://${hostname()}:${port}/subscriptions`
   },
   postgresConfig: {
     database: process.env.POSTGRES_DATABASE || 'aerogear_data_sync_db',
