@@ -90,4 +90,16 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
   }
 }
 
+playgroundQueryFileContent = fs.readFileSync(process.env.PLAYGROUND_QUERY_FILE, 'utf-8')
+
+if (process.env.KEYCLOAK_CONFIG_FILE) {
+  try {
+    let keycloakConfig = fs.readFileSync(process.env.KEYCLOAK_CONFIG_FILE, 'utf-8')
+    config.keycloakConfig = JSON.parse(keycloakConfig)
+  } catch (ex) {
+    log.error(`Unable to read keycloakConfig in ${process.env.KEYCLOAK_CONFIG_FILE} . Skipping it.`)
+    log.error(ex)
+  }
+}
+
 module.exports = config

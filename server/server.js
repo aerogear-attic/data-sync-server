@@ -7,7 +7,7 @@ const {log} = require('./lib/util/logger')
 const expressPino = require('express-pino-logger')({logger: log})
 const {runHealthChecks} = require('./health')
 const {getMetrics, responseLoggingMetric} = require('./metrics')
-
+const {applyAuthMiddleware} = require('./security')
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
@@ -18,7 +18,7 @@ function newExpressApp () {
 
   app.use('*', cors())
   app.use(expressPino)
-
+  applyAuthMiddleware(app)
   return app
 }
 
