@@ -239,3 +239,22 @@ docker-compose -p aerogeardatasyncserver up -d
 npm run db:init:memeo:postgres
 npm run dev:memeo
 ``` 
+
+### Authentication and Authorization
+
+By default server starts without any authentication and authorization mechanism. 
+Please follow documentation bellow to see how 
+
+
+### Keycloak SSO support
+
+Keycloak integration is supported by providing location to keycloak configuration file
+
+```
+KEYCLOAK_CONFIG_FILE=keycloak/keycloak.json
+```
+
+You can also execute `npm run dev:keymemeo` to run server preconfigured with example keycloak server.
+
+Memeolist example application requires keycloak realm to be configured. 
+See [Keycloak realm](./keycloak) configuration for more details  

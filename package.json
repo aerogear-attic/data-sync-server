@@ -25,6 +25,7 @@
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino-pretty --colorize --translateTime",
     "dev:memeo": "PLAYGROUND_QUERY_FILE='examples/memeolist.query.graphql' PLAYGROUND_VARIABLES_FILE='examples/memeolist.variables.json' nodemon ./index.js | pino-pretty --colorize --translateTime",
+    "dev:keymemeo": "KEYCLOAK_CONFIG_FILE='keycloak/keycloak.json' PLAYGROUND_QUERY_FILE='examples/memeolist.query.graphql' PLAYGROUND_VARIABLES_FILE='examples/memeolist.variables.json' nodemon ./index.js | pino-pretty --colorize --translateTime",
     "lint": "eslint .",
     "format": "eslint . --fix",
     "docker:build": "./scripts/docker_build.sh",
