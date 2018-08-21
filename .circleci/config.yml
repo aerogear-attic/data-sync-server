@@ -89,6 +89,8 @@ jobs:
             POSTGRES_HOST: 'config_postgres'
             POSTGRES_PORT: '5432'
       - run:
+          # CircleCI project has to have COVERALLS_REPO_TOKEN env set
+          # in order to make coveralls working
           command: npm run test:cover
           environment:
             POSTGRES_HOST: 'config_postgres'
