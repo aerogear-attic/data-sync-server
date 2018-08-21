@@ -28,17 +28,19 @@ if (process.env.PLAYGROUND_VARIABLES_FILE) {
   }
 }
 
+const topLevelGraphqlPath = '/graphql'
 const port = process.env.HTTP_PORT || '8000'
 
 const config = {
   server: {
+    apiPath: topLevelGraphqlPath,
     port
   },
   graphQLConfig: {
     tracing: true
   },
   playgroundConfig: {
-    endpoint: '/graphql', // if you want GraphiQL enabled
+    endpoint: topLevelGraphqlPath, // if you want GraphiQL enabled
     query: playgroundQueryFileContent,
     variables: playgroundVariableFileContent,
     subscriptionEndpoint: process.env.PLAYGROUND_SUBS_ENDPOINT || `ws://${hostname()}:${port}/subscriptions`
@@ -89,8 +91,6 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
     }
   }
 }
-
-playgroundQueryFileContent = fs.readFileSync(process.env.PLAYGROUND_QUERY_FILE, 'utf-8')
 
 if (process.env.KEYCLOAK_CONFIG_FILE) {
   try {

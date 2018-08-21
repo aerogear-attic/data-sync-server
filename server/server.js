@@ -10,6 +10,7 @@ const {getMetrics, responseLoggingMetric} = require('./metrics')
 const {applyAuthMiddleware} = require('./security')
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
+const { server } = require('./config')
 
 function newExpressApp () {
   let app = express()
@@ -18,12 +19,13 @@ function newExpressApp () {
 
   app.use('*', cors())
   app.use(expressPino)
-  applyAuthMiddleware(app)
+  applyAuthMiddleware(app, server.apiPath)
   return app
 }
 
 function newApolloServer (app, schema, httpServer, tracing, playgroundConfig) {
   let apolloServer = new ApolloServer({
+
     schema,
     context: async ({ req }) => {
       return {
@@ -41,7 +43,7 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig) {
       ]
     }
   })
-  apolloServer.applyMiddleware({ app })
+  apolloServer.applyMiddleware({ app, disableHealthCheck: true, path: server.apiPath })
   apolloServer.installSubscriptionHandlers(httpServer)
 
   return apolloServer
