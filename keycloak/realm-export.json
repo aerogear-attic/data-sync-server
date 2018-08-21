@@ -51,6 +51,22 @@
         "composite": false,
         "clientRole": false,
         "containerId": "Memeolist"
+      },
+      {
+        "id": "e62d02a3-8fbd-4af0-b459-82b46532c0a5",
+        "name": "admin",
+        "scopeParamRequired": false,
+        "composite": false,
+        "clientRole": false,
+        "containerId": "Memeolist"
+      },
+      {
+        "id": "73a25fca-899d-48fe-996a-a57ee99eb2f9",
+        "name": "voter",
+        "scopeParamRequired": false,
+        "composite": false,
+        "clientRole": false,
+        "containerId": "Memeolist"
       }
     ],
     "client": {
@@ -278,6 +294,7 @@
       ],
       "security-admin-console": [],
       "admin-cli": [],
+      "sync-server": [],
       "android-app": [],
       "broker": [
         {
@@ -360,6 +377,7 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": true,
       "publicClient": false,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
@@ -458,7 +476,24 @@
       ],
       "useTemplateConfig": false,
       "useTemplateScope": false,
-      "useTemplateMappers": false
+      "useTemplateMappers": false,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [],
+        "policies": [],
+        "scopes": [
+          {
+            "name": "map-role"
+          },
+          {
+            "name": "map-role-client-scope"
+          },
+          {
+            "name": "map-role-composite"
+          }
+        ]
+      }
     },
     {
       "id": "d927acb5-f263-4766-88d9-a5e0bdcc0c46",
@@ -578,8 +613,8 @@
       "useTemplateMappers": false
     },
     {
-      "id": "35a0e70b-3977-4dba-9c3f-1f4ea1379d88",
-      "clientId": "android-app",
+      "id": "66dfe449-ee2e-42e5-afd6-a59f5e005538",
+      "clientId": "sync-server",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
@@ -597,6 +632,137 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "8d89a11f-63dc-48a3-9f63-d1dc1a07b0c4",
+          "name": "given name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": true,
+          "consentText": "${givenName}",
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "firstName",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "given_name",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "9b12f165-dde8-4257-9f7b-34a8e3702105",
+          "name": "full name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-full-name-mapper",
+          "consentRequired": true,
+          "consentText": "${fullName}",
+          "config": {
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "id": "49f2832a-53dc-4c5f-b0e8-bf49a0c6267f",
+          "name": "username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": true,
+          "consentText": "${username}",
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "username",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "preferred_username",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "a8c3d444-1ff0-4b2e-be2f-13cabd64480b",
+          "name": "role list",
+          "protocol": "saml",
+          "protocolMapper": "saml-role-list-mapper",
+          "consentRequired": false,
+          "config": {
+            "single": "false",
+            "attribute.nameformat": "Basic",
+            "attribute.name": "Role"
+          }
+        },
+        {
+          "id": "aa148c87-70a4-4d6e-a084-5e0d4deb75bb",
+          "name": "email",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": true,
+          "consentText": "${email}",
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "email",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "email",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "2f58c0cd-3021-4d72-9c90-6390e494bfed",
+          "name": "family name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": true,
+          "consentText": "${familyName}",
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "lastName",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "family_name",
+            "jsonType.label": "String"
+          }
+        }
+      ],
+      "useTemplateConfig": false,
+      "useTemplateScope": false,
+      "useTemplateMappers": false
+    },
+    {
+      "id": "35a0e70b-3977-4dba-9c3f-1f4ea1379d88",
+      "clientId": "android-app",
+      "baseUrl": "memeolist",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "**********",
+      "redirectUris": [
+        "memeolist://callback",
+        "org.aerogear.android.app.memeolist://callback"
+      ],
+      "webOrigins": [],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "saml.assertion.signature": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.encrypt": "false",
+        "saml_force_name_id_format": "false",
+        "saml.client.signature": "false",
+        "saml.authnstatement": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "saml.onetimeuse.condition": "false"
+      },
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
