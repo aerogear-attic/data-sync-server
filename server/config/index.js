@@ -28,6 +28,7 @@ if (process.env.PLAYGROUND_VARIABLES_FILE) {
   }
 }
 
+const graphqlEndpoint = '/graphql'
 const port = process.env.HTTP_PORT || '8000'
 
 const config = {
@@ -35,10 +36,11 @@ const config = {
     port
   },
   graphQLConfig: {
+    graphqlEndpoint,
     tracing: true
   },
   playgroundConfig: {
-    endpoint: '/graphql', // if you want GraphiQL enabled
+    endpoint: graphqlEndpoint, // if you want GraphiQL enabled
     query: playgroundQueryFileContent,
     variables: playgroundVariableFileContent,
     subscriptionEndpoint: process.env.PLAYGROUND_SUBS_ENDPOINT || `ws://${hostname()}:${port}/subscriptions`
@@ -87,6 +89,16 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
       host: config.postgresConfig.host,
       port: config.postgresConfig.port
     }
+  }
+}
+
+if (process.env.KEYCLOAK_CONFIG_FILE) {
+  try {
+    let keycloakConfig = fs.readFileSync(process.env.KEYCLOAK_CONFIG_FILE, 'utf-8')
+    config.keycloakConfig = JSON.parse(keycloakConfig)
+  } catch (ex) {
+    log.error(`Unable to read keycloakConfig in ${process.env.KEYCLOAK_CONFIG_FILE} . Skipping it.`)
+    log.error(ex)
   }
 }
 
