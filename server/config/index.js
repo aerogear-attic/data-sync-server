@@ -28,19 +28,19 @@ if (process.env.PLAYGROUND_VARIABLES_FILE) {
   }
 }
 
-const topLevelGraphqlPath = '/graphql'
+const graphqlEndpoint = '/graphql'
 const port = process.env.HTTP_PORT || '8000'
 
 const config = {
   server: {
-    apiPath: topLevelGraphqlPath,
     port
   },
   graphQLConfig: {
+    graphqlEndpoint,
     tracing: true
   },
   playgroundConfig: {
-    endpoint: topLevelGraphqlPath, // if you want GraphiQL enabled
+    endpoint: graphqlEndpoint, // if you want GraphiQL enabled
     query: playgroundQueryFileContent,
     variables: playgroundVariableFileContent,
     subscriptionEndpoint: process.env.PLAYGROUND_SUBS_ENDPOINT || `ws://${hostname()}:${port}/subscriptions`

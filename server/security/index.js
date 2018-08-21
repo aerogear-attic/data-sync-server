@@ -2,19 +2,19 @@ const { log } = require('../lib/util/logger')
 const Keycloak = require('keycloak-connect')
 var session = require('express-session')
 
-const config = require('../config')
-
 /**
  * Create keycloak middleware if needed.
  *
- * @param {*} expressRouter
+ * @param {*} keycloakConfig keycloak server specific configuration
+ * @param {*} expressRouter express router that should be used to attach auth
+ * @param {string} apiPath  location of the protected api
  */
-exports.applyAuthMiddleware = (expressRouter, apiPath) => {
-  if (config.keycloakConfig) {
+exports.applyAuthMiddleware = (keycloakConfig, expressRouter, apiPath) => {
+  if (keycloakConfig) {
     log.info('Initializing Keycloak authentication')
     const memoryStore = new session.MemoryStore()
     expressRouter.use(session({
-      secret: config.secret || 'secret',
+      secret: keycloakConfig.secret || 'secret',
       resave: false,
       saveUninitialized: true,
       store: memoryStore
@@ -22,13 +22,13 @@ exports.applyAuthMiddleware = (expressRouter, apiPath) => {
 
     var keycloak = new Keycloak({
       store: memoryStore
-    }, config.keycloakConfig)
+    }, keycloakConfig)
 
     // Install general keycloak middleware
     expressRouter.use(keycloak.middleware())
 
     // Protect the main route for all graphql services
-    // (disable unauthenticated access)
+    // Disable unauthenticated access
     expressRouter.use(apiPath, keycloak.protect())
   } else {
     log.info('Keycloak authentication is not configured')

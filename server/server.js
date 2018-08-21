@@ -10,20 +10,19 @@ const {getMetrics, responseLoggingMetric} = require('./metrics')
 const {applyAuthMiddleware} = require('./security')
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
-const { server } = require('./config')
 
-function newExpressApp () {
+function newExpressApp (keycloakConfig, graphqlEndpoint) {
   let app = express()
 
   app.use(responseLoggingMetric)
 
   app.use('*', cors())
   app.use(expressPino)
-  applyAuthMiddleware(app, server.apiPath)
+  applyAuthMiddleware(keycloakConfig, app, graphqlEndpoint)
   return app
 }
 
-function newApolloServer (app, schema, httpServer, tracing, playgroundConfig) {
+function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, graphqlEndpoint) {
   let apolloServer = new ApolloServer({
 
     schema,
@@ -43,21 +42,25 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig) {
       ]
     }
   })
-  apolloServer.applyMiddleware({ app, disableHealthCheck: true, path: server.apiPath })
+  apolloServer.applyMiddleware({ app, disableHealthCheck: true, path: graphqlEndpoint })
   apolloServer.installSubscriptionHandlers(httpServer)
 
   return apolloServer
 }
 
-module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig}, models, pubsub) => {
+module.exports = async ({graphQLConfig,
+  playgroundConfig,
+  schemaListenerConfig,
+  keycloakConfig}, models, pubsub) => {
   const { tracing } = graphQLConfig
   let { schema, dataSources } = await buildSchema(models, pubsub)
   await connectDataSources(dataSources)
 
   let server = http.createServer()
 
-  let app = newExpressApp()
-  let apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig)
+  let graphqlEndpoint = graphQLConfig.graphqlEndpoint
+  let app = newExpressApp(keycloakConfig, graphqlEndpoint)
+  let apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig, graphqlEndpoint)
   server.on('request', app)
 
   app.get('/healthz', async (req, res) => {
@@ -97,7 +100,7 @@ module.exports = async ({graphQLConfig, playgroundConfig, schemaListenerConfig},
         server.removeListener('request', app)
         // reinitialize the server objects
         schema = newSchema.schema
-        app = newExpressApp()
+        app = newExpressApp(keycloakConfig, graphqlEndpoint)
         apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig)
         server.on('request', app)
 
