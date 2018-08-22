@@ -71,19 +71,19 @@ module.exports = async ({graphQLConfig,
 
   let graphqlEndpoint = graphQLConfig.graphqlEndpoint
 
-  const options = {
+  const expressAppOptions = {
     keycloakConfig,
     graphqlEndpoint,
     models
   }
 
-  const middlewares = {
+  const expressAppMiddlewares = {
     metrics: getMetrics,
     responseLoggingMetric,
     logging: expressPino
   }
 
-  let app = newExpressApp(options, middlewares)
+  let app = newExpressApp(expressAppOptions, expressAppMiddlewares)
   let apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig, graphqlEndpoint)
   server.on('request', app)
 
@@ -114,7 +114,7 @@ module.exports = async ({graphQLConfig,
         server.removeListener('request', app)
         // reinitialize the server objects
         schema = newSchema.schema
-        app = newExpressApp(options, middlewares)
+        app = newExpressApp(expressAppOptions, expressAppMiddlewares)
         apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig)
         server.on('request', app)
 
