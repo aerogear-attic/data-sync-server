@@ -11,13 +11,24 @@ const {applyAuthMiddleware} = require('./security')
 const schemaParser = require('./lib/schemaParser')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
-function newExpressApp (keycloakConfig, graphqlEndpoint) {
+function newExpressApp (options, middlewares) {
   let app = express()
+  const { metrics, responseLoggingMetric, logging } = middlewares
+  const { keycloakConfig, graphqlEndpoint, models } = options
 
   app.use(responseLoggingMetric)
-
   app.use('*', cors())
-  app.use(expressPino)
+  app.use(logging)
+
+  app.get('/healthz', async (req, res) => {
+    const result = await runHealthChecks(models)
+    if (!result.ok) {
+      res.status(503)
+    }
+    res.json(result)
+  })
+
+  app.get('/metrics', metrics)
   applyAuthMiddleware(keycloakConfig, app, graphqlEndpoint)
   return app
 }
@@ -59,19 +70,22 @@ module.exports = async ({graphQLConfig,
   let server = http.createServer()
 
   let graphqlEndpoint = graphQLConfig.graphqlEndpoint
-  let app = newExpressApp(keycloakConfig, graphqlEndpoint)
+
+  const options = {
+    keycloakConfig,
+    graphqlEndpoint,
+    models
+  }
+
+  const middlewares = {
+    metrics: getMetrics,
+    responseLoggingMetric,
+    logging: expressPino
+  }
+
+  let app = newExpressApp(options, middlewares)
   let apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig, graphqlEndpoint)
   server.on('request', app)
-
-  app.get('/healthz', async (req, res) => {
-    const result = await runHealthChecks(models)
-    if (!result.ok) {
-      res.status(503)
-    }
-    res.json(result)
-  })
-
-  app.get('/metrics', getMetrics)
 
   const schemaListener = schemaListenerCreator(schemaListenerConfig)
   if (schemaListener) {
@@ -100,7 +114,7 @@ module.exports = async ({graphQLConfig,
         server.removeListener('request', app)
         // reinitialize the server objects
         schema = newSchema.schema
-        app = newExpressApp(keycloakConfig, graphqlEndpoint)
+        app = newExpressApp(options, middlewares)
         apolloServer = newApolloServer(app, schema, server, tracing, playgroundConfig)
         server.on('request', app)
 
