@@ -30,6 +30,10 @@ exports.applyAuthMiddleware = (keycloakConfig, expressRouter, apiPath) => {
     // Protect the main route for all graphql services
     // Disable unauthenticated access
     expressRouter.use(apiPath, keycloak.protect())
+
+    expressRouter.get('/login', keycloak.protect(), function (req, res) {
+      res.send(JSON.stringify(JSON.parse(req.session['keycloak-token'])))
+    })
   } else {
     log.info('Keycloak authentication is not configured')
   }
