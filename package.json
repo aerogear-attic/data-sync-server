@@ -21,7 +21,7 @@
   "scripts": {
     "test": "ava '*.test.js' '**/*.test.js' '!integration_test/*'",
     "test:integration": "npm run db:init && ava --concurrency=1 integration_test/*.test.js",
-    "test:cover": "nyc --reporter=text-lcov ava --concurrency=1 '*.test.js' '**/*.test.js' | coveralls",
+    "test:cover": "nyc --reporter=text-lcov ava --concurrency=1 '*.test.js' '**/*.test.js' > coverage.lcov && codecov",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino-pretty --colorize --translateTime",
     "dev:memeo": "PLAYGROUND_QUERY_FILE='examples/memeolist.query.graphql' PLAYGROUND_VARIABLES_FILE='examples/memeolist.variables.json' nodemon ./index.js | pino-pretty --colorize --translateTime",
@@ -35,9 +35,9 @@
     "release:validate": "./scripts/validateRelease.sh",
     "db:init": "FORCE_DROP=true node ./scripts/sync_models",
     "db:init:memeo:inmem": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-inmem.js",
-    "db:init:memeo:postgres": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-postgres.js && docker exec datasyncserver_postgres_memeo_1 psql -U postgres -d memeolist_db -f /tmp/examples/memeolist.tables.sql",
-    "db:shell": "docker exec -it datasyncserver_postgres_1 psql -U postgresql -d aerogear_data_sync_db",
-    "db:shell:memeo": "docker exec -it datasyncserver_postgres_memeo_1 psql -U postgresql -d memeolist_db"
+    "db:init:memeo:postgres": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-postgres.js && docker exec data-sync-server_postgres_memeo_1 psql -U postgres -d memeolist_db -f /tmp/examples/memeolist.tables.sql",
+    "db:shell": "docker exec -it data-sync-server_postgres_1 psql -U postgresql -d aerogear_data_sync_db",
+    "db:shell:memeo": "docker exec -it data-sync-server_postgres_memeo_1 psql -U postgresql -d memeolist_db"
   },
   "devDependencies": {
     "apollo-cache-inmemory": "^1.3.0-beta.6",
@@ -47,7 +47,7 @@
     "apollo-link-ws": "^1.0.8",
     "apollo-utilities": "^1.0.17",
     "ava": "1.0.0-beta.6",
-    "coveralls": "^3.0.2",
+    "codecov": "^3.0.4",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-node": "^7.0.1",
