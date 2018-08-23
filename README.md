@@ -88,7 +88,7 @@ Currently only Postgres channel listening is supported.
    Use docker compose to start the database(s).
 
    ```shell
-   docker-compose up
+   docker-compose -p sync up
    ```
 
    There are 2 Postgres instances defined in docker-compose configuration:
@@ -145,7 +145,7 @@ npm run db:shell
 The Postgres container started by `docker-compose` can be stopped with `Ctrl + C`. To remove it fully:
 
 ```shell
-docker-compose rm
+docker-compose -p sync rm
 
 Going to remove ...
 Are you sure? [yN] y
@@ -164,7 +164,7 @@ npm run test:unit
    Start the database first:
 
    ```shell
-   docker-compose up
+   docker-compose -p sync up
    ```
 
    In another session, run the tests:
@@ -225,7 +225,7 @@ Memeolist is an application where AeroGear team targets testing AeroGear mobile 
 To start the application with MemeoList schema and queries with an in-memory data source, run these commands:
 
 ```shell
-docker-compose up
+docker-compose -p sync up
 npm run db:init:memeo:inmem
 npm run dev:memeo
 ```
@@ -235,7 +235,7 @@ npm run dev:memeo
 To start the application with MemeoList schema and queries with an Postgres source, run these commands:
 
 ```shell
-docker-compose up
+docker-compose -p sync up
 npm run db:init:memeo:postgres
 npm run dev:memeo
 ``` 
