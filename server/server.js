@@ -50,7 +50,7 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, gr
           query: playgroundConfig.query,
           variables: JSON.stringify(playgroundConfig.variables),
           headers: {
-            'Authentication': 'Bearer ' + ' ' // req.session['keycloak-token']
+            'Authorization': 'Bearer ' + ' ' // req.session['keycloak-token']
           }
         }
       ]
