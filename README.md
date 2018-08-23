@@ -88,7 +88,7 @@ Currently only Postgres channel listening is supported.
    Use docker compose to start the database(s).
 
    ```shell
-   docker-compose up
+   docker-compose --project-name=sync up
    ```
 
    There are 2 Postgres instances defined in docker-compose configuration:
