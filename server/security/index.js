@@ -25,14 +25,19 @@ exports.applyAuthMiddleware = (keycloakConfig, expressRouter, apiPath) => {
     }, keycloakConfig)
 
     // Install general keycloak middleware
-    expressRouter.use(keycloak.middleware())
+    expressRouter.use(keycloak.middleware({
+      admin: apiPath
+    }))
 
     // Protect the main route for all graphql services
     // Disable unauthenticated access
     expressRouter.use(apiPath, keycloak.protect())
 
     expressRouter.get('/login', keycloak.protect(), function (req, res) {
-      const token = JSON.stringify(JSON.parse(req.session['keycloak-token']))
+      let token = req.session['keycloak-token']
+      if (token) {
+        token = JSON.parse(token).access_token
+      }
       res.send({
         'Authorization': 'Bearer ' + token
       })
