@@ -44,6 +44,10 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, gr
     },
     tracing,
     playground: {
+      settings: {
+        'editor.theme': 'light',
+        'editor.cursorShape': 'block'
+      },
       tabs: [
         {
           endpoint: playgroundConfig.endpoint,
