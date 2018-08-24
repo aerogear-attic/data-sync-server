@@ -36,11 +36,11 @@ exports.applyAuthMiddleware = (keycloakConfig, expressRouter, apiPath) => {
     expressRouter.get('/login', keycloak.protect(), function (req, res) {
       let token = req.session['keycloak-token']
       if (token) {
-        token = JSON.parse(token).access_token
+        return res.json({
+          'Authorization': 'Bearer ' + JSON.parse(token).access_token
+        })
       }
-      res.send({
-        'Authorization': 'Bearer ' + token
-      })
+      res.json({})
     })
   } else {
     log.info('Keycloak authentication is not configured')
