@@ -9,11 +9,12 @@ class HasRoleDirective extends SchemaDirectiveVisitor {
     const allowedTypes = ['client', 'realm']
     let { role, type } = this.args
 
+    type = type || 'client' // default to client if a type is not specified
+
     const typeErrorMessage = `type argument in hasRole directive must be one of ${allowedTypes}`
     const permissionErrorMessage = `logged in user does not have sufficient permissions for ${field.name}: missing role ${role}`
 
     field.resolve = async function (root, args, context, info) {
-      type = type || 'client'
       if (!allowedTypes.includes(type)) {
         log.info(typeErrorMessage)
         throw new Error(typeErrorMessage)
@@ -22,12 +23,12 @@ class HasRoleDirective extends SchemaDirectiveVisitor {
       if (type === 'realm') {
         if (!context.auth.getToken().hasRealmRole(role)) {
           log.info(permissionErrorMessage)
-          return new ForbiddenError(permissionErrorMessage)
+          throw new ForbiddenError(permissionErrorMessage)
         }
       } else {
         if (!context.auth.getToken().hasRole(role)) {
           log.info(permissionErrorMessage)
-          return new ForbiddenError(permissionErrorMessage)
+          throw new ForbiddenError(permissionErrorMessage)
         }
       }
 
