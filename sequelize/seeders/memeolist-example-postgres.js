@@ -25,10 +25,30 @@ const datasources = [
 const resolvers = [
   {
     type: 'Meme',
+    field: 'owner',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `SELECT * FROM profile WHERE id='{{context.parent.owner}}' ORDER BY id DESC`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Meme',
     field: 'comments',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `SELECT * FROM comment WHERE memeid='{{context.parent.id}}' ORDER BY id DESC`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Profile',
+    field: 'memes',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `SELECT * FROM meme WHERE owner='{{context.parent.id}}' ORDER BY id DESC`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -58,7 +78,7 @@ const resolvers = [
     field: 'createMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `INSERT INTO meme ("ownerid","photourl", "owner", "likes") VALUES ('{{context.arguments.ownerid}}','{{context.arguments.photourl}}', '{{context.arguments.owner}}', 0) RETURNING *;`,
+    requestMapping: `INSERT INTO meme ("owner","photourl", "likes") VALUES ('{{context.arguments.owner}}','{{context.arguments.photourl}}', 0) RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     publish: JSON.stringify({
       topic: 'memeCreated',
@@ -74,7 +94,7 @@ const resolvers = [
     field: 'createProfile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `INSERT INTO profile ("email", "displayname", "pictureurl") VALUES ('{{context.arguments.email}}','{{context.arguments.displayname}}','{{context.arguments.pictureUrl}}') RETURNING *;`,
+    requestMapping: `INSERT INTO profile ("email", "displayname", "pictureurl") VALUES ('{{context.arguments.email}}','{{context.arguments.displayname}}','{{context.arguments.pictureurl}}') RETURNING *;`,
     responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
     updatedAt: time

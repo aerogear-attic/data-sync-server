@@ -1,10 +1,14 @@
-
 query allMemes {
   allMemes {
     id
     photourl
-    owner
     likes
+    owner {
+      id
+      displayname
+      email
+      pictureurl
+    }
     comments {
       id
       comment
@@ -13,15 +17,33 @@ query allMemes {
   }
 }
 
-mutation createMeme($ownerid: ID!, $photourl: String!, $owner: String!) {
-  createMeme(ownerid: $ownerid, photourl: $photourl, owner: $owner) {
+mutation createMeme($owner: ID!, $photourl: String!) {
+  createMeme(owner: $owner, photourl: $photourl) {
       id
       photourl
-      owner
       likes
+      owner {
+        id
+        displayname
+        email
+        pictureurl
+      }
   }
 }
 
+subscription memeAdded {
+  memeAdded {
+    id
+    photourl
+    likes
+    owner {
+      id
+      displayname
+      email
+      pictureurl
+    }
+  }
+}
 
 mutation postComment($memeid: ID!, $comment: String!, $owner: String!){
   postComment(memeid: $memeid, comment: $comment, owner: $owner){
@@ -36,6 +58,7 @@ mutation likeMeme($memeid: ID!){
 }
 
 ## Profile section
+
 mutation createProfile($email: String!, $displayname: String!, $pictureurl: String!) {
   createProfile(email: $email, displayname: $displayname, pictureurl: $pictureurl) {
     id

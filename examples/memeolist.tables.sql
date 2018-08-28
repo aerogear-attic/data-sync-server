@@ -12,9 +12,8 @@ CREATE TABLE profile (
 CREATE TABLE meme (
   id SERIAL NOT NULL PRIMARY KEY,
   photourl CHARACTER VARYING(500) NOT NULL,
-  owner CHARACTER VARYING(100) NOT NULL,
   likes NUMERIC NOT NULL,
-  ownerid SERIAL NOT NULL references profile(id)
+  owner SERIAL NOT NULL references profile(id)
 );
 
 CREATE TABLE comment (
