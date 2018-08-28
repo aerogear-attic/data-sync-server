@@ -11,11 +11,11 @@ class SecurityService {
   }
 
   getSchemaDirectives () {
-    return this.instance.schemaDirectives
+    return this.instance.getSchemaDirectives()
   }
 
   getAuthContextProvider () {
-    return this.instance.AuthContextProvider
+    return this.instance.getAuthContextProvider()
   }
 
   applyAuthMiddleware (...args) {

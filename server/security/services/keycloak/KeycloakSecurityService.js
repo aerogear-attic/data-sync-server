@@ -12,6 +12,14 @@ class KeycloakSecurityService {
     this.AuthContextProvider = AuthContextProvider
   }
 
+  getSchemaDirectives () {
+    return this.schemaDirectives
+  }
+
+  getAuthContextProvider () {
+    return this.AuthContextProvider
+  }
+
   /**
   * Create keycloak middleware if needed.
   *
