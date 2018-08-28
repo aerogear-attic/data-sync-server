@@ -132,6 +132,30 @@ for [Memeolist](#whats-memeolist) sample application.
    The **graphql endpoint** is at `/graphql`.   
    The **subscriptions websocket** is at `/subscriptions`.
 
+
+## Using Keycloak for local development
+
+Currently, there is a config file available which makes authorisation via Keycloak possible. It is available under keycloak/keycloak.json. Currently this file points to a demo Keycloak instance hosted at https://keycloak.security.feedhenry.org. If you wish, you can also use the realm-export file to create a realm on your own Keycloak instance.
+
+To use Keycloak with Sync complete the steps above in the Getting Started section to create and initialise the database, then start the application by running:
+
+```shell
+npm run dev:keymemeo
+```
+
+Once the application is started, visit http://localhost:8000/graphql. You should be redirected to the login for the Memeolist realm. You can log in here with the example credentials:
+
+```
+u: voter
+p: 123
+```
+
+Once logged in and you are redirected to the Graphql playground you will need to (for the time being) manually attach the Bearer token used by Keycloak to each request. To get this token, visit http://localhost:8000/token and put this whole string in the HTTP HEADERS section of Graphql Playground.
+
+Currently, the roles available in the demo instance for use are 'admin' and 'voter'.
+
+Each request should now be autorised via Keycloak. To logout visit http://localhost:8000/logout.
+
 ## Postgres
 
 ### Inspecting 
