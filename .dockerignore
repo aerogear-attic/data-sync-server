@@ -12,3 +12,5 @@ k8s_templates
 .vscode
 .circleci
 .env
+keycloak
+integration_test
