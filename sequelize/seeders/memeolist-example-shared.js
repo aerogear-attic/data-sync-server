@@ -49,7 +49,7 @@ const memeoListSchema = {
   }
   
   type Mutation {
-    createProfile(email: String!, displayname: String!, pictureurl: String!):Profile!
+    createProfile(email: String!, displayname: String!, pictureurl: String!):Profile! @hasRole(role: "admin", type: "realm")
     createMeme(ownerid: ID!, photourl: String!, owner: String!):Meme!
     likeMeme(id: ID!): Boolean @hasRole(role: "voter", type: "realm")
     postComment(memeid: ID!, comment: String!, owner: String!): Comment!
