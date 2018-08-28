@@ -53,6 +53,10 @@ const config = {
     port: process.env.POSTGRES_PORT || '5432'
   },
   pubsubConfig: {},
+  securityServiceConfig: {
+    type: null, // e.g. type 'keycloak' or 'passport'
+    config: null // implementation specific config
+  },
   schemaListenerConfig: undefined
 }
 
@@ -94,8 +98,10 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
 
 if (process.env.KEYCLOAK_CONFIG_FILE) {
   try {
-    let keycloakConfig = fs.readFileSync(process.env.KEYCLOAK_CONFIG_FILE, 'utf-8')
-    config.keycloakConfig = JSON.parse(keycloakConfig)
+    const keycloakConfig = fs.readFileSync(process.env.KEYCLOAK_CONFIG_FILE, 'utf-8')
+
+    config.securityServiceConfig.type = 'keycloak'
+    config.securityServiceConfig.config = JSON.parse(keycloakConfig)
   } catch (ex) {
     log.error(`Unable to read keycloakConfig in ${process.env.KEYCLOAK_CONFIG_FILE} . Skipping it.`)
     log.error(ex)

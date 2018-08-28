@@ -1,3 +1,4 @@
+const DataSyncServer = require('./server/server')
 const { log } = require('./server/lib/util/logger')
 const PubSub = require('./server/lib/pubsubNotifiers/pubsubNotifier')
 
@@ -19,7 +20,8 @@ class DataSyncService {
     this.models = require('./sequelize/models/index')(postgresConfig)
     await this.models.sequelize.sync({ logging: false })
 
-    this.app = await require('./server/server')(this.config, this.models, this.pubsub)
+    this.app = new DataSyncServer(this.config, this.models, this.pubsub)
+    await this.app.initialize()
   }
 
   async start () {
