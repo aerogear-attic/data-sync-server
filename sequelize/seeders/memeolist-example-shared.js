@@ -56,7 +56,7 @@ const memeoListSchema = {
   }
 
   type Subscription {
-    memeAdded(photourl: String):Meme!
+    memeAdded(photourl: String, id: ID, ownerid: ID, owner: String):Meme!
   }
   `,
   createdAt: time,
