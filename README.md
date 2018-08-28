@@ -132,6 +132,28 @@ for [Memeolist](#whats-memeolist) sample application.
    The **graphql endpoint** is at `/graphql`.   
    The **subscriptions websocket** is at `/subscriptions`.
 
+
+## Using Keycloak for local development
+
+To use Keycloak for authorisation, set the env var
+
+```
+KEYCLOAK_CONFIG_FILE
+```
+to point to a config file. An example can be seen at [./keycloak/keycloak.json](./keycloak/keycloak.json).
+
+To use Keycloak with Sync complete the steps above in the Getting Started section to create and initialise the database, then start the application by running:
+
+```shell
+npm run dev
+```
+
+Once the application is started, visit http://localhost:8000/graphql. You should be redirected to the login for your realm. You can log in here with the example credentials:
+
+Once logged in and you are redirected to the Graphql playground you will need to (for the time being) manually attach the Bearer token used by Keycloak to each request. To get this token, visit http://localhost:8000/token and put this whole string in the HTTP HEADERS section of Graphql Playground.
+
+Each request should now be autorised via Keycloak. To logout visit http://localhost:8000/logout.
+
 ## Postgres
 
 ### Inspecting 
@@ -254,7 +276,20 @@ Keycloak integration is supported by providing location to keycloak configuratio
 KEYCLOAK_CONFIG_FILE=keycloak/keycloak.json
 ```
 
-You can also execute `npm run dev:keymemeo` to run server preconfigured with example keycloak server.
+You can also execute `npm run dev:keymemeo` to run the server preconfigured with an example keycloak server.
 
-Memeolist example application requires keycloak realm to be configured. 
-See [Keycloak realm](./keycloak) configuration for more details  
+Memeolist example application requires a keycloak realm to be configured. 
+See [Keycloak realm](./keycloak) configuration for more details.
+
+Currently this file points to a demo Keycloak instance hosted at https://keycloak.security.feedhenry.org. If you wish, you can also use the realm-export file mentioned above to create a realm on your own Keycloak instance.
+
+The credentials currently available for use on this realm are:
+
+```
+u: admin/voter
+p: 123
+```
+
+Currently, the roles available in the demo instance for use are 'admin' and 'voter'.
+
+See the "Using Keycloak for local development" above for details about how to use authorisation once it is configured.
