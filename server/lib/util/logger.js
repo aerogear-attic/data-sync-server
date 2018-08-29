@@ -7,7 +7,7 @@ function auditLog (success, request, info, parent, args, msg) {
   if (auditLogEnabled) {
     auditLogger.info({
       msg: msg || '',
-      requestId: request.id,
+      requestId: request ? request.id : '',
       operationType: info.operation.operation,
       fieldName: info.fieldname,
       parentTypeName: info.parentType.name,
