@@ -60,7 +60,7 @@ const config = {
   schemaListenerConfig: undefined,
   serverSecurity: {
     introspection: process.env.INTROSPECTION || true,
-    depthLimit: process.env.DEPTH_LIMIT || 10,
+    queryDepthLimit: process.env.QUERY_DEPTH_LIMIT || 1,
     complexityLimit: process.env.COMPLEXITY_LIMIT || 1000
   }
 }

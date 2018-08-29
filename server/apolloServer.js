@@ -1,5 +1,5 @@
 const { ApolloServer } = require('apollo-server-express')
-const depthLimit = require('graphql-depth-limit')
+const queryDepthLimit = require('graphql-depth-limit')
 const { createComplexityLimitRule } = require('graphql-validation-complexity')
 
 function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, graphqlEndpoint, securityService, serverSecurity) {
@@ -13,7 +13,7 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, gr
     schema,
     introspection: serverSecurity.introspection,
     validationRules: [
-      depthLimit(serverSecurity.depthLimit),
+      queryDepthLimit(serverSecurity.queryDepthLimit),
       createComplexityLimitRule(serverSecurity.complexityLimit)
     ],
     context: async ({ req }) => {
