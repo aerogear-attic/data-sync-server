@@ -11,7 +11,6 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, gr
 
   let apolloServer = new ApolloServer({
     schema,
-    introspection: serverSecurity.introspection,
     validationRules: [
       queryDepthLimit(serverSecurity.queryDepthLimit),
       createComplexityLimitRule(serverSecurity.complexityLimit)
