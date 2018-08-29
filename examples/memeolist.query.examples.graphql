@@ -1,10 +1,14 @@
-## MEMES section
 query allMemes {
   allMemes {
     id
     photourl
-    owner
     likes
+    owner {
+      id
+      email
+      displayname
+      pictureurl
+    }
     comments {
       id
       comment
@@ -14,11 +18,30 @@ query allMemes {
 }
 
 mutation createMeme {
-  createMeme(ownerid: "1", photourl: "https://i.imgur.com/W4dhL0b.jpg", owner: "Wojtek") {
+  createMeme(owner: "1", photourl: "https://i.imgur.com/W4dhL0b.jpg") {
     id
     photourl
-    owner
     likes
+    owner {
+      id
+      email
+      displayname
+      pictureurl
+    }
+  }
+}
+
+subscription memeAdded {
+  memeAdded {
+    id
+    photourl
+    likes
+    owner {
+      id
+      displayname
+      email
+      pictureurl
+    }
   }
 }
 
