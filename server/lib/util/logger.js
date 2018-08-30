@@ -19,7 +19,6 @@ function auditLog (success, request, info, parent, args, msg) {
     })
   }
 }
-
 // builds path for a GraphQL operation
 function buildPath (path) {
   let pathItems = []
