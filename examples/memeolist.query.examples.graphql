@@ -54,7 +54,7 @@ query comments {
 }
 
 mutation postComment {
-  postComment(memeid: "Fha32ppqLNWEfX3b", comment: "Like it", owner: "Wojtek") {
+  postComment(memeid: "Fha32ppqLNWEfX3b", comment: "Like it", owner: "1") {
     id
     comment
     owner {

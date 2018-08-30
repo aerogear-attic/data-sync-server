@@ -37,8 +37,8 @@ const memeoListSchema = {
   
   type Comment {
     id: ID!
-    owner: String!
     comment: String!
+    owner: Profile!
   }
   
   type Query {
@@ -51,7 +51,7 @@ const memeoListSchema = {
     createProfile(email: String!, displayname: String!, pictureurl: String!):Profile! @hasRole(role: "realm:admin")
     createMeme(owner: ID!, photourl: String!):Meme!
     likeMeme(id: ID!): Boolean @hasRole(role: "realm:voter")
-    postComment(memeid: ID!, comment: String!, owner: String!): Comment!
+    postComment(memeid: ID!, comment: String!, owner: ID!): Comment!
   }
 
   type Subscription {

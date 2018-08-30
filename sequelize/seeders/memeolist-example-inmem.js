@@ -39,6 +39,17 @@ const resolvers = [
     updatedAt: time
   },
   {
+    type: 'Comment',
+    field: 'owner',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `{"operation": "find", "query": 
+                    {"_type":"profile", "id": "{{context.parent.owner}}"}}`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
     type: 'Query',
     field: 'allMemes',
     DataSourceId: 1,

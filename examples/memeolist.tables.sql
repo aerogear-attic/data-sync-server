@@ -18,7 +18,7 @@ CREATE TABLE meme (
 
 CREATE TABLE comment (
   id SERIAL NOT NULL PRIMARY KEY,
-  owner CHARACTER VARYING(100) NOT NULL,
   comment CHARACTER VARYING(500) NOT NULL,
+  owner SERIAL NOT NULL references profile(id),
   memeid SERIAL NOT NULL references meme(id)
 );

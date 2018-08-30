@@ -9,6 +9,7 @@ query allMemes {
       email
       pictureurl
     }
+  }
 }
 
 mutation createMeme($owner: ID!, $photourl: String!) {
@@ -43,15 +44,25 @@ query comments($memeid: ID!) {
   comments(memeid: $memeid) {
      id
      comment
-     owner
+     owner {
+       id
+       displayname
+       email
+       pictureurl
+     }
   }
 }
 
-mutation postComment($memeid: ID!, $comment: String!, $owner: String!){
+mutation postComment($memeid: ID!, $comment: String!, $owner: ID!){
   postComment(memeid: $memeid, comment: $comment, owner: $owner){
       id
       comment
-      owner
+      owner {
+        id
+        displayname
+        email
+        pictureurl
+      }
   }
 }
 
