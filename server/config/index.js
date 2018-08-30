@@ -59,8 +59,8 @@ const config = {
   },
   schemaListenerConfig: undefined,
   serverSecurity: {
-    queryDepthLimit: process.env.QUERY_DEPTH_LIMIT || 1,
-    complexityLimit: process.env.COMPLEXITY_LIMIT || 1000
+    queryDepthLimit: process.env.QUERY_DEPTH_LIMIT || 20,
+    complexityLimit: process.env.COMPLEXITY_LIMIT || 10000
   }
 }
 
