@@ -32,7 +32,7 @@ const memeoListSchema = {
     id: ID!
     photourl: String!    
     likes: Int!
-    owner: [Profile!]!
+    owner: Profile!
   }
   
   type Comment {

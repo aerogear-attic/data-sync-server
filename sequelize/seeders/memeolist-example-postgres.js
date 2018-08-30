@@ -29,7 +29,7 @@ const resolvers = [
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `SELECT * FROM profile WHERE id='{{context.parent.owner}}' ORDER BY id DESC`,
-    responseMapping: '{{ toJSON context.result }}',
+    responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
     updatedAt: time
   },
