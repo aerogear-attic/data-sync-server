@@ -9,11 +9,6 @@ query allMemes {
       displayname
       pictureurl
     }
-    comments {
-      id
-      comment
-      owner
-    }
   }
 }
 
@@ -45,11 +40,29 @@ subscription memeAdded {
   }
 }
 
+query comments {
+  comments(memeid: ID!) {
+    id
+    comment
+    owner {
+      id
+      displayname
+      email
+      pictureurl
+    }
+  }
+}
+
 mutation postComment {
   postComment(memeid: "Fha32ppqLNWEfX3b", comment: "Like it", owner: "Wojtek") {
     id
     comment
-    owner
+    owner {
+      id
+      displayname
+      email
+      pictureurl
+    }
   }
 }
 

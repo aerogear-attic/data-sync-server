@@ -33,7 +33,6 @@ const memeoListSchema = {
     photourl: String!    
     likes: Int!
     owner: [Profile!]!
-    comments: [Comment!]!
   }
   
   type Comment {
@@ -43,8 +42,9 @@ const memeoListSchema = {
   }
   
   type Query {
-    allMemes:[Meme!]!
     profile(email: String!): [Profile]!
+    allMemes:[Meme!]!
+    comments(memeid: ID!): [Comment]!
   }
   
   type Mutation {

@@ -9,12 +9,6 @@ query allMemes {
       email
       pictureurl
     }
-    comments {
-      id
-      comment
-      owner
-    }
-  }
 }
 
 mutation createMeme($owner: ID!, $photourl: String!) {
@@ -42,6 +36,14 @@ subscription memeAdded {
       email
       pictureurl
     }
+  }
+}
+
+query comments($memeid: ID!) {
+  comments(memeid: $memeid) {
+     id
+     comment
+     owner
   }
 }
 
