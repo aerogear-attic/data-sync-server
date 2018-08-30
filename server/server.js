@@ -113,7 +113,7 @@ class DataSyncServer {
       // reinitialize the server objects
       this.schema = newSchema.schema
       this.app = newExpressApp(this.expressAppOptions, this.expressAppMiddlewares)
-      this.apolloServer = newApolloServer(this.app, this.schema, this.server, this.config.graphQLConfig.tracing, this.config.playgroundConfig)
+      this.apolloServer = newApolloServer(this.app, this.schema, this.server, this.config.graphQLConfig.tracing, this.config.playgroundConfig, this.config.graphQLConfig.graphqlEndpoint, this.securityService, this.serverSecurity)
       this.server.on('request', this.app)
 
       try {
