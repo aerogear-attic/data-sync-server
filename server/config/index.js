@@ -57,7 +57,11 @@ const config = {
     type: null, // e.g. type 'keycloak' or 'passport'
     config: null // implementation specific config
   },
-  schemaListenerConfig: undefined
+  schemaListenerConfig: undefined,
+  serverSecurity: {
+    queryDepthLimit: process.env.QUERY_DEPTH_LIMIT || 20,
+    complexityLimit: process.env.COMPLEXITY_LIMIT || 10000
+  }
 }
 
 if (process.env.SCHEMA_LISTENER_CONFIG) {

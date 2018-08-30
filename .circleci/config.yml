@@ -45,16 +45,12 @@ jobs:
       - run: npm install tap-xunit --dev
       - run: mkdir -p ~/reports
       - run:
-          command: ./node_modules/.bin/ava  --concurrency=1 --tap integration_test/*.test.js | ./node_modules/.bin/tap-xunit > ~/reports/ava.xml
+          command: npm run test:integration
           environment:
             POSTGRES_HOST: 'config_postgres'
             POSTGRES_PORT: '5432'
             MEMEOLIST_DB_HOST: 'memeolist_postgres'
             MEMEOLIST_DB_PORT: '5432'
-      - store_test_results:
-          path: ~/reports
-      - store_artifacts:
-          path: ~/reports
   
   test_coverage:
     docker:
