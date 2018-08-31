@@ -5,7 +5,6 @@ CONTRIBUTING.md
 Jenkinsfile
 LICENSE
 README.md
-examples
 *.png
 nodemon.json
 k8s_templates
