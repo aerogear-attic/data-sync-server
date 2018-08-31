@@ -6,7 +6,7 @@ const gql = require('graphql-tag')
 /// //////////////// NOTE /////////////////////////////////////
 
 module.exports = function (context) {
-  test.serial('should return empty list when no Profiles created yet', async t => {
+  test.serial(`should return empty list when no Profiles created yet (${context.testNote})`, async t => {
     const res = await context.helper.apolloClient.client.query({
       // language=GraphQL
       query: gql`{
@@ -17,10 +17,10 @@ module.exports = function (context) {
     })
 
     t.falsy(res.errors)
-    t.deepEqual(res.data, {allProfiles: []})
+    t.deepEqual(res.data, { allProfiles: [] })
   })
 
-  test.serial('should create a Profile', async t => {
+  test.serial(`should create a Profile (${context.testNote})`, async t => {
     let res = await context.helper.apolloClient.client.mutate({
       // language=GraphQL
       mutation: gql`
@@ -36,7 +36,7 @@ module.exports = function (context) {
                   displayName,
                   biography,
                   avatarUrl
-              }
+              } 
           }
       `
     })
@@ -67,7 +67,7 @@ module.exports = function (context) {
     t.is(res.data.allProfiles[0].id, createdId)
   })
 
-  test.serial('should get a Profile by email', async t => {
+  test.serial(`hould get a Profile by email (${context.testNote})`, async t => {
     let res = await context.helper.apolloClient.client.query({
       // language=GraphQL
       query: gql`{
@@ -91,7 +91,7 @@ module.exports = function (context) {
     t.deepEqual(res.data.profile.avatarUrl, 'http://example.com/mj.jpg')
   })
 
-  test.serial('should update a Profile', async t => {
+  test.serial(`should update a Profile (${context.testNote})`, async t => {
     let res = await context.helper.apolloClient.client.query({
       // language=GraphQL
       query: gql`{
@@ -158,7 +158,7 @@ module.exports = function (context) {
     t.deepEqual(res.data.allProfiles[0].avatarUrl, 'http://example.com/mj.jpg')
   })
 
-  test.serial('should delete a Profile', async t => {
+  test.serial(`should delete a Profile (${context.testNote})`, async t => {
     let res = await context.helper.apolloClient.client.query({
       // language=GraphQL
       query: gql`{
@@ -205,7 +205,7 @@ module.exports = function (context) {
     t.is(res.data.allProfiles.length, 0)
   })
 
-  test.serial('should return empty list when no Memes created yet', async t => {
+  test.serial(`should return empty list when no Memes created yet (${context.testNote})`, async t => {
     const res = await context.helper.apolloClient.client.query({
       // language=GraphQL
       query: gql`{
@@ -216,10 +216,10 @@ module.exports = function (context) {
     })
 
     t.falsy(res.errors)
-    t.deepEqual(res.data, {allMemes: []})
+    t.deepEqual(res.data, { allMemes: [] })
   })
 
-  test.serial('should create a Profile and a Meme', async t => {
+  test.serial(`should create a Profile and a Meme (${context.testNote})`, async t => {
     let res = await context.helper.apolloClient.client.mutate({
       // language=GraphQL
       mutation: gql`

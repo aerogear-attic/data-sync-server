@@ -1,19 +1,24 @@
 const { test } = require('ava')
-const axios = require('axios')
-const DataSyncService = require('../DataSyncService')
-const config = require('../server/config')
+const base = require('./datasource.integration.test.base')
 
-test.serial('Check DataSyncService running in authenticated mode', async (t) => {
-    config.server.port = 0 // specifying port 0 gives us a random port number to make sure it doesn't conflict with anything
-    process.env.KEYCLOAK_CONFIG_FILE = '../keycloak/keycloak.json'
-    t.plan(2)
-    const syncService = new DataSyncService(config)
-    await syncService.initialize()
-    await syncService.start()
+const context = {
+  helper: undefined,
+  testNote: 'auth, inmem'
+}
 
-    let { port } = syncService.app.server.address()
+test.before(async t => {
+  process.env.KEYCLOAK_CONFIG_FILE = require('path').resolve('./keycloak/keycloak.json')
+  const Helper = require('./helper')
+  const helper = new Helper()
 
-    const response = await axios.get(`http://localhost:${port}/healthz`)
-    t.deepEqual(response.status, 200)
-    t.pass()
+  await helper.initialize()
+
+  // delete the all the config 1-time before starting the tests
+  await helper.deleteConfig()
+  await helper.feedConfig('auth.complete.inmem.valid.memeo')
+  await helper.triggerReload()
+
+  context.helper = helper
 })
+
+base(context)

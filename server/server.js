@@ -16,7 +16,7 @@ const buildSchema = require('./buildSchema')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
 class DataSyncServer {
-  constructor(config, models, pubsub) {
+  constructor (config, models, pubsub) {
     this.config = config
     this.models = models
     this.pubsub = pubsub
@@ -25,7 +25,7 @@ class DataSyncServer {
     this.dataSources = null
   }
 
-  async initialize() {
+  async initialize () {
     this.server = http.createServer()
 
     // get some options
@@ -73,7 +73,7 @@ class DataSyncServer {
     this.apolloServer = newApolloServer(this.app, this.schema, this.server, tracing, playgroundConfig, this.expressAppOptions.graphqlEndpoint, this.securityService)
     this.server.on('request', this.app)
 
-    function startListening(port) {
+    function startListening (port) {
       var server = this
       return new Promise((resolve) => {
         server.listen(port, resolve)
@@ -88,14 +88,14 @@ class DataSyncServer {
     this.schemaListener.start(this.debouncedOnReceive)
   }
 
-  async cleanup() {
+  async cleanup () {
     await this.models.sequelize.close()
     if (this.schemaListener) await this.schemaListener.stop()
     if (this.dataSources) await this.disconnectDataSources(this.dataSources)
     if (this.server) await this.server.close()
   }
 
-  async onReceive() {
+  async onReceive () {
     log.info('Received schema change notification. Rebuilding it')
     let newSchema
     try {
@@ -141,7 +141,7 @@ class DataSyncServer {
     }
   }
 
-  async connectDataSources(dataSources) {
+  async connectDataSources (dataSources) {
     log.info('Connecting data sources')
     for (let key of Object.keys(dataSources)) {
       const dataSource = dataSources[key]
@@ -155,7 +155,7 @@ class DataSyncServer {
     }
   }
 
-  async disconnectDataSources(dataSources) {
+  async disconnectDataSources (dataSources) {
     log.info('Disconnecting data sources')
     for (let key of Object.keys(dataSources)) {
       const dataSource = dataSources[key]
