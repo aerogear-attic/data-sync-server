@@ -24,9 +24,13 @@ function Helper () {
   this.qi = this.sequelize.queryInterface
 
   this.initialize = async () => {
-    this.apolloClient = new TestApolloClient()
+    this.resetApolloClient()
     await this.syncService.initialize()
     await this.syncService.start()
+  }
+
+  this.resetApolloClient = (headers) => {
+    this.apolloClient = new TestApolloClient('localhost:8000', headers)
   }
 
   this.deleteConfig = async () => {

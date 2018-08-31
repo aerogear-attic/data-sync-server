@@ -23,6 +23,7 @@
     "test:integration": "npm run db:init && ava --concurrency=1 integration_test/*.test.js",
     "test:cover": "nyc --reporter=text-lcov ava --concurrency=1 '*.test.js' '**/*.test.js' > coverage.lcov && codecov",
     "start": "node ./index.js",
+    "debug": "node --nolazy --inspect-brk=9229 ./index.js",
     "dev": "nodemon ./index.js | pino-pretty --colorize --translateTime",
     "dev:memeo": "PLAYGROUND_QUERY_FILE='examples/memeolist.query.graphql' PLAYGROUND_VARIABLES_FILE='examples/memeolist.variables.json' nodemon ./index.js | pino-pretty --colorize --translateTime",
     "dev:keymemeo": "KEYCLOAK_CONFIG_FILE='keycloak/keycloak.json' PLAYGROUND_QUERY_FILE='examples/memeolist.query.graphql' PLAYGROUND_VARIABLES_FILE='examples/memeolist.variables.json' nodemon ./index.js | pino-pretty --colorize --translateTime",
@@ -59,6 +60,7 @@
     "nyc": "^12.0.2",
     "pino-pretty": "^2.0.0",
     "pre-commit": "^1.2.2",
+    "puppeteer": "^1.7.0",
     "standard": "^11.0.1",
     "stoppable": "^1.0.6",
     "ws": "^6.0.0"

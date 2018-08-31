@@ -1,8 +1,9 @@
-const {test} = require('ava')
+const { test } = require('ava')
 const base = require('./datasource.integration.test.base')
 
 const context = {
-  helper: undefined
+  helper: undefined,
+  testNote: 'noauth, postgres'
 }
 
 test.before(async t => {
