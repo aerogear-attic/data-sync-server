@@ -21,15 +21,15 @@ const memeoListSchema = {
   name: 'default',
   schema: `
   type Profile {
-    id: ID! @isUnique
-    email: String! @isUnique
+    id: ID! 
+    email: String!
     displayname: String
     pictureurl: String
     memes: [Meme!]!
   }
   
   type Meme {
-    id: ID! @isUnique
+    id: ID!
     photourl: String!    
     likes: Int!
     owner: [Profile!]!
@@ -37,7 +37,7 @@ const memeoListSchema = {
   }
   
   type Comment {
-    id: ID! @isUnique
+    id: ID!
     owner: String!
     comment: String!
   }
