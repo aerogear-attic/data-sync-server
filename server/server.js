@@ -8,8 +8,8 @@ const SecurityService = require('./security/SecurityService')
 
 // middlewares
 const { log } = require('./lib/util/logger')
-const expressPino = require('express-pino-logger')({logger: log})
-const {getMetrics, responseLoggingMetric} = require('./metrics')
+const expressPino = require('express-pino-logger')({ logger: log })
+const { getMetrics, responseLoggingMetric } = require('./metrics')
 
 // schema
 const buildSchema = require('./buildSchema')
@@ -70,7 +70,7 @@ class DataSyncServer {
 
     // Initialize an express app, apply the apollo middleware, and mount the app to the http server
     this.app = newExpressApp(this.expressAppOptions, this.expressAppMiddlewares, this.securityService)
-    this.apolloServer = newApolloServer(this.app, this.schema, this.server, tracing, playgroundConfig, graphqlEndpoint, this.securityService, this.serverSecurity)
+    this.apolloServer = newApolloServer(this.app, this.schema, this.server, tracing, playgroundConfig, this.expressAppOptions.graphqlEndpoint, this.securityService, this.serverSecurity)
     this.server.on('request', this.app)
 
     function startListening (port) {
@@ -112,8 +112,8 @@ class DataSyncServer {
       this.server.removeListener('request', this.app)
       // reinitialize the server objects
       this.schema = newSchema.schema
-      this.app = newExpressApp(this.expressAppOptions, this.expressAppMiddlewares)
-      this.apolloServer = newApolloServer(this.app, this.schema, this.server, this.config.graphQLConfig.tracing, this.config.playgroundConfig, this.config.graphQLConfig.graphqlEndpoint, this.securityService, this.serverSecurity)
+      this.app = newExpressApp(this.expressAppOptions, this.expressAppMiddlewares, this.securityService)
+      this.apolloServer = newApolloServer(this.app, this.schema, this.server, this.config.graphQLConfig.tracing, this.config.playgroundConfig, this.expressAppOptions.graphqlEndpoint, this.securityService, this.serverSecurity)
       this.server.on('request', this.app)
 
       try {
