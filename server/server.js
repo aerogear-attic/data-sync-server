@@ -99,7 +99,7 @@ class DataSyncServer {
     log.info('Received schema change notification. Rebuilding it')
     let newSchema
     try {
-      newSchema = await buildSchema(this.models, this.pubsub)
+      newSchema = await buildSchema(this.models, this.pubsub, this.schemaDirectives)
     } catch (ex) {
       log.error('Error while reloading config')
       log.error(ex)
