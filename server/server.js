@@ -38,9 +38,12 @@ class DataSyncServer {
       serverSecurity
     } = this.config
 
+    let securityService
+    let schemaDirectives
+
     if (securityServiceConfig.type && securityServiceConfig.config) {
-      this.securityService = new SecurityService(securityServiceConfig)
-      this.schemaDirectives = this.securityService.getSchemaDirectives()
+      securityService = new SecurityService(securityServiceConfig)
+      schemaDirectives = securityService.getSchemaDirectives()
     }
 
     // generate the GraphQL Schema
@@ -50,28 +53,28 @@ class DataSyncServer {
 
     await this.connectDataSources(this.dataSources)
 
-    const { tracing } = graphQLConfig
-
-    const graphqlEndpoint = graphQLConfig.graphqlEndpoint
-
-    this.expressAppOptions = {
-      keycloakConfig,
-      graphqlEndpoint,
-      models: this.models
+    const serverConfig = {
+      expressAppOptions: {
+        keycloakConfig: keycloakConfig,
+        graphqlEndpoint: graphQLConfig.graphqlEndpoint,
+        models: this.models
+      },
+      expressAppMiddlewares: {
+        metrics: getMetrics,
+        responseLoggingMetric,
+        logging: expressPino
+      },
+      serverSecurity: serverSecurity,
+      securityService: securityService,
+      schemaDirectives: schemaDirectives,
+      graphQLConfig: graphQLConfig,
+      playgroundConfig: playgroundConfig,
+      schemaListenerConfig: schemaListenerConfig
     }
 
-    this.expressAppMiddlewares = {
-      metrics: getMetrics,
-      responseLoggingMetric,
-      logging: expressPino
-    }
+    this.serverConfig = serverConfig
 
-    this.serverSecurity = serverSecurity
-
-    // Initialize an express app, apply the apollo middleware, and mount the app to the http server
-    this.app = newExpressApp(this.expressAppOptions, this.expressAppMiddlewares, this.securityService)
-    this.apolloServer = newApolloServer(this.app, this.schema, this.server, tracing, playgroundConfig, this.expressAppOptions.graphqlEndpoint, this.securityService, this.serverSecurity)
-    this.server.on('request', this.app)
+    this.newServer()
 
     function startListening (port) {
       var server = this
@@ -83,9 +86,19 @@ class DataSyncServer {
     this.server.startListening = startListening.bind(this.server)
 
     // Initialize the schema listener for hot reload
-    this.schemaListener = schemaListenerCreator(schemaListenerConfig)
-    this.debouncedOnReceive = _.debounce(this.onReceive, 500).bind(this)
-    this.schemaListener.start(this.debouncedOnReceive)
+    this.schemaListener = schemaListenerCreator(this.serverConfig.schemaListenerConfig)
+    this.debouncedOnSchemaRebuild = _.debounce(this.onSchemaChangedNotification, 500).bind(this)
+    this.schemaListener.start(this.debouncedOnSchemaRebuild)
+  }
+
+  /**
+   * Starts or restarts express app and Apollo server
+   */
+  newServer () {
+    // Initialize an express app, apply the apollo middleware, and mount the app to the http server
+    this.app = newExpressApp(this.serverConfig.expressAppOptions, this.serverConfig.expressAppMiddlewares, this.serverConfig.securityService)
+    this.apolloServer = newApolloServer(this.app, this.schema, this.server, this.serverConfig.tracing, this.serverConfig.playgroundConfig, this.serverConfig.graphQLConfig.graphqlEndpoint, this.serverConfig.securityService, this.serverConfig.serverSecurity)
+    this.server.on('request', this.app)
   }
 
   async cleanup () {
@@ -95,11 +108,11 @@ class DataSyncServer {
     if (this.server) await this.server.close()
   }
 
-  async onReceive () {
+  async onSchemaChangedNotification () {
     log.info('Received schema change notification. Rebuilding it')
     let newSchema
     try {
-      newSchema = await buildSchema(this.models, this.pubsub)
+      newSchema = await buildSchema(this.models, this.pubsub, this.schemaDirectives)
     } catch (ex) {
       log.error('Error while reloading config')
       log.error(ex)
@@ -112,9 +125,7 @@ class DataSyncServer {
       this.server.removeListener('request', this.app)
       // reinitialize the server objects
       this.schema = newSchema.schema
-      this.app = newExpressApp(this.expressAppOptions, this.expressAppMiddlewares, this.securityService)
-      this.apolloServer = newApolloServer(this.app, this.schema, this.server, this.config.graphQLConfig.tracing, this.config.playgroundConfig, this.expressAppOptions.graphqlEndpoint, this.securityService, this.serverSecurity)
-      this.server.on('request', this.app)
+      this.newServer()
 
       try {
         await this.disconnectDataSources(this.dataSources) // disconnect existing ones first
