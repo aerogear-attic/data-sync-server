@@ -125,3 +125,56 @@ test('if context.auth.getToken.hasRole() is false, then an error is returned and
     await field.resolve(root, args, context, info)
   }, `user is not authorized for field ${field.name} on parent ${info.parentType.name}. Must have one of the following roles: [${directiveArgs.role}]`)
 })
+
+test('if hasRole arguments are invalid, visitSchemaDirective does not throw, but field.resolve will return a generic error to the user and original resolver will not be called', async (t) => {
+  const directiveArgs = {
+    role: 'admin',
+    some: 'unknown arg'
+  }
+
+  const directive = new HasRoleDirective({
+    name: 'testHasRoleDirective',
+    args: directiveArgs
+  })
+
+  const field = {
+    resolve: (root, args, context, info) => {
+      return new Promise((resolve, reject) => {
+        t.fail('the original resolver should never be called when an auth error is thrown')
+        return reject(new Error('the original resolver should never be called when an auth error is thrown'))
+      })
+    },
+    name: 'testField'
+  }
+
+  t.notThrows(() => {
+    directive.visitFieldDefinition(field)
+  })
+
+  const root = {}
+  const args = {}
+  const context = {
+    auth: {
+      getToken: () => {
+        return {
+          hasRole: (role) => {
+            t.deepEqual(role, directiveArgs.role)
+            return false
+          }
+        }
+      }
+    },
+    request: {
+      id: '123'
+    }
+  }
+  const info = {
+    parentType: {
+      name: 'testParent'
+    }
+  }
+
+  await t.throws(async () => {
+    await field.resolve(root, args, context, info)
+  }, `An internal server error occurred, please contact the server administrator and provide the following id: ${context.request.id}`)
+})
