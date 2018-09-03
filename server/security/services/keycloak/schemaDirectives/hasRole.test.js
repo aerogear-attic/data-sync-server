@@ -206,7 +206,7 @@ test('if context.auth.getToken.hasRole() is false, then an error is returned and
         return reject(new Error('the original resolver should never be called when an auth error is thrown'))
       })
     },
-    name: 'test'
+    name: 'testField'
   }
 
   directive.visitFieldDefinition(field)
@@ -225,11 +225,15 @@ test('if context.auth.getToken.hasRole() is false, then an error is returned and
       }
     }
   }
-  const info = {}
+  const info = {
+    parentType: {
+      name: 'testParent'
+    }
+  }
 
   await t.throws(async () => {
     await field.resolve(root, args, context, info)
-  }, `logged in user does not have sufficient permissions for ${field.name}. Must have one of the following roles: [${directiveArgs.role}]`)
+  }, `user is not authorized for field ${field.name} on parent ${info.parentType.name}. Must have one of the following roles: [${directiveArgs.role}]`)
 })
 
 test('if context.auth.getToken.hasRealmRole() is false, then an error is returned and the original resolver will not execute', async (t) => {
@@ -250,7 +254,7 @@ test('if context.auth.getToken.hasRealmRole() is false, then an error is returne
         return reject(new Error('the original resolver should never be called when an auth error is thrown'))
       })
     },
-    name: 'test'
+    name: 'testField'
   }
 
   directive.visitFieldDefinition(field)
@@ -269,9 +273,13 @@ test('if context.auth.getToken.hasRealmRole() is false, then an error is returne
       }
     }
   }
-  const info = {}
+  const info = {
+    parentType: {
+      name: 'testParent'
+    }
+  }
 
   await t.throws(async () => {
     await field.resolve(root, args, context, info)
-  }, `logged in user does not have sufficient permissions for ${field.name}. Must have one of the following roles: [${directiveArgs.role}]`)
+  }, `user is not authorized for field ${field.name} on parent ${info.parentType.name}. Must have one of the following roles: [${directiveArgs.role}]`)
 })

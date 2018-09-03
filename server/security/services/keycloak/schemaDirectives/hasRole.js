@@ -21,13 +21,17 @@ class HasRoleDirective extends SchemaDirectiveVisitor {
       let foundRole = null // this will be the role the user was successfully authorized on
 
       if (type === 'realm') {
-        foundRole = roles.find(token.hasRealmRole)
+        foundRole = roles.find((role) => {
+          return token.hasRealmRole(role)
+        })
       } else {
-        foundRole = roles.find(token.hasRole)
+        foundRole = roles.find((role) => {
+          return token.hasRole(role)
+        })
       }
 
       if (!foundRole) {
-        const AuthorizationErrorMessage = `logged in user does not have sufficient permissions for ${field.name}. Must have one of the following roles: [${roles}]`
+        const AuthorizationErrorMessage = `user is not authorized for field ${field.name} on parent ${info.parentType.name}. Must have one of the following roles: [${roles}]`
         log.error({ error: AuthorizationErrorMessage, details: token.content })
         throw new ForbiddenError(AuthorizationErrorMessage)
       }
