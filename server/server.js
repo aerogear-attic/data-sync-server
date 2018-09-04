@@ -11,6 +11,12 @@ const { log } = require('./lib/util/logger')
 const expressPino = require('express-pino-logger')({ logger: log })
 const { getMetrics, responseLoggingMetric } = require('./metrics')
 
+if (process.env.LOG_LEVEL) {
+  expressPino.logger.level = process.env.LOG_LEVEL
+} else {
+  expressPino.logger.level = 'debug'
+}
+
 // schema
 const buildSchema = require('./buildSchema')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
