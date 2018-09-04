@@ -13,6 +13,8 @@ const {getMetrics, responseLoggingMetric} = require('./metrics')
 
 if (process.env.LOG_LEVEL) {
   expressPino.logger.level = process.env.LOG_LEVEL
+} else {
+  expressPino.logger.level = 'debug'
 }
 
 // schema
