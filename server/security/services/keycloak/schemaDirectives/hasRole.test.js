@@ -1,11 +1,10 @@
 const { test } = require('ava')
 const HasRoleDirective = require('./hasRole')
 
-test('context.auth.hasRole is called when type is client', async (t) => {
+test('context.auth.hasRole is called', async (t) => {
   t.plan(3)
   const directiveArgs = {
-    role: 'admin',
-    type: 'client'
+    role: 'admin'
   }
 
   const directive = new HasRoleDirective({
@@ -41,11 +40,10 @@ test('context.auth.hasRole is called when type is client', async (t) => {
   await field.resolve(root, args, context, info)
 })
 
-test('context.auth.hasRealmRole is called when type is realm', async (t) => {
-  t.plan(3)
+test('visitFieldDefinition accepts an array of roles', async (t) => {
+  t.plan(4)
   const directiveArgs = {
-    role: 'admin',
-    type: 'realm'
+    role: ['foo', 'bar', 'baz']
   }
 
   const directive = new HasRoleDirective({
@@ -67,52 +65,10 @@ test('context.auth.hasRealmRole is called when type is realm', async (t) => {
     auth: {
       getToken: () => {
         return {
-          hasRealmRole: (role) => {
-            t.pass()
-            t.deepEqual(role, directiveArgs.role)
-            return true
-          }
-        }
-      }
-    }
-  }
-  const info = {}
-
-  await field.resolve(root, args, context, info)
-})
-
-test('context.auth.hasRole is called when type is not specified, i.e. client type auth is used', async (t) => {
-  t.plan(3)
-  const directiveArgs = {
-    role: 'admin' // notice no type arg here
-  }
-
-  const directive = new HasRoleDirective({
-    name: 'testHasRoleDirective',
-    args: directiveArgs
-  })
-
-  const field = {
-    resolve: (root, args, context, info) => {
-      return new Promise((resolve, reject) => {
-        t.pass()
-        return resolve()
-      })
-    }
-  }
-
-  directive.visitFieldDefinition(field)
-
-  const root = {}
-  const args = {}
-  const context = {
-    auth: {
-      getToken: () => {
-        return {
           hasRole: (role) => {
+            t.log(`checking has role ${role}`)
             t.pass()
-            t.deepEqual(role, directiveArgs.role)
-            return true
+            return (role === 'baz') // this makes sure it doesn't return true instantly
           }
         }
       }
@@ -121,44 +77,11 @@ test('context.auth.hasRole is called when type is not specified, i.e. client typ
   const info = {}
 
   await field.resolve(root, args, context, info)
-})
-
-test('field.resolve will throw an error when type is not one of [client, realm]', async (t) => {
-  const directiveArgs = {
-    role: 'admin',
-    type: 'some random type'
-  }
-
-  const directive = new HasRoleDirective({
-    name: 'testHasRoleDirective',
-    args: directiveArgs
-  })
-
-  const field = {
-    resolve: (root, args, context, info) => {
-      return new Promise((resolve, reject) => {
-        t.fail('the original resolver should never be called when an auth error is thrown')
-        return reject(new Error('the original resolver should never be called when an auth error is thrown'))
-      })
-    }
-  }
-
-  directive.visitFieldDefinition(field)
-
-  const root = {}
-  const args = {}
-  const context = {}
-  const info = {}
-
-  await t.throws(async () => {
-    await field.resolve(root, args, context, info)
-  }, 'type argument in hasRole directive must be one of client,realm')
 })
 
 test('if context.auth.getToken.hasRole() is false, then an error is returned and the original resolver will not execute', async (t) => {
   const directiveArgs = {
-    role: 'admin',
-    type: 'client'
+    role: 'admin'
   }
 
   const directive = new HasRoleDirective({
@@ -173,7 +96,7 @@ test('if context.auth.getToken.hasRole() is false, then an error is returned and
         return reject(new Error('the original resolver should never be called when an auth error is thrown'))
       })
     },
-    name: 'test'
+    name: 'testField'
   }
 
   directive.visitFieldDefinition(field)
@@ -192,17 +115,21 @@ test('if context.auth.getToken.hasRole() is false, then an error is returned and
       }
     }
   }
-  const info = {}
+  const info = {
+    parentType: {
+      name: 'testParent'
+    }
+  }
 
   await t.throws(async () => {
     await field.resolve(root, args, context, info)
-  }, `logged in user does not have sufficient permissions for ${field.name}: missing role ${directiveArgs.role}`)
+  }, `user is not authorized for field ${field.name} on parent ${info.parentType.name}. Must have one of the following roles: [${directiveArgs.role}]`)
 })
 
-test('if context.auth.getToken.hasRealmRole() is false, then an error is returned and the original resolver will not execute', async (t) => {
+test('if hasRole arguments are invalid, visitSchemaDirective does not throw, but field.resolve will return a generic error to the user and original resolver will not be called', async (t) => {
   const directiveArgs = {
     role: 'admin',
-    type: 'realm'
+    some: 'unknown arg'
   }
 
   const directive = new HasRoleDirective({
@@ -217,10 +144,12 @@ test('if context.auth.getToken.hasRealmRole() is false, then an error is returne
         return reject(new Error('the original resolver should never be called when an auth error is thrown'))
       })
     },
-    name: 'test'
+    name: 'testField'
   }
 
-  directive.visitFieldDefinition(field)
+  t.notThrows(() => {
+    directive.visitFieldDefinition(field)
+  })
 
   const root = {}
   const args = {}
@@ -228,17 +157,24 @@ test('if context.auth.getToken.hasRealmRole() is false, then an error is returne
     auth: {
       getToken: () => {
         return {
-          hasRealmRole: (role) => {
+          hasRole: (role) => {
             t.deepEqual(role, directiveArgs.role)
             return false
           }
         }
       }
+    },
+    request: {
+      id: '123'
     }
   }
-  const info = {}
+  const info = {
+    parentType: {
+      name: 'testParent'
+    }
+  }
 
   await t.throws(async () => {
     await field.resolve(root, args, context, info)
-  }, `logged in user does not have sufficient permissions for ${field.name}: missing role ${directiveArgs.role}`)
+  }, `An internal server error occurred, please contact the server administrator and provide the following id: ${context.request.id}`)
 })

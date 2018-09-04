@@ -80,6 +80,7 @@
     "graphql-tools": "^3.0.2",
     "graphql-validation-complexity": "^0.2.3",
     "handlebars": "^4.0.11",
+    "joi": "^13.6.0",
     "json-parse-safe": "^1.0.5",
     "keycloak-connect": "^4.2.1",
     "lodash": "^4.17.10",
@@ -90,7 +91,8 @@
     "prom-client": "^11.1.1",
     "sequelize": "^4.38.0",
     "sequelize-cli": "^4.0.0",
-    "subscriptions-transport-ws": "^0.9.11"
+    "subscriptions-transport-ws": "^0.9.11",
+    "uuid": "^3.3.2"
   },
   "pre-commit": [
     "lint",
