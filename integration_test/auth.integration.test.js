@@ -1,15 +1,18 @@
 const { test } = require('ava')
 const gql = require('graphql-tag')
 const auth = require('./util/auth')
+const axios = require('axios')
 
 const context = {
   helper: undefined,
   testNote: 'auth, inmem'
 }
 
-async function authTestAdmin (context) {
-  const authHeaders = await auth.authenticateKeycloak('test-admin', 'test123')
+async function authenticate (test, username, password) {
+  test.log(`Authenticating as ${username}`)
+  const authHeaders = await auth.authenticateKeycloak(username, password)
   context.helper.resetApolloClient(authHeaders)
+  test.log(`Authenticated as ${username}`)
 }
 
 test.before(async t => {
@@ -24,14 +27,32 @@ test.before(async t => {
   await helper.triggerReload()
 
   context.helper = helper
+  context.keycloakConfig = require(process.env.KEYCLOAK_CONFIG_FILE)
 })
 
-test.beforeEach(async () => {
+test.beforeEach(async (t) => {
   context.helper.resetApolloClient()
+  t.log('Cleared authentication headers')
+})
+
+test.serial(`not authenticated query should fail (${context.testNote}`, async t => {
+  let { port } = context.helper.syncService.app.server.address()
+
+  try {
+    await axios({method: 'post',
+      url: `http://localhost:${port}/graphql`,
+      data: { query: '{ allProfiles { id } }' },
+      maxRedirects: 0})
+    // shall not pass here, should be redirected to Keycloak, throws exception
+    t.fail('unauthenticated request passed')
+  } catch (e) {
+    t.deepEqual(e.response.status, 302, 'Improper HTTP redirection to Keycloak')
+    t.regex(e.response.headers.location, new RegExp(`^${context.keycloakConfig['auth-server-url']}.*`), 'Keycloak url not matching for the redirect')
+  }
 })
 
 test.serial(`should return empty list when no Profiles created yet (${context.testNote})`, async t => {
-  await authTestAdmin(context)
+  await authenticate(t, 'test-admin', 'test123')
 
   const res = await context.helper.apolloClient.client.query({
     // language=GraphQL
@@ -47,7 +68,7 @@ test.serial(`should return empty list when no Profiles created yet (${context.te
 })
 
 test.serial(`should create a Profile (${context.testNote})`, async t => {
-  await authTestAdmin(context)
+  await authenticate(t, 'test-admin', 'test123')
 
   let res = await context.helper.apolloClient.client.mutate({
     // language=GraphQL
