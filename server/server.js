@@ -52,13 +52,6 @@ class DataSyncServer {
       schemaDirectives = securityService.getSchemaDirectives()
     }
 
-    // generate the GraphQL Schema
-    const { schema, dataSources } = await buildSchema(this.models, this.pubsub, this.schemaDirectives)
-    this.schema = schema
-    this.dataSources = dataSources
-
-    await this.connectDataSources(this.dataSources)
-
     const serverConfig = {
       expressAppOptions: {
         keycloakConfig: keycloakConfig,
@@ -79,6 +72,13 @@ class DataSyncServer {
     }
 
     this.serverConfig = serverConfig
+
+    // generate the GraphQL Schema
+    const { schema, dataSources } = await buildSchema(this.models, this.pubsub, this.serverConfig.schemaDirectives)
+    this.schema = schema
+    this.dataSources = dataSources
+
+    await this.connectDataSources(this.dataSources)
 
     this.newServer()
 
@@ -118,7 +118,7 @@ class DataSyncServer {
     log.info('Received schema change notification. Rebuilding it')
     let newSchema
     try {
-      newSchema = await buildSchema(this.models, this.pubsub, this.schemaDirectives)
+      newSchema = await buildSchema(this.models, this.pubsub, this.serverConfig.schemaDirectives)
     } catch (ex) {
       log.error('Error while reloading config')
       log.error(ex)
