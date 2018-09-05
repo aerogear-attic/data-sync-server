@@ -77,6 +77,30 @@ const resolvers = [
   },
   {
     type: 'Query',
+    field: 'allProfiles',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    preHook: '',
+    postHook: '',
+    requestMapping: '{"operation": "find", "query": {"_type":"profile"}}',
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Query',
+    field: 'allComments',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    preHook: '',
+    postHook: '',
+    requestMapping: '{"operation": "find", "query": {"_type":"comment"}}',
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Query',
     field: 'profile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
@@ -114,6 +138,24 @@ const resolvers = [
   {
     type: 'Mutation',
     field: 'createProfile',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `{
+      "operation": "insert",
+      "doc": {
+        "_type":"profile",
+        "email": "{{context.arguments.email}}",
+        "displayname": "{{context.arguments.displayname}}",
+        "pictureurl": "{{context.arguments.pictureurl}}"
+      }
+    }`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Mutation',
+    field: 'createProfileRealm',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `{

@@ -1,7 +1,7 @@
 const { test } = require('ava')
-const gql = require('graphql-tag')
 const auth = require('./util/auth')
 const axios = require('axios')
+const gqls = require('./auth.integration.test.gql')
 
 const context = {
   helper: undefined,
@@ -19,11 +19,10 @@ test.before(async t => {
   process.env.KEYCLOAK_CONFIG_FILE = require('path').resolve('./keycloak/keycloak.json')
   const Helper = require('./helper')
   const helper = new Helper()
-
   await helper.initialize()
   // delete the all the config 1-time before starting the tests
   await helper.deleteConfig()
-  await helper.feedConfig('complete.inmem.valid.memeo')
+  await helper.feedConfig('auth.complete.inmem.valid.memeo')
   await helper.triggerReload()
 
   context.helper = helper
@@ -54,64 +53,78 @@ test.serial(`not authenticated query should fail (${context.testNote}`, async t 
 test.serial(`should return empty list when no Profiles created yet (${context.testNote})`, async t => {
   await authenticate(t, 'test-admin', 'test123')
 
-  const res = await context.helper.apolloClient.client.query({
-    // language=GraphQL
-    query: gql`{
-        allProfiles {
-            id
-        }
-      }`
-  })
-
+  const res = await context.helper.apolloClient.client.query(gqls.allProfiles)
   t.falsy(res.errors)
   t.deepEqual(res.data, { allProfiles: [] })
 })
 
-test.serial(`should create a Profile (${context.testNote})`, async t => {
+const checkProfile = (t, res, mutationName) => {
+  t.falsy(res.errors)
+  t.truthy(res.data[mutationName])
+  t.truthy(res.data[mutationName].id)
+  t.deepEqual(res.data[mutationName].email, 'jordan@example.com')
+  t.deepEqual(res.data[mutationName].displayname, 'Michael Jordan')
+  t.deepEqual(res.data[mutationName].pictureurl, 'http://example.com/mj.jpg')
+}
+
+test.serial(`should create a Profile with proper client role (${context.testNote})`, async t => {
   await authenticate(t, 'test-admin', 'test123')
 
-  let res = await context.helper.apolloClient.client.mutate({
-    // language=GraphQL
-    mutation: gql`
-          mutation {
-              createProfile (
-                  email: "jordan@example.com",
-                  displayName: "Michael Jordan",
-                  biography:"Nr #23!",
-                  avatarUrl:"http://example.com/mj.jpg"
-              ) {
-                  id,
-                  email,
-                  displayName,
-                  biography,
-                  avatarUrl
-              }
-          }
-      `
-  })
+  let res = await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfile'))
+
+  checkProfile(t, res, 'createProfile')
 
   t.log(res)
 
-  t.falsy(res.errors)
-  t.truthy(res.data.createProfile)
-  t.truthy(res.data.createProfile.id)
-  t.deepEqual(res.data.createProfile.email, 'jordan@example.com')
-  t.deepEqual(res.data.createProfile.displayName, 'Michael Jordan')
-  t.deepEqual(res.data.createProfile.biography, 'Nr #23!')
-  t.deepEqual(res.data.createProfile.avatarUrl, 'http://example.com/mj.jpg')
-
   const createdId = res.data.createProfile.id
 
-  res = await context.helper.apolloClient.client.query({
-    // language=GraphQL
-    query: gql`{
-        allProfiles{
-            id
-        }
-        }`
-  })
+  res = await context.helper.apolloClient.client.query(gqls.allProfiles)
   t.falsy(res.errors)
   t.truthy(res.data.allProfiles)
   t.is(res.data.allProfiles.length, 1)
   t.is(res.data.allProfiles[0].id, createdId)
+})
+
+const checkForbidden = async (t, exception) => {
+  t.truthy(exception.graphQLErrors)
+  t.is(exception.graphQLErrors[0].extensions.code, 'FORBIDDEN')
+}
+
+const checkProfileCount = async (t, count) => {
+  let res = await context.helper.apolloClient.client.query(gqls.allProfiles)
+  t.falsy(res.errors)
+  t.truthy(res.data.allProfiles)
+  t.is(res.data.allProfiles.length, count)
+}
+
+test.serial(`shouldn't create a Profile without proper client role (${context.testNote})`, async t => {
+  await authenticate(t, 'test-voter', 'test123')
+  try {
+    await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfile'))
+    t.fail('Profile was created without proper role')
+  } catch (e) {
+    await checkForbidden(t, e)
+  }
+  await checkProfileCount(t, 1)
+})
+
+test.serial(`shouldn't create a Profile without proper realm role (${context.testNote})`, async t => {
+  await authenticate(t, 'test-voter', 'test123')
+
+  try {
+    await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfileRealm'))
+    t.fail('Profile was created without proper role')
+  } catch (e) {
+    await checkForbidden(t, e)
+  }
+  await checkProfileCount(t, 1)
+})
+
+test.serial(`should create a Profile with proper realm role (${context.testNote})`, async t => {
+  await authenticate(t, 'test-realm-role', 'test123')
+
+  let res = await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfileRealm'))
+  checkProfile(t, res, 'createProfileRealm')
+
+  await checkProfileCount(t, 2)
 })

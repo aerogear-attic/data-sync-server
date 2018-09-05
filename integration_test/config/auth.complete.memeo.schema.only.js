@@ -1,45 +1,49 @@
 'use strict'
-const gql = require('graphql-tag')
-
 const time = new Date()
 const schema = {
   id: 1,
   name: 'default',
-  // language=GraphQL
-  schema: gql`
-   
-      type Profile {
-          id: ID! @isUnique
-          email: String! @isUnique
-          displayName: String!
-          biography: String!
-          avatarUrl: String!
-          memes: [Meme]!
-      }
-
-      type Meme {
-          id: ID! @isUnique
-          photoUrl: String!
-          ownerId: String!
-      }
-
-      type Query {
-          allProfiles:[Profile!]!
-          profile(email: String!):Profile
-          allMemes:[Meme!]!
-      }
-
-      type Mutation {
-          createProfile(email: String!, displayName: String!, biography: String!, avatarUrl: String!):Profile!
-          updateProfile(id: ID!, email: String!, displayName: String!, biography: String!, avatarUrl: String!):Profile
-          deleteProfile(id: ID!):Boolean!
-          createMeme(ownerId: String!, photoUrl: String!):Meme!
-      }
-
-      type Subscription {
-        memeAdded(photoUrl: String):Meme!
-      }
-
+  schema: `
+    type Profile {
+      id: ID! 
+      email: String!
+      displayname: String
+      pictureurl: String
+      memes: [Meme!]!
+    }
+    
+    type Meme {
+      id: ID!
+      photourl: String!    
+      likes: Int!
+      owner: [Profile!]!
+      comments: [Comment!]! @hasRole(role: ["admin","commentViewer" ])
+    }
+    
+    type Comment {
+      id: ID!
+      owner: String!
+      comment: String!
+    }
+    
+    type Query {
+      allMemes:[Meme!]!
+      profile(email: String!): [Profile]!
+      allProfiles:[Profile!]!
+      allComments: [Comment!]! @hasRole(role: "admin")
+    }
+    
+    type Mutation {
+      createProfile(email: String!, displayname: String!, pictureurl: String!):Profile! @hasRole(role: "admin")
+      createProfileRealm(email: String!, displayname: String!, pictureurl: String!):Profile! @hasRole(role: "realm:test")
+      createMeme(owner: ID!, photourl: String!):Meme!
+      likeMeme(id: ID!): Boolean @hasRole(role: ["voter","test"])
+      postComment(memeid: ID!, comment: String!, owner: String!): Comment!
+    }
+  
+    type Subscription {
+      memeAdded(photourl: String):Meme! @hasRole(role: "commentViewer")
+    }
     `,
   createdAt: time,
   updatedAt: time
