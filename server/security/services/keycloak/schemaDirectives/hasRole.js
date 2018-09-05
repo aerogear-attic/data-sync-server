@@ -15,6 +15,8 @@ class HasRoleDirective extends SchemaDirectiveVisitor {
     field.resolve = async function (root, args, context, info) {
       // must check for a validation error at runtime
       // to ensure an appropriate message is sent back
+      log.info(`checking user is authorized to access ${field.name} on parent ${info.parentType.name}. Must have one of [${roles}]`)
+
       if (error) {
         log.error(`Invalid hasRole directive on field ${field.name} on parent ${info.parentType.name}`, error)
         throw newInternalServerError(context)
@@ -32,6 +34,8 @@ class HasRoleDirective extends SchemaDirectiveVisitor {
         log.error({ error: AuthorizationErrorMessage, details: token.content })
         throw new ForbiddenError(AuthorizationErrorMessage)
       }
+
+      log.info(`user successfully authorized with role: ${foundRole}`)
 
       // Return appropriate error if this is false
       const result = await resolve.apply(this, [root, args, context, info])

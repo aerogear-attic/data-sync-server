@@ -15,7 +15,8 @@ test('context.auth.hasRole is called', async (t) => {
   const field = {
     resolve: (root, args, context, info) => {
       t.pass()
-    }
+    },
+    name: 'testField'
   }
 
   directive.visitFieldDefinition(field)
@@ -35,7 +36,11 @@ test('context.auth.hasRole is called', async (t) => {
       }
     }
   }
-  const info = {}
+  const info = {
+    parentType: {
+      name: 'testParent'
+    }
+  }
 
   await field.resolve(root, args, context, info)
 })
@@ -54,7 +59,8 @@ test('visitFieldDefinition accepts an array of roles', async (t) => {
   const field = {
     resolve: (root, args, context, info) => {
       t.pass()
-    }
+    },
+    name: 'testField'
   }
 
   directive.visitFieldDefinition(field)
@@ -74,7 +80,11 @@ test('visitFieldDefinition accepts an array of roles', async (t) => {
       }
     }
   }
-  const info = {}
+  const info = {
+    parentType: {
+      name: 'testParent'
+    }
+  }
 
   await field.resolve(root, args, context, info)
 })
