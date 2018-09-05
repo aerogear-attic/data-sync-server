@@ -67,7 +67,7 @@ const checkProfile = (t, res, mutationName) => {
   t.deepEqual(res.data[mutationName].pictureurl, 'http://example.com/mj.jpg')
 }
 
-test.serial(`should create a Profile with proper client role (${context.testNote})`, async t => {
+test.serial(`should create a Profile ( with proper client role (${context.testNote})`, async t => {
   await authenticate(t, 'test-admin', 'test123')
 
   let res = await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfile'))
@@ -85,7 +85,7 @@ test.serial(`should create a Profile with proper client role (${context.testNote
   t.is(res.data.allProfiles[0].id, createdId)
 })
 
-const checkForbidden = async (t, exception) => {
+const checkForbidden = (t, exception) => {
   t.truthy(exception.graphQLErrors)
   t.is(exception.graphQLErrors[0].extensions.code, 'FORBIDDEN')
 }
@@ -103,7 +103,7 @@ test.serial(`shouldn't create a Profile without proper client role (${context.te
     await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfile'))
     t.fail('Profile was created without proper role')
   } catch (e) {
-    await checkForbidden(t, e)
+    checkForbidden(t, e)
   }
   await checkProfileCount(t, 1)
 })
@@ -115,7 +115,7 @@ test.serial(`shouldn't create a Profile without proper realm role (${context.tes
     await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfileRealm'))
     t.fail('Profile was created without proper role')
   } catch (e) {
-    await checkForbidden(t, e)
+    checkForbidden(t, e)
   }
   await checkProfileCount(t, 1)
 })
@@ -127,4 +127,47 @@ test.serial(`should create a Profile with proper realm role (${context.testNote}
   checkProfile(t, res, 'createProfileRealm')
 
   await checkProfileCount(t, 2)
+})
+
+const createMeme = async t => {
+  const meme = await context.helper.apolloClient.client.mutate(gqls.createMeme(1))
+  t.truthy(meme.data.createMeme.id)
+  return meme
+}
+
+test.serial(`should be able to like a meme with proper role (hasRole array-check) (${context.testNote})`, async t => {
+  const likeAndCheckCount = async () => {
+    const meme = await createMeme(t)
+
+    let likeCount = meme.data.createMeme.likes
+    await context.helper.apolloClient.client.mutate(gqls.likeMeme(meme.data.createMeme.id))
+
+    let memes = await context.helper.apolloClient.client.query(gqls.allMemes(false))
+    const newMeme = memes.data.allMemes.filter(m => m.id === meme.data.createMeme.id)[0]
+    t.truthy(newMeme)
+    t.is(newMeme.likes, likeCount + 1)
+  }
+
+  await authenticate(t, 'test-voter', 'test123')
+  await likeAndCheckCount()
+
+  await authenticate(t, 'test-voter2', 'test123')
+  await likeAndCheckCount()
+})
+
+test.serial(`shouldn't be able to like a meme without proper role (hasRole array-check) (${context.testNote})`, async t => {
+  await authenticate(t, 'test-norole', 'test123')
+  const meme = await createMeme(t)
+
+  let likeCount = meme.data.createMeme.likes
+  try {
+    await context.helper.apolloClient.client.mutate(gqls.likeMeme(meme.data.createMeme.id))
+    t.fail('Meme was created without proper role')
+  } catch (e) {
+    checkForbidden(t, e)
+    let memes = await context.helper.apolloClient.client.query(gqls.allMemes(false))
+    const newMeme = memes.data.allMemes.filter(m => m.id === meme.data.createMeme.id)[0]
+    t.truthy(newMeme)
+    t.is(newMeme.likes, likeCount)
+  }
 })

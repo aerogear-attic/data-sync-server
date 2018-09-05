@@ -36,7 +36,7 @@ const schema = {
     type Mutation {
       createProfile(email: String!, displayname: String!, pictureurl: String!):Profile! @hasRole(role: "admin")
       createProfileRealm(email: String!, displayname: String!, pictureurl: String!):Profile! @hasRole(role: "realm:test")
-      createMeme(owner: ID!, photourl: String!):Meme!
+      createMeme(owner: ID!, photourl: String!):Meme! 
       likeMeme(id: ID!): Boolean @hasRole(role: ["voter","test"])
       postComment(memeid: ID!, comment: String!, owner: String!): Comment!
     }
