@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer')
 
 async function authenticateKeycloak (username, password) {
   const browser = await puppeteer.launch()
-  const page = await browser.newPage()
+  const page = await browser.newPage({args: ['--no-sandbox', '--disable-setuid-sandbox']})
 
   async function loginProcess () {
     await page.goto('http://localhost:8000/token')
