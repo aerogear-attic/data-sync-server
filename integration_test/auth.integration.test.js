@@ -206,3 +206,33 @@ test.serial(`querying all comments without proper role (query hasRole check) (${
     checkForbidden(t, e)
   }
 })
+
+test.serial(`query allMemes without field protected by hasRole (${context.testNote})`, async t => {
+  await authenticate(t, 'test-norole', 'test123')
+
+  const res = await context.helper.apolloClient.client.query(gqls.allMemes(false))
+  t.truthy(res.data.allMemes)
+  if (res.data.allMemes.length === 0) {
+    t.fail('allMemes field is empty, there should be some meme created')
+  }
+})
+
+test.serial(`query allMemes with field protected by hasRole and invalid role (${context.testNote})`, async t => {
+  await authenticate(t, 'test-norole', 'test123')
+  try {
+    await context.helper.apolloClient.client.query(gqls.allMemes(true))
+    t.fail('query should be denied for this role')
+  } catch (e) {
+    checkForbidden(t, e)
+  }
+})
+
+test.serial(`query allMemes with field protected by hasRole and valid role (${context.testNote})`, async t => {
+  await authenticate(t, 'test-admin', 'test123')
+  const res = await context.helper.apolloClient.client.query(gqls.allMemes(true))
+  t.truthy(res.data.allMemes)
+  if (res.data.allMemes.length === 0) {
+    t.fail('allMemes field is empty, there should be some meme created')
+  }
+  t.truthy(res.data.allMemes[0].comments, 'Field doesn\'t contain comments')
+})

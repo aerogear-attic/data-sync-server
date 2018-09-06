@@ -55,7 +55,7 @@ module.exports.createMeme = (owner) => {
 }
 
 module.exports.allMemes = (withComments) => {
-  const comments = withComments ? ',comments' : ''
+  const comments = withComments ? ',comments { id, comment }' : ''
   return {
     query: gql`
         query {
