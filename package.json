@@ -1,6 +1,6 @@
 {
   "name": "data-sync-server",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "GraphQL based server for syncing data between clients",
   "repository": {
     "type": "git",
