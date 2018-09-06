@@ -111,7 +111,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: npm run release:validate
+      - run: TAG=$CIRCLE_TAG npm run release:validate
       - run: npm run docker:build:release
       - run: npm run docker:push:release
 
