@@ -10,7 +10,7 @@ const context = {
 
 async function authenticate (test, username, password) {
   test.log(`Authenticating as ${username}`)
-  const authHeaders = await auth.authenticateKeycloak(username, password)
+  const authHeaders = await auth.authenticateKeycloak(context.keycloakConfig, username, password)
   context.helper.resetApolloClient(authHeaders)
   test.log(`Authenticated as ${username}`)
 }

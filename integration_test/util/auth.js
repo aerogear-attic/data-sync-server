@@ -1,35 +1,12 @@
-const puppeteer = require('puppeteer')
+const axios = require('axios')
 
-async function authenticateKeycloak (username, password) {
-  const browser = await puppeteer.launch()
-  const page = await browser.newPage({args: ['--no-sandbox', '--disable-setuid-sandbox']})
-
-  async function loginProcess () {
-    await page.goto('http://localhost:8000/token')
-    await page.type('input#username', username)
-    await page.type('input#password', password)
-    await page.click('input#kc-login')
-  }
-
-  const [authData] = await Promise.all([
-    new Promise(resolve =>
-      page.on('response', async response => {
-        const url = response.request().url()
-        if (url && url.includes('/token')) {
-          try {
-            const body = await response.text()
-            resolve(JSON.parse(body))
-          } catch (e) {
-            // do nothing here, first call doesn't have JSON
-          }
-        }
-      })
-    ),
-    loginProcess()
-  ])
-
-  await browser.close()
-  return authData
+async function authenticateKeycloak (config, username, password) {
+  const res = await axios({
+    method: 'post',
+    url: `${config['auth-server-url']}/realms/${config.realm}/protocol/openid-connect/token`,
+    data: `client_id=${config.resource}&username=${username}&password=${password}&grant_type=password`
+  })
+  return { Authorization: `Bearer ${res.data['access_token']}` }
 }
 
-module.exports = { authenticateKeycloak: authenticateKeycloak }
+module.exports = { authenticateKeycloak }
