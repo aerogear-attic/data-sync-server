@@ -96,3 +96,14 @@ module.exports.postComment = (memeid, comment, owner) => {
         `
   }
 }
+
+module.exports.allComments = {
+  // language=GraphQL
+  query: gql`  
+    query {
+        allComments {
+            id
+            comment
+        }
+    }
+    `}

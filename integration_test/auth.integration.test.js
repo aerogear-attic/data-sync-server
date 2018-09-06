@@ -67,7 +67,7 @@ const checkProfile = (t, res, mutationName) => {
   t.deepEqual(res.data[mutationName].pictureurl, 'http://example.com/mj.jpg')
 }
 
-test.serial(`should create a Profile ( with proper client role (${context.testNote})`, async t => {
+test.serial(`should create a Profile  with proper client role  (mutation client hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-admin', 'test123')
 
   let res = await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfile'))
@@ -97,7 +97,7 @@ const checkProfileCount = async (t, count) => {
   t.is(res.data.allProfiles.length, count)
 }
 
-test.serial(`shouldn't create a Profile without proper client role (${context.testNote})`, async t => {
+test.serial(`shouldn't create a Profile without proper client role (mutation client hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-voter', 'test123')
   try {
     await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfile'))
@@ -108,7 +108,7 @@ test.serial(`shouldn't create a Profile without proper client role (${context.te
   await checkProfileCount(t, 1)
 })
 
-test.serial(`shouldn't create a Profile without proper realm role (${context.testNote})`, async t => {
+test.serial(`shouldn't create a Profile without proper realm role (mutation realm hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-voter', 'test123')
 
   try {
@@ -120,7 +120,7 @@ test.serial(`shouldn't create a Profile without proper realm role (${context.tes
   await checkProfileCount(t, 1)
 })
 
-test.serial(`should create a Profile with proper realm role (${context.testNote})`, async t => {
+test.serial(`should create a Profile with proper realm role (mutation realm hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-realm-role', 'test123')
 
   let res = await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfileRealm'))
@@ -169,5 +169,40 @@ test.serial(`shouldn't be able to like a meme without proper role (hasRole array
     const newMeme = memes.data.allMemes.filter(m => m.id === meme.data.createMeme.id)[0]
     t.truthy(newMeme)
     t.is(newMeme.likes, likeCount)
+  }
+})
+
+test.serial(`querying all comments with proper role (query hasRole check) (${context.testNote})`, async t => {
+  await authenticate(t, 'test-admin', 'test123')
+  const meme = await createMeme(t)
+
+  let text = 'Lorem ipsum'
+  const comment1 = await context.helper.apolloClient.client.mutate(gqls.postComment(meme.data.createMeme.id, text, 1))
+  t.truthy(comment1.data)
+  t.falsy(comment1.errors)
+  t.is(comment1.data.postComment.comment, text)
+
+  text = 'Lorem ipsum2'
+  const comment2 = await context.helper.apolloClient.client.mutate(gqls.postComment(meme.data.createMeme.id, text, 1))
+  t.truthy(comment2.data)
+  t.falsy(comment2.errors)
+  t.is(comment2.data.postComment.comment, text)
+  const res = await context.helper.apolloClient.client.query(gqls.allComments)
+
+  t.falsy(res.errors)
+  t.truthy(res.data.allComments)
+
+  const filtered = res.data.allComments.filter(c => (c.id === comment1.data.postComment.id || c.id === comment2.data.postComment.id))
+  t.is(filtered.length, 2)
+})
+
+test.serial(`querying all comments without proper role (query hasRole check) (${context.testNote})`, async t => {
+  await authenticate(t, 'test-norole', 'test123')
+
+  try {
+    await context.helper.apolloClient.client.query(gqls.allComments)
+    t.fail('allComments shouldn\'t be able to query with this role')
+  } catch (e) {
+    checkForbidden(t, e)
   }
 })
