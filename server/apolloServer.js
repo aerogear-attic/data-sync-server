@@ -16,9 +16,9 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, gr
       queryDepthLimit(serverSecurity.queryDepthLimit),
       createComplexityLimitRule(serverSecurity.complexityLimit, {
         formatErrorMessage: (cost) => {
-          const queryLog = 'query with cost ' + cost + ' exceeds complexity limit'
-          log.warn(queryLog)
-          return queryLog
+          const errorMessage = `query with ${cost} exceeds complexity limit`
+          log.warn(errorMessage)
+          return errorMessage
         }
       })
     ],
