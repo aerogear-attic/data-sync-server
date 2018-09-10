@@ -1,0 +1,7 @@
+{
+    "realm": "sync-integration-test",
+    "auth-server-url": "https://keycloak.security.feedhenry.org/auth",
+    "ssl-required": "external",
+    "resource": "sync-server-test",
+    "public-client": true
+  }
