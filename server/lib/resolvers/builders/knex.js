@@ -10,13 +10,6 @@ function buildKnexResolver (dataSource, compiledRequestMapping, compiledResponse
       const requestTimeStart = Date.now()
       info['dataSourceType'] = dataSource.type
 
-      // const queryString = compiledRequestMapping({
-      //   context: {
-      //     arguments: args,
-      //     parent: obj
-      //   }
-      // })
-
       const sandbox = {
         db: dataSourceClient,
         arguments: args,
@@ -27,8 +20,6 @@ function buildKnexResolver (dataSource, compiledRequestMapping, compiledResponse
         sandbox
       })
 
-      // const script = new VMScript(compiledRequestMapping)
-
       // result is whatever is implicitly returned from the script
       // in this case it will be the query builder object from knex
       const query = vm.run(compiledRequestMapping)
@@ -38,6 +29,7 @@ function buildKnexResolver (dataSource, compiledRequestMapping, compiledResponse
         log.info({ msg: 'result from knex', result })
 
         if (isEmpty(compiledResponseMapping)) {
+          auditLog(true, context.request, info, obj, args, null)
           return resolve(result)
         }
 
@@ -51,7 +43,6 @@ function buildKnexResolver (dataSource, compiledRequestMapping, compiledResponse
 
         auditLog(true, context.request, info, obj, args, null)
 
-        // const responseScript = new VMScript(compiledResponseMapping)
         return resolve(responsevm.run(compiledResponseMapping))
       }).catch((error) => {
         log.error({ msg: 'error from knex', error })
