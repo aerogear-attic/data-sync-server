@@ -103,7 +103,7 @@ class DataSyncServer {
   newServer () {
     // Initialize an express app, apply the apollo middleware, and mount the app to the http server
     this.app = newExpressApp(this.serverConfig.expressAppOptions, this.serverConfig.expressAppMiddlewares, this.serverConfig.securityService)
-    this.apolloServer = newApolloServer(this.app, this.schema, this.server, this.serverConfig.tracing, this.serverConfig.playgroundConfig, this.serverConfig.graphQLConfig.graphqlEndpoint, this.serverConfig.securityService, this.serverConfig.serverSecurity)
+    this.apolloServer = newApolloServer(this.app, this.schema, this.server, this.serverConfig.graphQLConfig.tracing, this.serverConfig.playgroundConfig, this.serverConfig.graphQLConfig.graphqlEndpoint, this.serverConfig.securityService, this.serverConfig.serverSecurity)
     this.server.on('request', this.app)
   }
 
