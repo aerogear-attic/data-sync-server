@@ -83,6 +83,7 @@
     "joi": "^13.6.0",
     "json-parse-safe": "^1.0.5",
     "keycloak-connect": "^4.2.1",
+    "knex": "^0.15.2",
     "lodash": "^4.17.10",
     "nedb": "^1.8.0",
     "pg": "^7.4.3",
@@ -92,7 +93,8 @@
     "sequelize": "^4.38.0",
     "sequelize-cli": "^4.0.0",
     "subscriptions-transport-ws": "^0.9.11",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "vm2": "^3.6.3"
   },
   "pre-commit": [
     "lint",

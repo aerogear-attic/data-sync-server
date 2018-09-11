@@ -1,5 +1,6 @@
 const Handlebars = require('handlebars')
 const { log } = require('../util/logger')
+const { VMScript } = require('vm2')
 
 Handlebars.registerHelper('toJSON', function (json) {
   return new Handlebars.SafeString(JSON.stringify(json))
@@ -23,7 +24,7 @@ Handlebars.registerHelper('convertNeDBIds', function (json) {
   return json
 })
 
-function compile (template) {
+function compileTemplate (template) {
   // use Handlebars.precompile to fail early during initialization
   const noEscape = true
   try {
@@ -37,6 +38,18 @@ function compile (template) {
   return Handlebars.compile(template, { noEscape })
 }
 
+function compileScript (code) {
+  try {
+    const script = new VMScript(code)
+    return script.compile()
+  } catch (error) {
+    log.error({message: `error compiling javascript`, script: code})
+    log.error(error)
+    throw (error)
+  }
+}
+
 module.exports = {
-  compile
+  compileTemplate,
+  compileScript
 }

@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const axios = require('axios')
 const resolverBuilders = require('./builders')
-const { compile } = require('./compiler')
+const { compileScript, compileTemplate } = require('./compiler')
 const { wrapResolverWithPublish } = require('./wrapResolverWithPublisher')
 const { wrapResolverWithHooks } = require('./wrapResolverWithHooks')
 
@@ -24,7 +24,7 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
     }
 
     if (_.isEmpty(resolverMapping.responseMapping)) {
-      throw new Error('Missing response mapping for mapping: ' + resolverMappingName)
+      // throw new Error('Missing response mapping for mapping: ' + resolverMappingName)
     }
 
     if (!(resolverMapping.DataSource.name in dataSources)) {
@@ -42,8 +42,22 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
       throw new Error(`Resolver builder for ${dataSource.type} missing buildResolver function`)
     }
 
-    const compiledRequestMapping = compile(resolverMapping.requestMapping)
-    const compiledResponseMapping = compile(resolverMapping.responseMapping)
+    const compile = (dataSource.type === 'Postgres') ? compileScript : compileTemplate
+
+    let compiledRequestMapping
+    let compiledResponseMapping
+
+    try {
+      compiledRequestMapping = compile(resolverMapping.requestMapping)
+    } catch (error) {
+      throw new Error(`error compiling request mapping for resolver ${resolverMappingName}`)
+    }
+
+    try {
+      compiledResponseMapping = (!_.isEmpty(resolverMapping.responseMapping)) ? compile(resolverMapping.responseMapping) : null
+    } catch (error) {
+      throw new Error(`error compiling response mapping for resolver ${resolverMappingName}`)
+    }
 
     // This is the actual resolver function
     let resolver = builder.buildResolver(
