@@ -4,15 +4,11 @@ const { log } = require('../../util/logger')
 const type = 'Postgres'
 
 function KnexDataSource (config = {}) {
-  // Node Postgres lib recommends using `Pool`s instead of clients
-  // to handle auto reconnect, even though the program needs only 1 client
   let db
 
   this.type = type
 
   this.connect = async () => {
-    // in case of a schema/resolver building error, we will reconnect the existing data sources
-    // thus, check if the data source is already connected first
     if (!db) {
       db = knex({
         client: 'pg',

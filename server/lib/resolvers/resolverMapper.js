@@ -23,9 +23,9 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
       throw new Error('Missing request mapping for mapping: ' + resolverMappingName)
     }
 
-    if (_.isEmpty(resolverMapping.responseMapping)) {
-      // throw new Error('Missing response mapping for mapping: ' + resolverMappingName)
-    }
+    // if (_.isEmpty(resolverMapping.responseMapping)) {
+    //   throw new Error('Missing response mapping for mapping: ' + resolverMappingName)
+    // }
 
     if (!(resolverMapping.DataSource.name in dataSources)) {
       throw new Error('Unknown data source "' + resolverMapping.DataSource.name + '" for mapping ' + resolverMappingName)
