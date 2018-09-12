@@ -2,9 +2,18 @@ const _ = require('lodash')
 
 const schemaParser = require('./lib/schemaParser')
 const emptySchemaString = require('./lib/util/emptySchema')
+const dataSourceParser = require('./lib/datasources/dataSourceParser')
 const { log } = require('./lib/util/logger')
 
-async function buildSchema (models, pubsub, schemaDirectives) {
+async function buildDataSources (models) {
+  let dataSourcesJson = await models.DataSource.findAll({raw: true})
+  dataSourcesJson = (!_.isEmpty(dataSourcesJson)) ? dataSourcesJson : {}
+
+  const dataSources = dataSourceParser(dataSourcesJson)
+  return dataSources
+}
+
+async function buildSchema (models, pubsub, dataSources, schemaDirectives) {
   const graphQLSchemas = await models.GraphQLSchema.findAll()
   let graphQLSchemaString = null
 
@@ -22,7 +31,6 @@ async function buildSchema (models, pubsub, schemaDirectives) {
     }
   }
 
-  let dataSourcesJson = await models.DataSource.findAll({raw: true})
   const subscriptionsJson = await models.Subscription.findAll({raw: true})
 
   const resolvers = await models.Resolver.findAll({
@@ -32,14 +40,14 @@ async function buildSchema (models, pubsub, schemaDirectives) {
     return resolver.toJSON()
   })
 
-  if (_.isEmpty(graphQLSchemaString) || _.isEmpty(dataSourcesJson) || _.isEmpty(resolversJson)) {
+  if (_.isEmpty(graphQLSchemaString) || _.isEmpty(resolversJson)) {
     log.warn('At least one of schema, dataSources or resolvers is missing. Using noop defaults')
     graphQLSchemaString = emptySchemaString
-    resolversJson = dataSourcesJson = {}
+    resolversJson = {}
   }
 
   try {
-    return schemaParser(graphQLSchemaString, dataSourcesJson, resolversJson, subscriptionsJson, pubsub, schemaDirectives)
+    return schemaParser(graphQLSchemaString, dataSources, resolversJson, subscriptionsJson, pubsub, schemaDirectives)
   } catch (error) {
     log.error('Error while building schema.')
     log.error(error)
@@ -47,4 +55,7 @@ async function buildSchema (models, pubsub, schemaDirectives) {
   }
 }
 
-module.exports = buildSchema
+module.exports = {
+  buildSchema,
+  buildDataSources
+}

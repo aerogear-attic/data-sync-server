@@ -28,8 +28,8 @@ const resolvers = [
     field: 'owner',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `SELECT * FROM profile WHERE id='{{context.parent.owner}}' ORDER BY id DESC`,
-    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    requestMapping: `return db.select().from('profile').where('id', resolve.parent.owner)`,
+    responseMapping: '',
     createdAt: time,
     updatedAt: time
   },
@@ -38,8 +38,8 @@ const resolvers = [
     field: 'comments',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `SELECT * FROM comment WHERE memeid='{{context.parent.id}}' ORDER BY id DESC`,
-    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    requestMapping: `return db.select().from('comment').where('memeid', resolve.parent.id)`,
+    responseMapping: '',
     createdAt: time,
     updatedAt: time
   },
@@ -48,8 +48,8 @@ const resolvers = [
     field: 'memes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `SELECT * FROM meme WHERE owner='{{context.parent.id}}' ORDER BY id DESC`,
-    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    requestMapping: `return db.select().from('meme').where('owner', resolve.parent.id)`,
+    responseMapping: '',
     createdAt: time,
     updatedAt: time
   },
@@ -58,8 +58,8 @@ const resolvers = [
     field: 'allMemes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: 'SELECT * FROM meme ORDER BY id DESC',
-    responseMapping: '{{ toJSON context.result }}',
+    requestMapping: `return db.select().from('meme').orderBy('id', 'desc')`,
+    responseMapping: '',
     createdAt: time,
     updatedAt: time
   },
@@ -68,8 +68,8 @@ const resolvers = [
     field: 'profile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `SELECT * FROM profile WHERE email='{{context.arguments.email}}'`,
-    responseMapping: '{{ toJSON context.result }}',
+    requestMapping: `return db.select().from('profile').where('email', resolve.args.email)`,
+    responseMapping: 'result[0]',
     createdAt: time,
     updatedAt: time
   },
@@ -78,8 +78,15 @@ const resolvers = [
     field: 'createMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `INSERT INTO meme ("owner","photourl", "likes") VALUES ('{{context.arguments.owner}}','{{context.arguments.photourl}}', 0) RETURNING *;`,
-    responseMapping: '{{ toJSON context.result.[0] }}',
+    requestMapping: `let meme = {
+  owner: resolve.args.owner,
+  photourl: resolve.args.photourl,
+  likes: 0
+}
+
+return db('meme').insert(meme).returning('*')
+    `,
+    responseMapping: 'result[0]',
     publish: JSON.stringify({
       topic: 'memeCreated',
       payload: `{
@@ -94,8 +101,17 @@ const resolvers = [
     field: 'createProfile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `INSERT INTO profile ("email", "displayname", "pictureurl") VALUES ('{{context.arguments.email}}','{{context.arguments.displayname}}','{{context.arguments.pictureurl}}') RETURNING *;`,
-    responseMapping: '{{ toJSON context.result.[0] }}',
+    requestMapping: `let profile = {
+  email: resolve.args.email,
+  displayname: resolve.args.displayname,
+  pictureurl: resolve.args.pictureurl
+}
+
+return db('profile').insert(profile).returning('*').then((rows) => {
+  return rows[0]
+})
+    `,
+    responseMapping: '',
     createdAt: time,
     updatedAt: time
   },
@@ -104,7 +120,7 @@ const resolvers = [
     field: 'likeMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `UPDATE meme SET likes=likes+1 WHERE id={{context.arguments.id}} RETURNING *;`,
+    requestMapping: `return db('meme').where('id', resolve.args.id).increment('likes', 1)`,
     responseMapping: 'true',
     createdAt: time,
     updatedAt: time
@@ -113,8 +129,15 @@ const resolvers = [
     field: 'postComment',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `INSERT INTO comment ("comment", "owner", "memeid") VALUES ('{{context.arguments.comment}}','{{context.arguments.owner}}','{{context.arguments.memeid}}') RETURNING *;`,
-    responseMapping: '{{ toJSON context.result.[0] }}',
+    requestMapping: `let comment = {
+  comment: resolve.args.comment,
+  owner: resolve.args.owner,
+  memeid: resolve.args.memeid
+}
+
+return db('comment').insert(comment).returning('*')
+`,
+    responseMapping: 'result[0]',
     createdAt: time,
     updatedAt: time
   }

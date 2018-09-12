@@ -1,4 +1,4 @@
-const { compile } = require('./compiler')
+const { compileTemplate } = require('./compiler')
 const { log } = require('../util/logger')
 const JSONParse = require('json-parse-safe')
 
@@ -20,7 +20,7 @@ function wrapResolverWithDefaultPublish (resolver, resolverMapping, pubsub) {
   }
 
   const topic = resolverMapping.publish
-  const compiledPayload = compile(getDefaultPayload(topic))
+  const compiledPayload = compileTemplate(getDefaultPayload(topic))
 
   const publishOpts = {
     topic,
@@ -45,7 +45,7 @@ function wrapResolverWithCustomPublish (resolver, resolverMapping, pubsub) {
 
   const publishOpts = {
     topic,
-    compiledPayload: compile(payload)
+    compiledPayload: compileTemplate(payload)
   }
   return resolveAndPublish(resolver, pubsub, publishOpts)
 }

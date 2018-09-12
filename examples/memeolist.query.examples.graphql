@@ -31,22 +31,8 @@ mutation createMeme {
   }
 }
 
-subscription memeAdded {
-  memeAdded {
-    id
-    photourl
-    likes
-    owner {
-      id
-      displayname
-      email
-      pictureurl
-    }
-  }
-}
-
 mutation postComment {
-  postComment(memeid: "Fha32ppqLNWEfX3b", comment: "Like it", owner: "Wojtek") {
+  postComment(memeid: "1", comment: "Like it", owner: "Wojtek") {
     id
     comment
     owner
@@ -54,7 +40,7 @@ mutation postComment {
 }
 
 mutation likeMeme {
-  likeMeme(id: "Fha32ppqLNWEfX3b")
+  likeMeme(id: "1")
 }
 
 ## Profile section
@@ -81,5 +67,11 @@ subscription memeAdded {
     id
     photourl
     likes
+    owner {
+      id
+      displayname
+      email
+      pictureurl
+    }
   }
 }
