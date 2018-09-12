@@ -68,7 +68,7 @@ const resolvers = [
     field: 'profile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `return db.select().from('profile').where('email', arguments.email)`,
+    requestMapping: `return db.select().from('profile').where('email', resolve.args.email)`,
     responseMapping: 'result[0]',
     createdAt: time,
     updatedAt: time
@@ -79,8 +79,8 @@ const resolvers = [
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `let meme = {
-  owner: arguments.owner,
-  photourl: arguments.photourl,
+  owner: resolve.args.owner,
+  photourl: resolve.args.photourl,
   likes: 0
 }
 
@@ -102,9 +102,9 @@ return db('meme').insert(meme).returning('*')
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `let profile = {
-  email: arguments.email,
-  displayname: arguments.displayname,
-  pictureurl: arguments.pictureurl
+  email: resolve.args.email,
+  displayname: resolve.args.displayname,
+  pictureurl: resolve.args.pictureurl
 }
 
 return db('profile').insert(profile).returning('*').then((rows) => {
@@ -120,7 +120,7 @@ return db('profile').insert(profile).returning('*').then((rows) => {
     field: 'likeMeme',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `return db('meme').where('id', arguments.id).increment('likes', 1)`,
+    requestMapping: `return db('meme').where('id', resolve.args.id).increment('likes', 1)`,
     responseMapping: 'true',
     createdAt: time,
     updatedAt: time
@@ -130,9 +130,9 @@ return db('profile').insert(profile).returning('*').then((rows) => {
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `let comment = {
-  comment: arguments.comment,
-  owner: arguments.owner,
-  memeid: arguments.memeid
+  comment: resolve.args.comment,
+  owner: resolve.args.owner,
+  memeid: resolve.args.memeid
 }
 
 return db('comment').insert(comment).returning('*')

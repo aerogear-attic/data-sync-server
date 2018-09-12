@@ -41,7 +41,7 @@ function compileTemplate (template) {
 function compileScript (userCodeFragment) {
   try {
     const code = `(function () {
-return function customResolverScript(context) {
+return function customResolverScript(resolve) {
   ${userCodeFragment}
   }
 })()`

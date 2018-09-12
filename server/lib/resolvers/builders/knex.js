@@ -22,12 +22,14 @@ function buildKnexResolver (dataSource, compiledRequestMapping, compiledResponse
       const requestTimeStart = Date.now()
       info['dataSourceType'] = dataSource.type
 
-      const context = {
-        args: args,
-        parent: obj
+      const resolveArgs = {
+        parent: obj,
+        args,
+        info,
+        context
       }
 
-      const query = userResolverFunction(context)
+      const query = userResolverFunction(resolveArgs)
 
       // result is whatever is implicitly returned from the script
       // in this case it will be the query builder object from knex
