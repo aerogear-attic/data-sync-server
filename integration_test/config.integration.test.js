@@ -1,4 +1,4 @@
-const {test} = require('ava')
+const { test } = require('ava')
 const gql = require('graphql-tag')
 
 let helper
@@ -52,7 +52,7 @@ test.serial('should pick up config changes', async t => {
     query: gql`{ listNotes {id} }`
   })
 
-  t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
+  t.deepEqual(res.data, { listNotes: [] }) // no data since no mutation is executed
 })
 
 test.serial('should use prev config when there is a schema syntax problem with the new config', async t => {
@@ -70,7 +70,7 @@ test.serial('should use prev config when there is a schema syntax problem with t
     query: gql`{ listNotes {id} }`
   })
 
-  t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
+  t.deepEqual(res.data, { listNotes: [] }) // no data since no mutation is executed
 })
 
 test.serial('should use prev config when there is a resolver not in the new schema', async t => {
@@ -108,13 +108,13 @@ test.serial('should return null when executing a query with missing resolver', a
     query: gql`{ listNotes {id} }`
   })
 
-  t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
+  t.deepEqual(res.data, { listNotes: [] }) // no data since no mutation is executed
 
   res = await helper.apolloClient.client.query({
     query: gql`{ foo }`
   })
 
-  t.deepEqual(res.data, {foo: null})
+  t.deepEqual(res.data, { foo: null })
 })
 
 test.serial('should return error when calling a query that does not exist', async t => {
@@ -127,7 +127,7 @@ test.serial('should return error when calling a query that does not exist', asyn
     query: gql`{ listNotes {id} }`
   })
 
-  t.deepEqual(res.data, {listNotes: []}) // no data since no mutation is executed
+  t.deepEqual(res.data, { listNotes: [] }) // no data since no mutation is executed
 
   const query = helper.apolloClient.client.query({
     query: gql`{ FOO }`

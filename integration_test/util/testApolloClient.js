@@ -8,8 +8,8 @@ const { ApolloClient } = require('apollo-client')
 const { InMemoryCache } = require('apollo-cache-inmemory')
 
 class TestApolloClient {
-  constructor (host = 'localhost:8000') {
-    this.client = createApolloClient(host)
+  constructor (host = 'localhost:8000', authHeaders) {
+    this.client = createApolloClient(host, authHeaders)
   }
 
   subscribe (query, timeout = 3000) {
@@ -27,12 +27,15 @@ class TestApolloClient {
 
 module.exports = TestApolloClient
 
-function createApolloClient (host) {
+function createApolloClient (host, authHeaders) {
   // Create an http link:
-  const httpLink = new HttpLink({
+  const httpLinkConfig = {
     uri: `http://${host}/graphql`,
-    fetch: fetch
-  })
+    fetch: fetch,
+    headers: authHeaders
+  }
+
+  const httpLink = new HttpLink(httpLinkConfig)
 
   // Create a WebSocket link:
   const wsLink = new WebSocketLink({
