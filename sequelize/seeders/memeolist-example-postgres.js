@@ -28,7 +28,7 @@ const resolvers = [
     field: 'owner',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `return db.select().from('profile').where('id', parent.owner)`,
+    requestMapping: `return db.select().from('profile').where('id', resolve.parent.owner)`,
     responseMapping: '',
     createdAt: time,
     updatedAt: time
@@ -38,7 +38,7 @@ const resolvers = [
     field: 'comments',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `return db.select().from('comment').where('memeid', parent.id)`,
+    requestMapping: `return db.select().from('comment').where('memeid', resolve.parent.id)`,
     responseMapping: '',
     createdAt: time,
     updatedAt: time
@@ -48,7 +48,7 @@ const resolvers = [
     field: 'memes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `return db.select().from('meme').where('owner', parent.id)`,
+    requestMapping: `return db.select().from('meme').where('owner', resolve.parent.id)`,
     responseMapping: '',
     createdAt: time,
     updatedAt: time

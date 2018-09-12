@@ -115,22 +115,32 @@ class DataSyncServer {
 
   async onSchemaChangedNotification () {
     log.info('Received schema change notification. Rebuilding it')
+    let newDataSources
     let newSchema
+
     try {
-      newSchema = await buildSchema(this.models, this.pubsub, this.serverConfig.schemaDirectives)
+      newDataSources = await buildDataSources(this.models)
+      await this.connectDataSources(newDataSources)
+    } catch (ex) {
+      log.error('Error while connecting to new data sources')
+      log.error(ex)
+      log.error('Will use the old schema and the data sources')
+      return
+    }
+
+    try {
+      newSchema = await buildSchema(this.models, this.pubsub, newDataSources, this.serverConfig.schemaDirectives)
     } catch (ex) {
       log.error('Error while reloading config')
       log.error(ex)
       log.error('Will continue using the old config')
+      return
     }
 
-    if (newSchema) {
+    if (newSchema && newDataSources) {
       // first do some cleaning up
       this.apolloServer.subscriptionServer.close()
       this.server.removeListener('request', this.app)
-      // reinitialize the server objects
-      this.schema = newSchema.schema
-      this.newServer()
 
       try {
         await this.disconnectDataSources(this.dataSources) // disconnect existing ones first
@@ -140,20 +150,10 @@ class DataSyncServer {
         log.error('Will continue connecting to new ones')
       }
 
-      try {
-        await this.connectDataSources(newSchema.dataSources)
-        this.dataSources = newSchema.dataSources
-      } catch (ex) {
-        log.error('Error while connecting to new data sources')
-        log.error(ex)
-        log.error('Will use the old schema and the data sources')
-        try {
-          await this.connectDataSources(this.dataSources)
-        } catch (ex) {
-          log.error('Error while connecting to previous data sources')
-          log.error(ex)
-        }
-      }
+      // reinitialize the server objects
+      this.dataSources = newDataSources
+      this.schema = newSchema
+      this.newServer()
     }
   }
 
