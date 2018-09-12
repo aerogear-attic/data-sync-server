@@ -38,12 +38,17 @@ function compileTemplate (template) {
   return Handlebars.compile(template, { noEscape })
 }
 
-function compileScript (code) {
+function compileScript (userCodeFragment) {
   try {
-    const script = new VMScript(code)
-    return script.compile()
+    const code = `(function () {
+return function customResolverScript(context) {
+  ${userCodeFragment}
+  }
+})()`
+    const script = new VMScript(code).compile()
+    return script
   } catch (error) {
-    log.error({message: `error compiling javascript`, script: code})
+    log.error({message: `error compiling javascript`, script: userCodeFragment})
     log.error(error)
     throw (error)
   }

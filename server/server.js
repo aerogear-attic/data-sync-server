@@ -18,7 +18,7 @@ if (process.env.LOG_LEVEL) {
 }
 
 // schema
-const buildSchema = require('./buildSchema')
+const { buildSchema, buildDataSources } = require('./buildSchema')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
 
 class DataSyncServer {
@@ -73,12 +73,11 @@ class DataSyncServer {
 
     this.serverConfig = serverConfig
 
-    // generate the GraphQL Schema
-    const { schema, dataSources } = await buildSchema(this.models, this.pubsub, this.serverConfig.schemaDirectives)
-    this.schema = schema
-    this.dataSources = dataSources
-
+    this.dataSources = await buildDataSources(this.models)
     await this.connectDataSources(this.dataSources)
+
+    // generate the GraphQL Schema
+    this.schema = await buildSchema(this.models, this.pubsub, this.dataSources, this.serverConfig.schemaDirectives)
 
     this.newServer()
 
