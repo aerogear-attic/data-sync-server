@@ -1,5 +1,6 @@
 const { ApolloServer } = require('apollo-server-express')
 const queryDepthLimit = require('graphql-depth-limit')
+const { GraphQLError } = require('graphql')
 const { createComplexityLimitRule } = require('graphql-validation-complexity')
 const { log } = require('./lib/util/logger')
 
@@ -15,10 +16,10 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, gr
     validationRules: [
       queryDepthLimit(serverSecurity.queryDepthLimit),
       createComplexityLimitRule(serverSecurity.complexityLimit, {
-        formatErrorMessage: (cost) => {
-          const errorMessage = `query with ${cost} exceeds complexity limit`
-          log.warn(errorMessage)
-          return errorMessage
+        createError (cost, documentNode) {
+          const error = new GraphQLError(`query with ${cost} exceeds complexity limit`, [documentNode])
+          log.debug(error)
+          return error
         }
       })
     ],
