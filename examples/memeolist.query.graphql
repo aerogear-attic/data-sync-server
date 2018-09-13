@@ -9,11 +9,6 @@ query allMemes {
       email
       pictureurl
     }
-    comments {
-      id
-      comment
-      owner
-    }
   }
 }
 
@@ -45,11 +40,29 @@ subscription memeAdded {
   }
 }
 
-mutation postComment($memeid: ID!, $comment: String!, $owner: String!){
+query comments($memeid: ID!) {
+  comments(memeid: $memeid) {
+     id
+     comment
+     owner {
+       id
+       displayname
+       email
+       pictureurl
+     }
+  }
+}
+
+mutation postComment($memeid: ID!, $comment: String!, $owner: ID!){
   postComment(memeid: $memeid, comment: $comment, owner: $owner){
       id
       comment
-      owner
+      owner {
+        id
+        displayname
+        email
+        pictureurl
+      }
   }
 }
 

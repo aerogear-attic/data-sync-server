@@ -28,23 +28,23 @@ const resolvers = [
     updatedAt: time
   },
   {
-    type: 'Meme',
-    field: 'comments',
-    DataSourceId: 1,
-    GraphQLSchemaId: 1,
-    requestMapping: `{"operation": "find", "query": 
-                    {"_type":"comment", "memeid": "{{context.parent.id}}"}}`,
-    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
-    createdAt: time,
-    updatedAt: time
-  },
-  {
     type: 'Profile',
     field: 'memes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `{"operation": "find", "query": 
                     {"_type":"meme", "owner": "{{context.parent.id}}"}}`,
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Comment',
+    field: 'owner',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `{"operation": "find", "query": 
+                    {"_type":"profile", "id": "{{context.parent.owner}}"}}`,
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time
@@ -67,6 +67,16 @@ const resolvers = [
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: '{"operation": "find", "query": {"_type":"profile", "email": "{{context.arguments.email}}" }}',
+    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Query',
+    field: 'comments',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: '{"operation": "find", "query": {"_type":"comment", "memeid": "{{context.arguments.memeid}}" }}',
     responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
     createdAt: time,
     updatedAt: time

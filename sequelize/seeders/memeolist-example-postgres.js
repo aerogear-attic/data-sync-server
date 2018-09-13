@@ -29,17 +29,7 @@ const resolvers = [
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `SELECT * FROM profile WHERE id='{{context.parent.owner}}' ORDER BY id DESC`,
-    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
-    createdAt: time,
-    updatedAt: time
-  },
-  {
-    type: 'Meme',
-    field: 'comments',
-    DataSourceId: 1,
-    GraphQLSchemaId: 1,
-    requestMapping: `SELECT * FROM comment WHERE memeid='{{context.parent.id}}' ORDER BY id DESC`,
-    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
     updatedAt: time
   },
@@ -49,7 +39,17 @@ const resolvers = [
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `SELECT * FROM meme WHERE owner='{{context.parent.id}}' ORDER BY id DESC`,
-    responseMapping: '{{ toJSON (convertNeDBIds context.result) }}',
+    responseMapping: '{{ toJSON context.result }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Comment',
+    field: 'owner',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `SELECT * FROM profile WHERE id='{{context.parent.owner}}' ORDER BY id DESC`,
+    responseMapping: '{{ toJSON context.result.[0] }}',
     createdAt: time,
     updatedAt: time
   },
@@ -69,6 +69,16 @@ const resolvers = [
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `SELECT * FROM profile WHERE email='{{context.arguments.email}}'`,
+    responseMapping: '{{ toJSON context.result }}',
+    createdAt: time,
+    updatedAt: time
+  },
+  {
+    type: 'Query',
+    field: 'comments',
+    DataSourceId: 1,
+    GraphQLSchemaId: 1,
+    requestMapping: `SELECT * FROM comment WHERE memeid='{{context.arguments.memeid}}' ORDER BY id DESC`,
     responseMapping: '{{ toJSON context.result }}',
     createdAt: time,
     updatedAt: time
