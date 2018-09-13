@@ -2,12 +2,12 @@ const { test } = require('ava')
 const auth = require('./util/auth')
 const axios = require('axios')
 const gqls = require('./auth.integration.test.gql')
-const pino = require('pino')()
+const localKeycloak = require('./auth.integration.test.keycloak')
 
 const context = {
   helper: undefined,
   testNote: 'auth, inmem',
-  testPassword: process.env.KEYCLOAK_TEST_USER_PASSWORD
+  testPassword: 'admin'
 }
 
 async function authenticate (test, username, password) {
@@ -17,16 +17,11 @@ async function authenticate (test, username, password) {
   test.log(`Authenticated as ${username}`)
 }
 
-test.serialOrSkip = (name, t) => {
-  if (process.env.KEYCLOAK_TEST_USER_PASSWORD) {
-    test.serial(name, t)
-  } else {
-    pino.warn('KEYCLOAK_TEST_USER_PASSWORD not set, skipping test')
-    test.skip(name, t)
-  }
-}
-
 test.before(async t => {
+  const keycloakHost = process.env.KEYCLOAK_HOST || 'localhost'
+  const keycloakPort = process.env.KEYCLOAK_PORT || '8080'
+
+  await localKeycloak.prepareKeycloak()
   process.env.KEYCLOAK_CONFIG_FILE = require('path').resolve('./integration_test/config/keycloak.json')
   const Helper = require('./helper')
   const helper = new Helper()
@@ -38,6 +33,11 @@ test.before(async t => {
 
   context.helper = helper
   context.keycloakConfig = require(process.env.KEYCLOAK_CONFIG_FILE)
+  context.keycloakConfig['auth-server-url'] = `http://${keycloakHost}:${keycloakPort}/auth`
+})
+
+test.after.always(async t => {
+  await localKeycloak.resetKeycloakConfiguration()
 })
 
 test.beforeEach(async (t) => {
@@ -60,7 +60,7 @@ test.serial(`not authenticated query should fail (${context.testNote}`, async t 
   }
 })
 
-test.serialOrSkip(`should return empty list when no Profiles created yet (${context.testNote})`, async t => {
+test.serial(`should return empty list when no Profiles created yet (${context.testNote})`, async t => {
   await authenticate(t, 'test-admin', context.testPassword)
   const res = await context.helper.apolloClient.client.query(gqls.allProfiles)
   t.falsy(res.errors)
@@ -76,7 +76,7 @@ const checkProfile = (t, res, mutationName) => {
   t.deepEqual(res.data[mutationName].pictureurl, 'http://example.com/mj.jpg')
 }
 
-test.serialOrSkip(`should create a Profile  with proper client role  (mutation client hasRole check) (${context.testNote})`, async t => {
+test.serial(`should create a Profile  with proper client role  (mutation client hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-admin', context.testPassword)
 
   let res = await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfile'))
@@ -106,7 +106,7 @@ const checkProfileCount = async (t, count) => {
   t.is(res.data.allProfiles.length, count)
 }
 
-test.serialOrSkip(`shouldn't create a Profile without proper client role (mutation client hasRole check) (${context.testNote})`, async t => {
+test.serial(`shouldn't create a Profile without proper client role (mutation client hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-voter', context.testPassword)
   try {
     await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfile'))
@@ -117,7 +117,7 @@ test.serialOrSkip(`shouldn't create a Profile without proper client role (mutati
   await checkProfileCount(t, 1)
 })
 
-test.serialOrSkip(`shouldn't create a Profile without proper realm role (mutation realm hasRole check) (${context.testNote})`, async t => {
+test.serial(`shouldn't create a Profile without proper realm role (mutation realm hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-voter', context.testPassword)
 
   try {
@@ -129,7 +129,7 @@ test.serialOrSkip(`shouldn't create a Profile without proper realm role (mutatio
   await checkProfileCount(t, 1)
 })
 
-test.serialOrSkip(`should create a Profile with proper realm role (mutation realm hasRole check) (${context.testNote})`, async t => {
+test.serial(`should create a Profile with proper realm role (mutation realm hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-realm-role', context.testPassword)
 
   let res = await context.helper.apolloClient.client.mutate(gqls.profileMutation('createProfileRealm'))
@@ -144,7 +144,7 @@ const createMeme = async t => {
   return meme
 }
 
-test.serialOrSkip(`should be able to like a meme with proper role (hasRole array-check) (${context.testNote})`, async t => {
+test.serial(`should be able to like a meme with proper role (hasRole array-check) (${context.testNote})`, async t => {
   const likeAndCheckCount = async () => {
     const meme = await createMeme(t)
 
@@ -164,7 +164,7 @@ test.serialOrSkip(`should be able to like a meme with proper role (hasRole array
   await likeAndCheckCount()
 })
 
-test.serialOrSkip(`shouldn't be able to like a meme without proper role (hasRole array-check) (${context.testNote})`, async t => {
+test.serial(`shouldn't be able to like a meme without proper role (hasRole array-check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-norole', context.testPassword)
   const meme = await createMeme(t)
 
@@ -181,7 +181,7 @@ test.serialOrSkip(`shouldn't be able to like a meme without proper role (hasRole
   }
 })
 
-test.serialOrSkip(`querying all comments with proper role (query hasRole check) (${context.testNote})`, async t => {
+test.serial(`querying all comments with proper role (query hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-admin', context.testPassword)
   const meme = await createMeme(t)
 
@@ -205,7 +205,7 @@ test.serialOrSkip(`querying all comments with proper role (query hasRole check) 
   t.is(filtered.length, 2)
 })
 
-test.serialOrSkip(`querying all comments without proper role (query hasRole check) (${context.testNote})`, async t => {
+test.serial(`querying all comments without proper role (query hasRole check) (${context.testNote})`, async t => {
   await authenticate(t, 'test-norole', context.testPassword)
 
   try {
@@ -216,7 +216,7 @@ test.serialOrSkip(`querying all comments without proper role (query hasRole chec
   }
 })
 
-test.serialOrSkip(`query allMemes without field protected by hasRole (${context.testNote})`, async t => {
+test.serial(`query allMemes without field protected by hasRole (${context.testNote})`, async t => {
   await authenticate(t, 'test-norole', context.testPassword)
 
   const res = await context.helper.apolloClient.client.query(gqls.allMemes(false))
@@ -226,7 +226,7 @@ test.serialOrSkip(`query allMemes without field protected by hasRole (${context.
   }
 })
 
-test.serialOrSkip(`query allMemes with field protected by hasRole and invalid role (${context.testNote})`, async t => {
+test.serial(`query allMemes with field protected by hasRole and invalid role (${context.testNote})`, async t => {
   await authenticate(t, 'test-norole', context.testPassword)
   try {
     await context.helper.apolloClient.client.query(gqls.allMemes(true))
@@ -236,7 +236,7 @@ test.serialOrSkip(`query allMemes with field protected by hasRole and invalid ro
   }
 })
 
-test.serialOrSkip(`query allMemes with field protected by hasRole and valid role (${context.testNote})`, async t => {
+test.serial(`query allMemes with field protected by hasRole and valid role (${context.testNote})`, async t => {
   await authenticate(t, 'test-admin', context.testPassword)
   const res = await context.helper.apolloClient.client.query(gqls.allMemes(true))
   t.truthy(res.data.allMemes)

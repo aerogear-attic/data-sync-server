@@ -1,6 +1,15 @@
 version: '3'
 
 services:
+  keycloak:
+    image: jboss/keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      DB_VENDOR: h2
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+
   postgres:
     image: postgres:9.6
     ports:
@@ -20,3 +29,4 @@ services:
       POSTGRES_DB: memeolist_db
     volumes:
       - ./examples:/tmp/examples
+

@@ -28,6 +28,13 @@ jobs:
             POSTGRES_USER: postgresql
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: memeolist_db
+      # keycloak
+      - image: jboss/keycloak
+        name: keycloak_instance
+        environment:
+            KEYCLOAK_USER: admin
+            KEYCLOAK_PASSWORD: admin
+            DB_VENDOR: h2
     steps:
       - checkout
       - run:
@@ -36,6 +43,9 @@ jobs:
       - run:
           name: Wait for memeolist database to start up
           command: dockerize -wait tcp://memeolist_postgres:5432 -timeout 120s
+      - run:
+          name: Wait for keycloak instance to start up
+          command: dockerize -wait tcp://keycloak_instance:8080 -timeout 120s
       - run: npm install
       - run:
           command: npm run db:init
@@ -51,6 +61,8 @@ jobs:
             POSTGRES_PORT: '5432'
             MEMEOLIST_DB_HOST: 'memeolist_postgres'
             MEMEOLIST_DB_PORT: '5432'
+            KEYCLOAK_HOST: 'keycloak_instance'
+            KEYCLOAK_PORT: '8080'
   
   test_coverage:
     docker:
@@ -70,6 +82,13 @@ jobs:
             POSTGRES_USER: postgresql
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: memeolist_db
+      # keycloak
+      - image: jboss/keycloak
+        name: keycloak_instance
+        environment:
+            KEYCLOAK_USER: admin
+            KEYCLOAK_PASSWORD: admin
+            DB_VENDOR: h2
     steps:
       - checkout
       - run:
@@ -78,6 +97,9 @@ jobs:
       - run:
           name: Wait for memeolist database to start up
           command: dockerize -wait tcp://memeolist_postgres:5432 -timeout 120s
+      - run:
+          name: Wait for keycloak instance to start up
+          command: dockerize -wait tcp://keycloak_instance:8080 -timeout 120s
       - run: npm install
       - run:
           command: npm run db:init
@@ -93,6 +115,8 @@ jobs:
             POSTGRES_PORT: '5432'
             MEMEOLIST_DB_HOST: 'memeolist_postgres'
             MEMEOLIST_DB_PORT: '5432'
+            KEYCLOAK_HOST: 'keycloak_instance'
+            KEYCLOAK_PORT: '8080'
 
   docker_push_master:
     docker:

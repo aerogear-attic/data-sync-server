@@ -1,7 +1,7 @@
 {
-    "realm": "sync-integration-test",
-    "auth-server-url": "https://keycloak.security.feedhenry.org/auth",
+    "realm": "Memeolist",
+    "auth-server-url": "http://localhost:8080/auth",
     "ssl-required": "external",
-    "resource": "sync-server-test",
+    "resource": "sync-server",
     "public-client": true
   }
