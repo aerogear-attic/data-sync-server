@@ -10,17 +10,13 @@ class DataSyncService {
 
     this.app = null
     this.pubsub = null
-    this.models = null
   }
 
   async initialize () {
-    let { pubsubConfig, postgresConfig } = this.config
+    let { pubsubConfig } = this.config
     this.pubsub = PubSub(pubsubConfig)
 
-    this.models = require('./sequelize/models/index')(postgresConfig)
-    await this.models.sequelize.sync({ logging: false })
-
-    this.app = new DataSyncServer(this.config, this.models, this.pubsub)
+    this.app = new DataSyncServer(this.config, this.pubsub)
     await this.app.initialize()
   }
 

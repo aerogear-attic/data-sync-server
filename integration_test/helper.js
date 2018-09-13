@@ -8,7 +8,7 @@ let { postgresConfig } = config
 
 function Helper () {
   this.pubsubInstance = new PGPubsub({
-    user: postgresConfig.user,
+    user: postgresConfig.username,
     host: postgresConfig.host,
     database: postgresConfig.database,
     password: postgresConfig.password,
@@ -17,7 +17,7 @@ function Helper () {
 
   this.syncService = new RestartableSyncService(config)
 
-  this.models = require('../sequelize/models/index')(postgresConfig)
+  this.models = require('@aerogear/data-sync-gql-core').models(postgresConfig)
   this.sequelize = this.models.sequelize
 
   // see http://docs.sequelizejs.com/class/lib/query-interface.js~QueryInterface.html
