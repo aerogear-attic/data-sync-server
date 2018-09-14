@@ -2,14 +2,10 @@ const axios = require('axios')
 const realmToImport = require('./config/realm-export.json')
 const { log } = require('../server/lib/util/logger')
 
-const keycloakHost = process.env.KEYCLOAK_HOST || 'localhost'
-const keycloakPort = process.env.KEYCLOAK_PORT || '8080'
-
 const config = {
+  ...require(process.env.KEYCLOAK_CONFIG_FILE),
   adminRealmName: 'master',
-  appRealmName: 'Memeolist',
   resource: 'admin-cli',
-  'auth-server-url': `http://${keycloakHost}:${keycloakPort}/auth`,
   username: 'admin',
   password: 'admin',
   token: undefined
@@ -44,7 +40,7 @@ async function importRealm () {
 async function getRealmRoles () {
   const res = await axios({
     method: 'GET',
-    url: `${config['auth-server-url']}/admin/realms/${config.appRealmName}/roles`,
+    url: `${config['auth-server-url']}/admin/realms/${config.realm}/roles`,
     headers: {'Authorization': config.token}
   }).catch((err) => { return log.error(err) })
 
@@ -54,7 +50,7 @@ async function getRealmRoles () {
 async function getClients () {
   const res = await axios({
     method: 'GET',
-    url: `${config['auth-server-url']}/admin/realms/${config.appRealmName}/clients`,
+    url: `${config['auth-server-url']}/admin/realms/${config.realm}/clients`,
     headers: {'Authorization': config.token}
   }).catch((err) => { return log.error(err) })
 
@@ -64,7 +60,7 @@ async function getClients () {
 async function getClientRoles (client) {
   const res = await axios({
     method: 'GET',
-    url: `${config['auth-server-url']}/admin/realms/${config.appRealmName}/clients/${client.id}/roles`,
+    url: `${config['auth-server-url']}/admin/realms/${config.realm}/clients/${client.id}/roles`,
     headers: {'Authorization': config.token}
   }).catch((err) => { return log.error(err) })
   return res.data
@@ -73,7 +69,7 @@ async function getClientRoles (client) {
 async function createUser (name) {
   const res = await axios({
     method: 'post',
-    url: `http://${keycloakHost}:${keycloakPort}/auth/admin/realms/${config.appRealmName}/users`,
+    url: `${config['auth-server-url']}/admin/realms/${config.realm}/users`,
     data: {
       'username': name,
       'credentials': [{'type': 'password', 'value': config.password, 'temporary': false}],
@@ -133,7 +129,7 @@ async function prepareKeycloak () {
 async function resetKeycloakConfiguration () {
   await axios({
     method: 'DELETE',
-    url: `${config['auth-server-url']}/admin/realms/${config.appRealmName}`,
+    url: `${config['auth-server-url']}/admin/realms/${config.realm}`,
     headers: {'Authorization': config.token}
   }).catch((err) => { return log.error(err) })
 }

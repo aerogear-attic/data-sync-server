@@ -1,3 +1,4 @@
+process.env.KEYCLOAK_CONFIG_FILE = require('path').resolve('./integration_test/config/keycloak.json')
 const { test } = require('ava')
 const auth = require('./util/auth')
 const axios = require('axios')
@@ -7,7 +8,15 @@ const localKeycloak = require('./auth.integration.test.keycloak')
 const context = {
   helper: undefined,
   testNote: 'auth, inmem',
-  testPassword: 'admin'
+  testPassword: 'admin',
+  keycloakConfig: require(process.env.KEYCLOAK_CONFIG_FILE)
+}
+
+function modifyKeycloakServerUrl (url) {
+  const fs = require('fs')
+
+  context.keycloakConfig['auth-server-url'] = url
+  fs.writeFileSync(process.env.KEYCLOAK_CONFIG_FILE, JSON.stringify(context.keycloakConfig))
 }
 
 async function authenticate (test, username, password) {
@@ -18,11 +27,11 @@ async function authenticate (test, username, password) {
 }
 
 test.before(async t => {
-  const keycloakHost = process.env.KEYCLOAK_HOST || 'localhost'
-  const keycloakPort = process.env.KEYCLOAK_PORT || '8080'
-
+  // Used in Circle CI
+  if (process.env.KEYCLOAK_HOST && process.env.KEYCLOAK_PORT) {
+    modifyKeycloakServerUrl(`http://${process.env.KEYCLOAK_HOST}:${process.env.KEYCLOAK_PORT}/auth`)
+  }
   await localKeycloak.prepareKeycloak()
-  process.env.KEYCLOAK_CONFIG_FILE = require('path').resolve('./integration_test/config/keycloak.json')
   const Helper = require('./helper')
   const helper = new Helper()
   await helper.initialize()
@@ -32,8 +41,6 @@ test.before(async t => {
   await helper.triggerReload()
 
   context.helper = helper
-  context.keycloakConfig = require(process.env.KEYCLOAK_CONFIG_FILE)
-  context.keycloakConfig['auth-server-url'] = `http://${keycloakHost}:${keycloakPort}/auth`
 })
 
 test.after.always(async t => {

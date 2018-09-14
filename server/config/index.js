@@ -1,4 +1,3 @@
-
 const fs = require('fs')
 const { hostname } = require('os')
 
@@ -102,13 +101,10 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
 
 if (process.env.KEYCLOAK_CONFIG_FILE) {
   try {
-    const keycloakHost = process.env.KEYCLOAK_HOST || 'localhost'
-    const keycloakPort = process.env.KEYCLOAK_PORT || '8080'
     const keycloakConfig = fs.readFileSync(process.env.KEYCLOAK_CONFIG_FILE, 'utf-8')
 
     config.securityServiceConfig.type = 'keycloak'
     config.securityServiceConfig.config = JSON.parse(keycloakConfig)
-    config.securityServiceConfig.config['auth-server-url'] = `http://${keycloakHost}:${keycloakPort}/auth`
   } catch (ex) {
     log.error(`Unable to read keycloakConfig in ${process.env.KEYCLOAK_CONFIG_FILE} . Skipping it.`)
     log.error(ex)
