@@ -31,7 +31,7 @@ test.before(async t => {
   if (process.env.KEYCLOAK_HOST && process.env.KEYCLOAK_PORT) {
     modifyKeycloakServerUrl(`http://${process.env.KEYCLOAK_HOST}:${process.env.KEYCLOAK_PORT}/auth`)
   }
-  await localKeycloak.prepareKeycloak()
+  await localKeycloak.prepareKeycloak(context.keycloakConfig['auth-server-url'])
   const Helper = require('./helper')
   const helper = new Helper()
   await helper.initialize()
