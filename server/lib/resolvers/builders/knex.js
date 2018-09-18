@@ -1,15 +1,12 @@
 const { VM } = require('vm2')
 const { auditLog, log } = require('../../../lib/util/logger')
 const { updateResolverMetrics } = require('../../../metrics')
-const { isEmpty } = require('lodash')
 
 function buildKnexResolver (dataSource, compiledRequestMapping, compiledResponseMapping) {
-  const sandbox = {
-    db: dataSource.getClient()
-  }
-
   const vm = new VM({
-    sandbox
+    sandbox: {
+      db: dataSource.getClient()
+    }
   })
 
   // run the vm code which will return a function that executes the user code
@@ -31,31 +28,13 @@ function buildKnexResolver (dataSource, compiledRequestMapping, compiledResponse
 
       const query = userResolverFunction(resolveArgs)
 
-      // result is whatever is implicitly returned from the script
-      // in this case it will be the query builder object from knex
-
-      // this is a super rough implementation
-      query.then((result) => {
-        log.info({ msg: 'result from knex', result })
-
-        if (isEmpty(compiledResponseMapping)) {
-          auditLog(true, context.request, info, obj, args, null)
-          return resolve(result)
-        }
-
-        const responseSandbox = {
-          result: result
-        }
-
-        const responsevm = new VM({
-          sandbox: responseSandbox
-        })
-
+      // Promise.resolve ensures that if the user code doesn't return a promise
+      // we can still interact with it like a promise
+      Promise.resolve(query).then((result) => {
         auditLog(true, context.request, info, obj, args, null)
-
-        return resolve(responsevm.run(compiledResponseMapping))
+        return resolve(result)
       }).catch((error) => {
-        log.error({ msg: 'error from knex', error })
+        log.error({ msg: 'error executing user resolver', error })
         auditLog(false, context.request, info, obj, args, error.message)
         return reject(error)
       }).finally(() => {
