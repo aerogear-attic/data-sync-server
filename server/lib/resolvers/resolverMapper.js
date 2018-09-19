@@ -42,7 +42,7 @@ module.exports = function (dataSources, resolverMappings, pubsub) {
       throw new Error(`Resolver builder for ${dataSource.type} missing buildResolver function`)
     }
 
-    const compile = (dataSource.type === 'Postgres') ? compileScript : compileTemplate
+    const compile = (dataSource.type === 'Knex') ? compileScript : compileTemplate
 
     let compiledRequestMapping
     let compiledResponseMapping

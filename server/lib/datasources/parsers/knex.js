@@ -1,7 +1,7 @@
 const knex = require('knex')
 const { log } = require('../../util/logger')
 
-const type = 'Postgres'
+const type = 'Knex'
 
 function KnexDataSource (config = {}) {
   let db

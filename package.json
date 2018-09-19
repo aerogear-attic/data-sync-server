@@ -19,8 +19,8 @@
   "homepage": "https://github.com/aerogear/data-sync-server#readme",
   "main": "index.js",
   "scripts": {
-    "test": "ava '*.test.js' '**/*.test.js' '!integration_test/*'",
-    "test:integration": "npm run db:init && ava --concurrency=1 integration_test/*.test.js",
+    "test": "ava -v '*.test.js' '**/*.test.js' '!integration_test/*'",
+    "test:integration": "npm run db:init && ava -v --concurrency=1 integration_test/*.test.js",
     "test:cover": "nyc --reporter=text-lcov ava --concurrency=1 '*.test.js' '**/*.test.js' > coverage.lcov && codecov",
     "start": "node ./index.js",
     "dev": "nodemon ./index.js | pino-pretty --colorize --translateTime",
