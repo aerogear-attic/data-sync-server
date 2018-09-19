@@ -140,7 +140,7 @@ test('should throw exception when request mapping is not defined', t => {
   })
 })
 
-test('should throw exception when response mapping is not defined', t => {
+test.skip('should throw exception when response mapping is not defined', t => {
   const dataSourceDefs = [{
     'type': 'Postgres',
     'name': 'p1',
