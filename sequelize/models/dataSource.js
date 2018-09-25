@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const DataSource = sequelize.define('DataSource', {
     name: DataTypes.STRING,
-    type: DataTypes.ENUM('InMemory', 'Postgres', 'Knex'),
+    type: DataTypes.ENUM('InMemory', 'Postgres', 'Knex', 'Mongo'),
     config: DataTypes.JSON
   })
 

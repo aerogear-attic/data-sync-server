@@ -36,6 +36,7 @@
     "db:init": "FORCE_DROP=true node ./scripts/sync_models",
     "db:init:memeo:inmem": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-inmem.js",
     "db:init:memeo:postgres": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-postgres.js && docker exec sync_postgres_memeo_1 psql -U postgres -d memeolist_db -f /tmp/examples/memeolist.tables.sql",
+    "db:init:memeo:mongo": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-mongo.js",
     "db:shell": "docker exec -it sync_postgres_1 psql -U postgresql -d aerogear_data_sync_db",
     "db:shell:memeo": "docker exec -it sync_postgres_memeo_1 psql -U postgresql -d memeolist_db"
   },
@@ -85,6 +86,7 @@
     "keycloak-connect": "^4.2.1",
     "knex": "^0.15.2",
     "lodash": "^4.17.10",
+    "mongodb": "^3.1.6",
     "nedb": "^1.8.0",
     "pg": "^7.4.3",
     "pg-pubsub": "^0.4.0",
