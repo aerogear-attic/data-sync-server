@@ -54,7 +54,7 @@ const resolvers = [
     field: 'allMemes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `db.getCollection('meme').find({})`,
+    requestMapping: `return db.collection('meme').find({}).next()`,
     responseMapping: '',
     createdAt: time,
     updatedAt: time
