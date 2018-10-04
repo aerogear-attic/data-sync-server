@@ -12,7 +12,7 @@ function MongoSource (config = {}) {
   this.connect = async () => {
     const options = config.options
     if (!db) {
-      log.info('Connecting to mongo')
+      log.debug('Connecting to mongo', options)
       // Use connect method to connect to the Server
       client = await MongoClient.connect(options.url)
       db = client.db(options.database)

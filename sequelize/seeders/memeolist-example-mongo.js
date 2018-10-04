@@ -24,7 +24,7 @@ const resolvers = [
     field: 'owner',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `return {}`,
+    requestMapping: `return []`,
     responseMapping: '',
     createdAt: time,
     updatedAt: time
@@ -54,7 +54,7 @@ const resolvers = [
     field: 'allMemes',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `return db.collection('meme').find({}).next()`,
+    requestMapping: `return db.collection('meme').find({}).toArray()`,
     responseMapping: '',
     createdAt: time,
     updatedAt: time
@@ -64,8 +64,8 @@ const resolvers = [
     field: 'profile',
     DataSourceId: 1,
     GraphQLSchemaId: 1,
-    requestMapping: `return db.select().from('profile').where('email', resolve.args.email)`,
-    responseMapping: 'result[0]',
+    requestMapping: `return db.collection('profile').find({}).next()`,
+    responseMapping: '',
     createdAt: time,
     updatedAt: time
   },
@@ -75,12 +75,14 @@ const resolvers = [
     DataSourceId: 1,
     GraphQLSchemaId: 1,
     requestMapping: `let meme = {
-  owner: resolve.args.owner,
-  photourl: resolve.args.photourl,
-  likes: 0
-}
-
-return db('meme').insert(meme).returning('*')
+      owner: resolve.args.owner,
+      photourl: resolve.args.photourl,
+      likes: 0,
+      id: new Date().getTime().toString()
+    }
+    return db.collection('meme').insert(meme).then(()=>{
+      return meme;
+    });
     `,
     responseMapping: 'result[0]',
     publish: JSON.stringify({
@@ -101,11 +103,13 @@ return db('meme').insert(meme).returning('*')
   email: resolve.args.email,
   displayname: resolve.args.displayname,
   pictureurl: resolve.args.pictureurl
+
 }
 
-return db('profile').insert(profile).returning('*').then((rows) => {
-  return rows[0]
-})
+  return db.collection('profile').insert(profile).then((profile)=> {
+    profile.id = profile._id;
+    return profile;
+  })
     `,
     responseMapping: '',
     createdAt: time,
