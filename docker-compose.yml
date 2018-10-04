@@ -10,13 +10,14 @@ services:
       POSTGRES_USER: postgresql
       POSTGRES_DB: aerogear_data_sync_db
 
-  postgres_memeo:
-    image: postgres:9.6
-    ports:
-      - "15432:5432"
+  mongo_memeo:
+    image: mongo:latest
+    container_name: "mongodb"
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgresql
-      POSTGRES_DB: memeolist_db
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
     volumes:
-      - ./examples:/tmp/examples
+      - ./data/db:/data/db
+    ports:
+        - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null
