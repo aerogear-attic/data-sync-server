@@ -294,7 +294,24 @@
       ],
       "security-admin-console": [],
       "admin-cli": [],
-      "sync-server": [],
+      "sync-server": [
+        {
+          "id": "6ee57320-6ed9-4d51-addf-fb3de0e69546",
+          "name": "voter",
+          "scopeParamRequired": false,
+          "composite": false,
+          "clientRole": true,
+          "containerId": "66dfe449-ee2e-42e5-afd6-a59f5e005538"
+        },
+        {
+          "id": "4199885c-25d2-4d2e-b542-d3f9463bdf89",
+          "name": "admin",
+          "scopeParamRequired": false,
+          "composite": false,
+          "clientRole": true,
+          "containerId": "66dfe449-ee2e-42e5-afd6-a59f5e005538"
+        }
+      ],
       "android-app": [],
       "broker": [
         {
