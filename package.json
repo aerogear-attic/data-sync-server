@@ -33,6 +33,8 @@
     "docker:build:release": "./scripts/docker_build_release.sh",
     "docker:push": "./scripts/docker_push.sh",
     "docker:push:release": "./scripts/docker_push_release.sh",
+    "compose:sync": "docker-compose -p sync up",
+    "compose:sync:keycloak": "docker-compose -f keycloak/docker-compose.yml -p sync up",
     "release:validate": "./scripts/validateRelease.sh",
     "db:init": "FORCE_DROP=true node ./scripts/sync_models",
     "db:init:memeo:inmem": "FORCE_DROP=true node ./scripts/sync_models && sequelize db:seed --seed memeolist-example-inmem.js",
