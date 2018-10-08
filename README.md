@@ -100,7 +100,7 @@ Currently only Postgres channel listening is supported.
 
 1. Initialize the database.
 
-   **Those are destructive actions.** They drop and recreate the tables every time.
+   **WARNING: These are destructive actions.** they drop and recreate the tables every time.
 
    No sample schema/resolvers
 
@@ -108,7 +108,7 @@ Currently only Postgres channel listening is supported.
    npm run db:init
    ```
 
-   Commands below are useful for **local development** which and seed the database with config and tables
+   Commands below are useful for **local development** which seed the database with config and tables
 for [Memeolist](#whats-memeolist) sample application. 
 
    Sample schema/resolvers for memeolist - in-memory data source
@@ -142,7 +142,7 @@ To use Keycloak for authorisation, set the env var
 KEYCLOAK_CONFIG_FILE
 ```
 to point to a config file. An example can be seen at [./keycloak/keycloak.json](./keycloak/keycloak.json).
-To use Keycloak with Sync complete the steps above in the Getting Started section to create and initialise the database, then start the application by running:
+To use Keycloak with Sync, complete the steps above in the [Getting Started](#getting-started) section to create and initialise the database, then start the application by running:
 
 ```shell
 npm run dev
@@ -248,11 +248,11 @@ The DevTools window should automatically connect to the debugging session and ex
 
 ### What's Memeolist?
 
-Memeolist is an application where AeroGear team targets testing AeroGear mobile Sync services and SDKs on it [based on the dogfood proposal](https://github.com/aerogear/proposals/blob/master/dogfood.md)
+Memeolist is an application where the AeroGear community can test AeroGear Mobile Sync Services and SDKs and is [based on the dogfood proposal](https://github.com/aerogear/proposals/blob/master/dogfood.md)
 
-### In memory 
+### In memory
 
-To start the application with MemeoList schema and queries with an in-memory data source, run these commands:
+To start the application with MemeoList schema and queries with an in-memory data source, run the following commands:
 
 ```shell
 docker-compose -p sync up
@@ -262,7 +262,7 @@ npm run dev:memeo
 
 ### Postgres 
 
-To start the application with MemeoList schema and queries with an Postgres source, run these commands:
+To start the application with MemeoList schema and queries with a Postgres source, run the following commands:
 
 ```shell
 docker-compose -p sync up
@@ -272,13 +272,13 @@ npm run dev:memeo
 
 ### Authentication and Authorization
 
-By default server starts without any authentication and authorization mechanism. 
-Please follow documentation bellow to see how 
+By default, the server starts without any authentication and authorization mechanism configured. 
+Please follow the documentation below to see how to enable support for this feature.
 
 
 ### Keycloak SSO support
 
-Keycloak integration is supported by providing location to keycloak configuration file
+Keycloak integration is supported by providing a location to the keycloak configuration file:
 
 ```
 KEYCLOAK_CONFIG_FILE=keycloak/keycloak.json
@@ -286,10 +286,10 @@ KEYCLOAK_CONFIG_FILE=keycloak/keycloak.json
 
 You can also execute `npm run dev:keymemeo` to run the server preconfigured with an example keycloak server.
 
-Memeolist example application requires a keycloak realm to be configured. 
+The Memeolist example application requires a keycloak realm to be configured.
 See [Keycloak realm](./keycloak) configuration for more details.
 
-Currently this file points to a demo Keycloak instance hosted at https://keycloak.security.feedhenry.org. If you wish, you can also use the realm-export file mentioned above to create a realm on your own Keycloak instance.
+Currently this file points to a demo Keycloak instance hosted at https://keycloak.security.feedhenry.org. If you wish, you can also use the realm-export file, mentioned above, to create a realm on your own Keycloak instance.
 
 The credentials currently available for use on this realm are:
 
@@ -300,4 +300,4 @@ p: 123
 
 Currently, the roles available in the demo instance for use are 'admin' and 'voter'.
 
-See the "Using Keycloak for local development" above for details about how to use authorisation once it is configured.
+See the [Using Keycloak for local development](#using-keycloak-for-local-development) above for details about how to use authorisation once it is configured.
