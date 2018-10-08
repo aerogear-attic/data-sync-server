@@ -1,16 +1,14 @@
 # How to contribute
 
-Thank you for your interest in contributing to the Aerogear project. We want
+Thank you for your interest in contributing to the AeroGear project. We want
 keep this process as easy as possible so we've outlined a few guidelines below. 
-For more information about the Aerogear project, visit 
-[our website](http://aerogear.org/).
+For more information about the AeroGear community and project , visit 
+[our website](https://aerogear.org/community/).
 
 ## Asking for help
 
-Whether you're contributing a new feature or bug fix, or simply submitting a
-ticket, the Aerogear team is available for technical advice or feedback. 
-You can reach us at #aerogear on [Freenode IRC](https://freenode.net/) or the 
-[aerogear-dev list](http://lists.jboss.org/pipermail/aerogear-dev/)
+Whether you're contributing a new feature or bug fix, or simply submitting a ticket, the AeroGear team is available for technical advice or feedback. 
+You can reach us at #aerogear on [Freenode IRC](https://freenode.net/) or join the  [mailing list](https://groups.google.com/forum/#!forum/aerogear)
 -- both are actively monitored.
 
 ## Getting started
@@ -18,7 +16,7 @@ You can reach us at #aerogear on [Freenode IRC](https://freenode.net/) or the
 * Make sure you have a [JIRA account](https://issues.jboss.org)
 * Make sure you have a [GitHub account](https://github.com/signup/free)
 * Submit a ticket for your issue to the 
-[Aerogear project](https://issues.jboss.org/projects/FH/), assuming one does 
+[AeroGear project]("https://issues.jboss.org/projects/AEROGEAR), assuming one does 
 not already exist.
   * Clearly describe the issue including steps to reproduce when it is a bug.
   * Make sure you fill in the earliest version that you know has the issue.
@@ -30,10 +28,10 @@ not already exist.
   * This is usually the master branch.
   * To quickly create a topic branch based on master; `git checkout -b
     <branch name> master`. By convention we typically include the JIRA issue 
-    key in the branch name, e.g. `FH-1234-my-feature`.
+    key in the branch name, e.g. `AEROGEAR-1234-my-feature`.
   * Please avoid working directly on the `master` branch.
 * Make commits of logical units.
-* Prepend your commit messages with a JIRA ticket number, e.g. "FH-1234: Fix
+* Prepend your commit messages with a JIRA ticket number, e.g. "AEROGEAR-1234: Fix
   spelling mistake in README."
 * Follow the coding style in use.
 * Check for unnecessary whitespace with `git diff --check` before committing.
@@ -43,7 +41,7 @@ not already exist.
 ## Submitting changes
 
 * Push your changes to a topic branch in your fork of the repository.
-* Submit a pull request to the repository in the [Aerogear GitHub organization]
+* Submit a pull request to the repository in the [AeroGear GitHub organization]
   (https://github.com/aerogear) and choose branch you want to patch 
   (usually master). 
   * Advanced users may want to install the [GitHub CLI](https://hub.github.com/) 
@@ -56,18 +54,13 @@ for it to be reviewed (Status: Dev Complete).
 
 ## Reviewing changes
 
-* After submitting a pull request, one of Aerogear team members will review it.
+* After submitting a pull request, one of AeroGear team members will review it.
 * Changes may be requested to conform to our style guide and internal 
   requirements.
-* When the changes are approved and all tests are passing, a Aerogear team
+* When the changes are approved and all tests are passing, a AeroGear team
   member will merge them.
 * Note: if you have write access to the repository, do not directly merge pull 
   requests. Let another team member review your pull request and approve it.
-
-## Coding best practices
-
-We have compiled a set of best practices for each programming
-language we use. View them [here](https://github.com/fheng/best_practice).
 
 # Additional Resources
 
