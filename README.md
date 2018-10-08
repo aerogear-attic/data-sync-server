@@ -135,17 +135,23 @@ for [Memeolist](#whats-memeolist) sample application.
 
 ## Using Keycloak for local development
 
+
 To use Keycloak for authorisation, set the env var
 
 ```
 KEYCLOAK_CONFIG_FILE
 ```
 to point to a config file. An example can be seen at [./keycloak/keycloak.json](./keycloak/keycloak.json).
-
 To use Keycloak with Sync complete the steps above in the Getting Started section to create and initialise the database, then start the application by running:
 
 ```shell
 npm run dev
+```
+
+If you do not have any running keycloak instance it can be run using docker compose with the rest of the required containers for sync server. Use separate docker compose file located at [./keycloak/](./keycloak/) folder:
+
+```
+npm run compose:sync:keycloak
 ```
 
 Once the application is started, visit http://localhost:8000/graphql. You should be redirected to the login for your realm. You can log in here with the example credentials:
@@ -153,6 +159,8 @@ Once the application is started, visit http://localhost:8000/graphql. You should
 Once logged in and you are redirected to the Graphql playground you will need to (for the time being) manually attach the Bearer token used by Keycloak to each request. To get this token, visit http://localhost:8000/token and put this whole string in the HTTP HEADERS section of Graphql Playground.
 
 Each request should now be autorised via Keycloak. To logout visit http://localhost:8000/logout.
+
+
 
 ## Postgres
 
