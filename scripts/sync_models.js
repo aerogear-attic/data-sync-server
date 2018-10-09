@@ -3,7 +3,7 @@ const postgresConfig = require('../server/config').postgresConfig
 const forceDrop = process.env.FORCE_DROP === 'true'
 
 if (require.main === module) {
-  require('../sequelize/models')(postgresConfig).sequelize.sync({force: forceDrop}).then(() => {
+  require('@aerogear/data-sync-gql-core').models(postgresConfig).sequelize.sync({force: forceDrop}).then(() => {
     process.exit(0)
   })
 } else {

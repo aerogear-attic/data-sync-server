@@ -1,3 +1,5 @@
+const { Core } = require('@aerogear/data-sync-gql-core')
+const { makeExecutableSchema } = require('graphql-tools')
 const DataSyncServer = require('./server/server')
 const { log } = require('./server/lib/util/logger')
 const PubSub = require('./server/lib/pubsubNotifiers/pubsubNotifier')
@@ -10,17 +12,18 @@ class DataSyncService {
 
     this.app = null
     this.pubsub = null
-    this.models = null
   }
 
   async initialize () {
-    let { pubsubConfig, postgresConfig } = this.config
+    let { pubsubConfig } = this.config
     this.pubsub = PubSub(pubsubConfig)
 
-    this.models = require('./sequelize/models/index')(postgresConfig)
-    await this.models.sequelize.sync({ logging: false })
+    this.core = new Core(this.config.postgresConfig, makeExecutableSchema)
 
-    this.app = new DataSyncServer(this.config, this.models, this.pubsub)
+    this.models = await this.core.getModels()
+    this.models.sync({ logging: false })
+
+    this.app = new DataSyncServer(this.config, this.models, this.pubsub, this.core)
     await this.app.initialize()
   }
 

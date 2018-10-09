@@ -46,10 +46,15 @@ const config = {
   },
   postgresConfig: {
     database: process.env.POSTGRES_DATABASE || 'aerogear_data_sync_db',
-    user: process.env.POSTGRES_USERNAME || 'postgresql',
+    username: process.env.POSTGRES_USERNAME || 'postgresql',
     password: process.env.POSTGRES_PASSWORD || 'postgres',
-    host: process.env.POSTGRES_HOST || '127.0.0.1',
-    port: process.env.POSTGRES_PORT || '5432'
+    options: {
+      host: process.env.POSTGRES_HOST || '127.0.0.1',
+      port: process.env.POSTGRES_PORT || '5432',
+      dialect: 'postgres',
+      operatorsAliases: false,
+      logging: false
+    }
   },
   pubsubConfig: {},
   securityServiceConfig: {
@@ -83,7 +88,13 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
 
   config.pubsubConfig = {
     type: 'Postgres',
-    config: config.postgresConfig
+    config: {
+      database: config.postgresConfig.database,
+      user: config.postgresConfig.username,
+      password: config.postgresConfig.password,
+      host: config.postgresConfig.options.host,
+      port: config.postgresConfig.options.port
+    }
   }
 
   config.schemaListenerConfig = {
@@ -91,10 +102,10 @@ if (process.env.SCHEMA_LISTENER_CONFIG) {
     config: {
       channel: 'aerogear-data-sync-config',
       database: config.postgresConfig.database,
-      user: config.postgresConfig.user,
+      username: config.postgresConfig.username,
       password: config.postgresConfig.password,
-      host: config.postgresConfig.host,
-      port: config.postgresConfig.port
+      host: config.postgresConfig.options.host,
+      port: config.postgresConfig.options.port
     }
   }
 }

@@ -18,17 +18,18 @@ if (process.env.LOG_LEVEL) {
 }
 
 // schema
-const buildSchema = require('./buildSchema')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
+const schemaName = 'default'
 
 class DataSyncServer {
-  constructor (config, models, pubsub) {
+  constructor (config, models, pubsub, core) {
     this.config = config
     this.models = models
     this.pubsub = pubsub
-
+    this.core = core
     this.schema = null
     this.dataSources = null
+    this.schemaName = schemaName
   }
 
   async initialize () {
@@ -74,11 +75,11 @@ class DataSyncServer {
     this.serverConfig = serverConfig
 
     // generate the GraphQL Schema
-    const { schema, dataSources } = await buildSchema(this.models, this.pubsub, this.serverConfig.schemaDirectives)
+    const { schema, dataSources } = await this.core.buildSchema(this.schemaName, this.pubsub, this.serverConfig.schemaDirectives)
     this.schema = schema
     this.dataSources = dataSources
 
-    await this.connectDataSources(this.dataSources)
+    await this.core.connectActiveDataSources(this.dataSources)
 
     this.newServer()
 
@@ -110,7 +111,7 @@ class DataSyncServer {
   async cleanup () {
     await this.models.sequelize.close()
     if (this.schemaListener) await this.schemaListener.stop()
-    if (this.dataSources) await this.disconnectDataSources(this.dataSources)
+    if (this.dataSources) await this.core.disconnectActiveDataSources(this.dataSources)
     if (this.server) await this.server.close()
   }
 
@@ -118,7 +119,7 @@ class DataSyncServer {
     log.info('Received schema change notification. Rebuilding it')
     let newSchema
     try {
-      newSchema = await buildSchema(this.models, this.pubsub, this.serverConfig.schemaDirectives)
+      newSchema = await this.core.buildSchema(this.schemaName, this.pubsub, this.serverConfig.schemaDirectives)
     } catch (ex) {
       log.error('Error while reloading config')
       log.error(ex)
@@ -134,7 +135,7 @@ class DataSyncServer {
       this.newServer()
 
       try {
-        await this.disconnectDataSources(this.dataSources) // disconnect existing ones first
+        await this.core.disconnectActiveDataSources(this.dataSources) // disconnect existing ones first
       } catch (ex) {
         log.error('Error while disconnecting previous data sources')
         log.error(ex)
@@ -142,46 +143,18 @@ class DataSyncServer {
       }
 
       try {
-        await this.connectDataSources(newSchema.dataSources)
+        await this.core.connectActiveDataSources(newSchema.dataSources)
         this.dataSources = newSchema.dataSources
       } catch (ex) {
         log.error('Error while connecting to new data sources')
         log.error(ex)
         log.error('Will use the old schema and the data sources')
         try {
-          await this.connectDataSources(this.dataSources)
+          await this.core.connectActiveDataSources(this.dataSources)
         } catch (ex) {
           log.error('Error while connecting to previous data sources')
           log.error(ex)
         }
-      }
-    }
-  }
-
-  async connectDataSources (dataSources) {
-    log.info('Connecting data sources')
-    for (let key of Object.keys(dataSources)) {
-      const dataSource = dataSources[key]
-      try {
-        await dataSource.connect()
-      } catch (error) {
-        log.error(`Error while connecting datasource with key ${key}`)
-        log.error(error)
-        throw (error)
-      }
-    }
-  }
-
-  async disconnectDataSources (dataSources) {
-    log.info('Disconnecting data sources')
-    for (let key of Object.keys(dataSources)) {
-      const dataSource = dataSources[key]
-      try {
-        await dataSource.disconnect()
-      } catch (error) {
-        log.error(`Error while disconnecting datasource with key ${key}`)
-        log.error(error)
-        // swallow
       }
     }
   }

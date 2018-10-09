@@ -77,9 +77,10 @@ async function createUser (name) {
       'enabled': true
     },
     headers: {'Authorization': config.token, 'Content-Type': 'application/json'}
-  }).catch((err) => { return log.error(err) })
-
-  return res.headers.location
+  })
+  if (res) {
+    return res.headers.location
+  }
 }
 
 async function assignRealmRoleToUser (userIdUrl, role) {

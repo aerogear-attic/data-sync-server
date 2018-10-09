@@ -5,7 +5,7 @@ function PostgresListener (config) {
   let pubsubInstance
 
   pubsubInstance = new PGPubsub({
-    user: config.user,
+    user: config.username,
     host: config.host,
     database: config.database,
     password: config.password,
