@@ -1,5 +1,5 @@
 # AeroGear Sync Server
-
+  
 [![circle-ci](https://img.shields.io/circleci/project/github/aerogear/data-sync-server/master.svg)](https://circleci.com/gh/aerogear/data-sync-server)
 [![Coverage Status](https://img.shields.io/coveralls/github/aerogear/data-sync-server.svg)](https://codecov.io/gh/aerogear/data-sync-server)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
