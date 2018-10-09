@@ -9,10 +9,10 @@ let { postgresConfig } = config
 function Helper () {
   this.pubsubInstance = new PGPubsub({
     user: postgresConfig.username,
-    host: postgresConfig.host,
+    host: postgresConfig.options.host,
     database: postgresConfig.database,
     password: postgresConfig.password,
-    port: postgresConfig.port
+    port: postgresConfig.options.port
   })
 
   this.syncService = new RestartableSyncService(config)
