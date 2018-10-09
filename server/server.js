@@ -18,27 +18,21 @@ if (process.env.LOG_LEVEL) {
 }
 
 // schema
-const { Core } = require('@aerogear/data-sync-gql-core')
 const schemaListenerCreator = require('./lib/schemaListeners/schemaListenerCreator')
-const { makeExecutableSchema } = require('graphql-tools')
+const schemaName = 'default'
 
 class DataSyncServer {
-  constructor (config, pubsub) {
+  constructor (config, models, pubsub, core) {
     this.config = config
+    this.models = models
     this.pubsub = pubsub
-
+    this.core = core
     this.schema = null
     this.dataSources = null
-  }
-
-  async initializeCore (config) {
-    this.core = new Core(config.postgresConfig, makeExecutableSchema)
-    this.models = await this.core.getModels()
-    this.models.sync({ logging: false })
+    this.schemaName = schemaName
   }
 
   async initialize () {
-    await this.initializeCore(this.config)
     this.server = http.createServer()
 
     // get some options
@@ -81,7 +75,7 @@ class DataSyncServer {
     this.serverConfig = serverConfig
 
     // generate the GraphQL Schema
-    const { schema, dataSources } = await this.core.buildSchema('default', this.pubsub, this.serverConfig.schemaDirectives)
+    const { schema, dataSources } = await this.core.buildSchema(this.schemaName, this.pubsub, this.serverConfig.schemaDirectives)
     this.schema = schema
     this.dataSources = dataSources
 
@@ -125,7 +119,7 @@ class DataSyncServer {
     log.info('Received schema change notification. Rebuilding it')
     let newSchema
     try {
-      newSchema = await this.core.buildSchema('default', this.pubsub, this.serverConfig.schemaDirectives)
+      newSchema = await this.core.buildSchema(this.schemaName, this.pubsub, this.serverConfig.schemaDirectives)
     } catch (ex) {
       log.error('Error while reloading config')
       log.error(ex)
