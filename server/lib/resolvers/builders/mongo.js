@@ -1,11 +1,13 @@
 const { VM } = require('vm2')
 const { auditLog, log } = require('../../../lib/util/logger')
 const { updateResolverMetrics } = require('../../../metrics')
+const { ObjectId } = require('mongodb')
 
 function buildMongoResolver (dataSource, compiledRequestMapping, compiledResponseMapping) {
   const vm = new VM({
     sandbox: {
-      db: dataSource.getClient()
+      db: dataSource.getClient(),
+      ObjectId
     }
   })
 
