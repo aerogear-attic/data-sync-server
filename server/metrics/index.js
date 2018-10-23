@@ -1,5 +1,5 @@
 const Prometheus = require('prom-client')
-const { buildPath } = require('../lib/util/logger')
+const { buildPath } = require('@aerogear/data-sync-gql-core').util.graphqlPathUtil
 
 Prometheus.collectDefaultMetrics()
 
