@@ -2,7 +2,7 @@ const { ApolloServer } = require('apollo-server-express')
 const queryDepthLimit = require('graphql-depth-limit')
 const { GraphQLError } = require('graphql')
 const { createComplexityLimitRule } = require('graphql-validation-complexity')
-const { log, getClientInfoFromHeaders, auditLogEnabled, auditLog } = require('./lib/util/logger')
+const { log, auditLogEnabled, auditLog } = require('./lib/util/logger')
 
 const NOOP = function () {
 }
@@ -34,7 +34,9 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, gr
         context.auth = new AuthContextProvider(req)
       }
       if (auditLogEnabled) {
-        context.clientInfo = getClientInfoFromHeaders(req)
+        // clientInfo is available in the request, decoded already
+        // just attach it to context
+        context.clientInfo = req.clientInfo
         context.auditLog = auditLog
       } else {
         context.clientInfo = undefined
