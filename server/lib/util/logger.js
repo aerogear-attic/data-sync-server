@@ -11,16 +11,18 @@ function getClientInfoFromHeaders (request) {
     try {
       buf = Buffer.from(encoded, 'base64')
     } catch (e) {
-      log.error('Unable decode base64 data-sync-client-info header provided by the client. Message: ' + e.message)
-      return undefined
+      const msg = 'Unable decode base64 data-sync-client-info header provided by the client. Message: ' + e.message
+      log.error(msg)
+      throw new Error(msg)
     }
 
     const decoded = buf.toString('utf8')
     try {
       return JSON.parse(decoded)
     } catch (e) {
-      log.error('Unable to parse data-sync-client-info header provided by the client. Message: ' + e.message)
-      return undefined
+      const msg = 'Unable to parse data-sync-client-info header provided by the client. Message: ' + e.message
+      log.error(msg)
+      throw new Error(msg)
     }
   }
   return undefined

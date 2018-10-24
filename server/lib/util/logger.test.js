@@ -2,7 +2,7 @@ const {test} = require('ava')
 
 const {getClientInfoFromHeaders} = require('./logger')
 
-test('getClientInfoFromHeaders should never throw error', t => {
+test('getClientInfoFromHeaders should not throw error if the header value is missing', t => {
   t.is(getClientInfoFromHeaders(undefined), undefined)
 
   t.is(getClientInfoFromHeaders(null), undefined)
@@ -23,27 +23,26 @@ test('getClientInfoFromHeaders should never throw error', t => {
       'data-sync-client-info': null
     }
   }), undefined)
+})
+
+test('getClientInfoFromHeaders should throw error if the header value is malformed', t => {
+  // structure ok, invalid base64
+  t.throws(
+    () => { getClientInfoFromHeaders({headers: {'data-sync-client-info': 1}}) },
+    Error
+  )
 
   // structure ok, invalid base64
-  t.is(getClientInfoFromHeaders({
-    headers: {
-      'data-sync-client-info': 1
-    }
-  }), undefined)
-
-  // structure ok, invalid base64
-  t.is(getClientInfoFromHeaders({
-    headers: {
-      'data-sync-client-info': 'foo'
-    }
-  }), undefined)
+  t.throws(
+    () => { getClientInfoFromHeaders({headers: {'data-sync-client-info': 'foo'}}) },
+    Error
+  )
 
   // structure ok, base64 ok, value not JSON
-  t.is(getClientInfoFromHeaders({
-    headers: {
-      'data-sync-client-info': Buffer.from('foo', 'utf8').toString('base64')
-    }
-  }), undefined)
+  t.throws(
+    () => { getClientInfoFromHeaders({headers: {'data-sync-client-info': Buffer.from('foo', 'utf8').toString('base64')}}) },
+    Error
+  )
 })
 
 test('getClientInfoFromHeaders return client info successfully', t => {
