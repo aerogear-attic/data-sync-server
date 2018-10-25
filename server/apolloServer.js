@@ -36,7 +36,7 @@ function newApolloServer (app, schema, httpServer, tracing, playgroundConfig, gr
       if (auditLogEnabled) {
         // clientInfo is available in the request, decoded already
         // just attach it to context
-        context.clientInfo = req.clientInfo
+        context.clientInfo = req ? req.clientInfo : undefined
         context.auditLog = auditLog
       } else {
         context.clientInfo = undefined
