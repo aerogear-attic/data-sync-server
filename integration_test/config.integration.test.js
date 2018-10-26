@@ -73,15 +73,17 @@ test.serial('should use prev config when there is a schema syntax problem with t
   t.deepEqual(res.data, { listNotes: [] }) // no data since no mutation is executed
 })
 
-test.serial('should use prev config when there is a resolver not in the new schema', async t => {
+test.serial('should not complain when there is a resolver not in the new schema', async t => {
   // delete everything and feed a valid config
   await helper.deleteConfig()
   await helper.triggerReload() // make server pick it up: it will use the default empty schema
 
   // delete everything and feed an invalid config
   await helper.deleteConfig()
-  await helper.feedConfig('simple.inmem.invalid.resolver.not.in.schema')
-  await helper.triggerReload() // make server try to pick it up. it should still use the the empty schema
+  await helper.feedConfig('simple.inmem.valid.resolver.not.in.schema')
+  // make server try to pick it up.
+  // it should use the the new schema even though there is a resolver not in the schema
+  await helper.triggerReload()
 
   const query = helper.apolloClient.client.query({
     query: gql`{ listNotes {id} }`
@@ -91,7 +93,7 @@ test.serial('should use prev config when there is a resolver not in the new sche
 
   // default empty schema has a Query defined with name '_'
   const res = await helper.apolloClient.client.query({
-    query: gql`{ _ }`
+    query: gql`{ someQuery }`
   })
 
   t.truthy(res)
