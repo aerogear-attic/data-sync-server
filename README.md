@@ -10,7 +10,7 @@
 
 GraphQL based data sync server for mobile, with backend integration capabilities
 
-## Table of content
+## Table of Contents
 
 * [Architecture](#architecture)
 * [Configuration](#configuration)
@@ -42,6 +42,143 @@ The baseline architecture is shown below:
 1. The Data Sync GraphQL Server executes the corresponding resolvers for queries, mutations & subscriptions.
 1. Configured Authentication & Autohorizatin checks are applied
 1. Logging & Metrics data is gathered from the Server & connected Clients
+
+## Getting Started
+
+1. Install Dependencies
+
+```shell
+npm install
+```
+
+1. Start and initialize the database
+
+Use docker compose to start the database(s).
+
+```shell
+docker-compose -p sync up
+```
+
+There are 2 Postgres instances defined in docker-compose configuration:
+
+1. For storing the configuration of the sync server itself
+1. For storing the [Memeolist](#whats-memeolist) data.
+
+Since docker-compose is only used with development, starting up the Postgres instance for [Memeolist](#whats-memeolist) will not cause any harm. 
+
+1. Initialize the database.
+
+**WARNING: These are destructive actions.** they drop and recreate the tables every time.
+
+No sample schema/resolvers
+
+```shell   
+npm run db:init
+```
+
+The Commands below are useful for **local development** which seed the database with config and tables
+for [Memeolist](#whats-memeolist) sample application. 
+
+Sample schema/resolvers for memeolist - in-memory data source
+```shell
+npm run db:init:memeo:inmem
+```
+
+Sample schema/resolvers for memeolist - Postgres data source
+```shell
+npm run db:init:memeo:postgres
+```
+
+1. Start the Server
+
+```shell
+npm run dev
+```
+
+1. Go to http://localhost:8000/graphql for an interactive query browser.
+
+The **graphql endpoint** is at `/graphql`.   
+The **subscriptions endpoint** is also at `/graphql`.
+
+## Postgres
+
+### Inspecting 
+
+```shell
+npm run db:shell
+```
+
+### Cleanup Postgres
+
+The Postgres container started by `docker-compose` can be stopped with `Ctrl + C`. To remove it fully:
+
+```shell
+docker-compose -p sync rm
+
+Going to remove ...
+Are you sure? [yN] y
+```
+
+## Tests
+
+### Running Unit Tests
+
+```shell
+npm run test
+```
+
+### Running Integration Tests
+
+Start the database first:
+
+```shell
+docker-compose -p sync up
+```
+
+In another session, run the tests:
+
+```shell
+npm run test:integration
+```
+
+### Running Individual Tests
+
+Assuming you have `npm@5.2.0` or greater you can do the following:
+
+```shell
+npx ava /path/to/test.js
+```
+
+`npx` will ensure the correct version of ava (specified in package.json) is used.
+
+### Debugging Individual Tests
+
+The easiest way to debug tests is using [Chrome DevTools](https://developers.google.com/web/tools/chrome-devtools/). Use [inspect-process](https://npm.im/inspect-process) to easily launch a debugging session with Chrome DevTools.
+
+```shell
+npm install -g inspect-process
+```
+
+1. In chrome go to [`chrome://inspect`](chrome://inspect/)
+1. Click on 'Open dedicated DevTools for Node.' This will open a new DevTools window.
+1. Click on 'add folder to workspace' and use the wizard to open this project.
+1. Go to the appropriate test file (or code that's being tested) and set a breakpoint
+1. Now run the individual test as follows:
+
+```shell
+inspect node_modules/ava/profile.js some/test/file.js
+```
+
+### Running all tests with CircleCi CLI
+
+1. Install [CircleCi CLI](https://circleci.com/docs/2.0/local-cli/)
+1. Execute these commands locally:
+
+   ```shell
+   # CircleCi CLI doesn't support workflows yet
+   circleci build --job unit_test
+   circleci build --job integration_test
+   ```
 
 ## Configuration
 
@@ -75,173 +212,6 @@ $ echo '
 ```
 Currently only Postgres channel listening is supported.
 
-## Getting Started
-
-1. Install Dependencies
-
-   ```shell
-   npm install
-   ```
-
-1. Start and initialize the database
-
-   Use docker compose to start the database(s).
-
-   ```shell
-   docker-compose -p sync up
-   ```
-
-   There are 2 Postgres instances defined in docker-compose configuration:
-
-   1. For storing the configuration of the sync server itself
-   1. For storing the [Memeolist](#whats-memeolist) data.
-
-   Since docker-compose is only used with development, starting up the Postgres instance for [Memeolist](#whats-memeolist) will not cause any harm. 
-
-1. Initialize the database.
-
-   **WARNING: These are destructive actions.** they drop and recreate the tables every time.
-
-   No sample schema/resolvers
-
-   ```shell   
-   npm run db:init
-   ```
-
-   Commands below are useful for **local development** which seed the database with config and tables
-for [Memeolist](#whats-memeolist) sample application. 
-
-   Sample schema/resolvers for memeolist - in-memory data source
-   ```shell
-   npm run db:init:memeo:inmem
-   ```
-
-   Sample schema/resolvers for memeolist - Postgres data source
-   ```shell
-   npm run db:init:memeo:postgres
-   ```
-
-1. Start the Server
-
-   ```shell
-   npm run dev
-   ```
-
-1. Go to http://localhost:8000/graphql for an interactive query browser.
-
-   The **graphql endpoint** is at `/graphql`.   
-   The **subscriptions websocket** is at `/subscriptions`.
-
-
-## Using Keycloak for local development
-
-
-To use Keycloak for authorisation, set the env var
-
-```
-KEYCLOAK_CONFIG_FILE
-```
-to point to a config file. An example can be seen at [./keycloak/keycloak.json](./keycloak/keycloak.json).
-To use Keycloak with Sync, complete the steps above in the [Getting Started](#getting-started) section to create and initialise the database, then start the application by running:
-
-```shell
-npm run dev
-```
-
-If you do not have any running keycloak instance it can be run using docker compose with the rest of the required containers for sync server. Use separate docker compose file located at [./keycloak/](./keycloak/) folder:
-
-```
-npm run compose:sync:keycloak
-```
-
-Once the application is started, visit http://localhost:8000/graphql. You should be redirected to the login for your realm. You can log in here with the example credentials:
-
-Once logged in and you are redirected to the Graphql playground you will need to (for the time being) manually attach the Bearer token used by Keycloak to each request. To get this token, visit http://localhost:8000/token and put this whole string in the HTTP HEADERS section of Graphql Playground.
-
-Each request should now be autorised via Keycloak. To logout visit http://localhost:8000/logout.
-
-
-
-## Postgres
-
-### Inspecting 
-
-```shell
-npm run db:shell
-```
-
-### Cleanup Postgres
-
-The Postgres container started by `docker-compose` can be stopped with `Ctrl + C`. To remove it fully:
-
-```shell
-docker-compose -p sync rm
-
-Going to remove ...
-Are you sure? [yN] y
-```
-
-## Tests
-
-### Running Unit Tests
-
-```shell
-npm run test:unit
-```
-
-### Running Integration tests:
-
-   Start the database first:
-
-   ```shell
-   docker-compose -p sync up
-   ```
-
-   In another session, run the tests:
-   
-   ```shell
-   npm run test:integration
-   ```
-
-### Running all tests with CircleCi CLI
-
-1. Install [CircleCi CLI](https://circleci.com/docs/2.0/local-cli/)
-1. Execute these command locally:
-
-   ```shell
-   # CircleCi CLI doesn't support workflows yet
-   circleci build --job unit_test
-   circleci build --job integration_test
-   ```
-
-### Running Individual Tests
-
-Assuming you have `npm@5.2.0` or greater you can do the following:
-
-```shell
-npx ava /path/to/test.js
-```
-
-`npx` will ensure the correct version of ava (specified in package.json) is used.
-
-### Debugging Individual Tests
-
-The easiest way to debug tests is using [Chrome DevTools](https://developers.google.com/web/tools/chrome-devtools/). Use [inspect-process](https://npm.im/inspect-process) to easily launch a debugging session with Chrome DevTools.
-
-```shell
-npm install -g inspect-process
-```
-
-1. In chrome go to [`chrome://inspect`](chrome://inspect/)
-1. Click on 'Open dedicated DevTools for Node.' This will open a new DevTools window.
-1. Click on 'add folder to workspace' and use the wizard to open this project.
-1. Go to the appropriate test file (or code that's being tested) and set a breakpoint
-1. Now run the individual test as follows:
-
-```shell
-inspect node_modules/ava/profile.js some/test/file.js
-```
-
 The DevTools window should automatically connect to the debugging session and execution should pause if some breakpoints are set.
 
 ## Memeolist
@@ -274,6 +244,27 @@ npm run dev:memeo
 
 By default, the server starts without any authentication and authorization mechanism configured. 
 Please follow the documentation below to see how to enable support for this feature.
+
+## Using Keycloak during Local Development
+
+To use Keycloak for authorisation, set the environment variable `KEYCLOAK_CONFIG_FILE` to point to a config file. An example can be seen at [./keycloak/keycloak.json](./keycloak/keycloak.json).
+To use Keycloak with Sync, complete the steps above in the [Getting Started](#getting-started) section to create and initialise the database, then start the application by running:
+
+```shell
+npm run dev
+```
+
+If you do not have any running keycloak instance, it can be run with docker-compose. Use the separate docker compose file located at the [./keycloak/](./keycloak/) folder.
+
+```
+npm run compose:sync:keycloak
+```
+
+Once the application is started, visit http://localhost:8000/graphql. You should be redirected to the login for your realm. You can log in here with the example credentials.
+
+Once logged in and you are redirected to the Graphql playground you will need to (for the time being) manually attach the Bearer token used by Keycloak to each request. To get this token, visit http://localhost:8000/token and put this whole string in the HTTP HEADERS section of Graphql Playground.
+
+Each request should now be autorised via Keycloak. To logout visit http://localhost:8000/logout.
 
 
 ### Keycloak SSO support
