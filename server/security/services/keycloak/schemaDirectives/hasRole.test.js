@@ -1,5 +1,6 @@
 const { test } = require('ava')
 const HasRoleDirective = require('./hasRole')
+const KeycloakAuthContextProvider = require('../AuthContextProvider')
 
 test('context.auth.hasRole is called', async (t) => {
   t.plan(3)
@@ -23,10 +24,10 @@ test('context.auth.hasRole is called', async (t) => {
 
   const root = {}
   const args = {}
-  const context = {
-    auth: {
-      getToken: () => {
-        return {
+  const req = {
+    kauth: {
+      grant: {
+        access_token: {
           hasRole: (role) => {
             t.pass()
             t.deepEqual(role, directiveArgs.role)
@@ -36,6 +37,11 @@ test('context.auth.hasRole is called', async (t) => {
       }
     }
   }
+  const context = {
+    request: req,
+    auth: new KeycloakAuthContextProvider(req)
+  }
+
   const info = {
     parentType: {
       name: 'testParent'
@@ -67,10 +73,10 @@ test('visitFieldDefinition accepts an array of roles', async (t) => {
 
   const root = {}
   const args = {}
-  const context = {
-    auth: {
-      getToken: () => {
-        return {
+  const req = {
+    kauth: {
+      grant: {
+        access_token: {
           hasRole: (role) => {
             t.log(`checking has role ${role}`)
             t.pass()
@@ -80,6 +86,11 @@ test('visitFieldDefinition accepts an array of roles', async (t) => {
       }
     }
   }
+  const context = {
+    request: req,
+    auth: new KeycloakAuthContextProvider(req)
+  }
+
   const info = {
     parentType: {
       name: 'testParent'
@@ -113,10 +124,10 @@ test('if context.auth.getToken.hasRole() is false, then an error is returned and
 
   const root = {}
   const args = {}
-  const context = {
-    auth: {
-      getToken: () => {
-        return {
+  const req = {
+    kauth: {
+      grant: {
+        access_token: {
           hasRole: (role) => {
             t.deepEqual(role, directiveArgs.role)
             return false
@@ -125,6 +136,11 @@ test('if context.auth.getToken.hasRole() is false, then an error is returned and
       }
     }
   }
+  const context = {
+    request: req,
+    auth: new KeycloakAuthContextProvider(req)
+  }
+
   const info = {
     parentType: {
       name: 'testParent'
@@ -163,21 +179,24 @@ test('if hasRole arguments are invalid, visitSchemaDirective does not throw, but
 
   const root = {}
   const args = {}
-  const context = {
-    auth: {
-      getToken: () => {
-        return {
+  const req = {
+    id: '123',
+    kauth: {
+      grant: {
+        access_token: {
           hasRole: (role) => {
             t.deepEqual(role, directiveArgs.role)
             return false
           }
         }
       }
-    },
-    request: {
-      id: '123'
     }
   }
+  const context = {
+    request: req,
+    auth: new KeycloakAuthContextProvider(req)
+  }
+
   const info = {
     parentType: {
       name: 'testParent'

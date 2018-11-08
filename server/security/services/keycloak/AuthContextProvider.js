@@ -9,6 +9,18 @@ class KeycloakAuthContextProvider {
     }
     return null
   }
+
+  isAuthenticated () {
+    return this.getToken() !== null
+  }
+
+  getTokenContent () {
+    return this.isAuthenticated() ? this.getToken().content : null
+  }
+
+  hasRole (role) {
+    return this.isAuthenticated() && this.getToken().hasRole(role)
+  }
 }
 
 module.exports = KeycloakAuthContextProvider
