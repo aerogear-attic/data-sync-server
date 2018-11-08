@@ -2,7 +2,7 @@ const { test } = require('ava')
 const HasRoleDirective = require('./hasRole')
 const KeycloakAuthContextProvider = require('../AuthContextProvider')
 
-test('context.auth.hasRole is called', async (t) => {
+test('context.auth.hasRole() is called', async (t) => {
   t.plan(3)
   const directiveArgs = {
     role: 'admin'
@@ -100,7 +100,48 @@ test('visitFieldDefinition accepts an array of roles', async (t) => {
   await field.resolve(root, args, context, info)
 })
 
-test('if context.auth.getToken.hasRole() is false, then an error is returned and the original resolver will not execute', async (t) => {
+test('if there is no authentication, then an error is returned and the original resolver will not execute', async (t) => {
+  const directiveArgs = {
+    role: 'admin'
+  }
+
+  const directive = new HasRoleDirective({
+    name: 'testHasRoleDirective',
+    args: directiveArgs
+  })
+
+  const field = {
+    resolve: (root, args, context, info) => {
+      return new Promise((resolve, reject) => {
+        t.fail('the original resolver should never be called when an auth error is thrown')
+        return reject(new Error('the original resolver should never be called when an auth error is thrown'))
+      })
+    },
+    name: 'testField'
+  }
+
+  directive.visitFieldDefinition(field)
+
+  const root = {}
+  const args = {}
+  const req = {}
+  const context = {
+    request: req,
+    auth: new KeycloakAuthContextProvider(req)
+  }
+
+  const info = {
+    parentType: {
+      name: 'testParent'
+    }
+  }
+
+  await t.throws(async () => {
+    await field.resolve(root, args, context, info)
+  }, `Unable to find authentication. Authorization is required for field ${field.name} on parent ${info.parentType.name}. Must have one of the following roles: [${directiveArgs.role}]`)
+})
+
+test('if token does not have the required role, then an error is returned and the original resolver will not execute', async (t) => {
   const directiveArgs = {
     role: 'admin'
   }
