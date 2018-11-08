@@ -22,16 +22,21 @@ class HasRoleDirective extends SchemaDirectiveVisitor {
         throw newInternalServerError(context)
       }
 
-      const token = context.auth.getToken()
+      if (!context.auth || !context.auth.isAuthenticated()) {
+        const AuthorizationErrorMessage = `Unable to find authentication. Authorization is required for field ${field.name} on parent ${info.parentType.name}. Must have one of the following roles: [${roles}]`
+        log.error({ error: AuthorizationErrorMessage })
+        throw new ForbiddenError(AuthorizationErrorMessage)
+      }
+
       let foundRole = null // this will be the role the user was successfully authorized on
 
       foundRole = roles.find((role) => {
-        return token.hasRole(role)
+        return context.auth.hasRole(role)
       })
 
       if (!foundRole) {
         const AuthorizationErrorMessage = `user is not authorized for field ${field.name} on parent ${info.parentType.name}. Must have one of the following roles: [${roles}]`
-        log.error({ error: AuthorizationErrorMessage, details: token.content })
+        log.error({ error: AuthorizationErrorMessage, details: context.auth.getTokenContent() })
         throw new ForbiddenError(AuthorizationErrorMessage)
       }
 

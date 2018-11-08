@@ -42,7 +42,9 @@ function auditLog (success, context, info, parent, args, msg) {
         parent: parent,
         arguments: args,
         dataSourceType: info.dataSourceType || '',
-        clientInfo: context ? context.clientInfo : undefined
+        clientInfo: context ? context.clientInfo : undefined,
+        authenticated: !!(context && context.auth && context.auth.isAuthenticated()),
+        userInfo: (context && context.auth) ? context.auth.getTokenContent() : undefined
       }
     })
   }
