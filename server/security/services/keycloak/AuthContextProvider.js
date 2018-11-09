@@ -1,17 +1,16 @@
 class KeycloakAuthContextProvider {
   constructor (request) {
     this.request = request
+    this.accessToken = (request && request.kauth && request.kauth.grant) ? request.kauth.grant.access_token : undefined
+    this.authenticated = !!(this.accessToken)
   }
 
   getToken () {
-    if (this.request.kauth && this.request.kauth.grant && this.request.kauth.grant.access_token) {
-      return this.request.kauth.grant.access_token
-    }
-    return null
+    return this.accessToken
   }
 
   isAuthenticated () {
-    return this.getToken() !== null
+    return this.authenticated
   }
 
   getTokenContent () {
