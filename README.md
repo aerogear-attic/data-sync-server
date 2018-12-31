@@ -1,4 +1,4 @@
-# AeroGear Sync Server
+# AeroGear Sync Server (DEPRECATED)
 
 [![circle-ci](https://img.shields.io/circleci/project/github/aerogear/data-sync-server/master.svg)](https://circleci.com/gh/aerogear/data-sync-server)
 [![Coverage Status](https://img.shields.io/coveralls/github/aerogear/data-sync-server.svg)](https://codecov.io/gh/aerogear/data-sync-server)
@@ -9,6 +9,8 @@
 [![License](https://img.shields.io/:license-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 GraphQL based data sync server for mobile, with backend integration capabilities
+
+*Project moved to [apollo-voyager-server](https://github.com/aerogear/apollo-voyager-server)* repository
 
 ## Table of Contents
 
